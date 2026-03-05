@@ -8,6 +8,8 @@ This documentation defines a defendable architecture for a low-cost, four-site s
 - All inter-site traffic traverses private WAN circuits and is additionally protected by IPsec tunnels between site edge pairs
 - Each site has an independent local internet connection for direct internet breakout
 - One designated site has a redundant internet edge with dual ISP circuits terminating on separate edge nodes
+- Dedicated vendor-agnostic stateful firewall pair (FW-A / FW-B) at each site, sitting between the edge routers and internal switching
+- Remote access VPN at each site — terminating on the firewall appliance or a dedicated VM — reachable via `vpn.example.com`
 - Guest traffic exits at the local site internet connection; it is never backhauled over the inter-site WAN
 - Site-level failure domains with no stretched Layer 2 between sites
 - VM-first compute with Podman for containerized workloads

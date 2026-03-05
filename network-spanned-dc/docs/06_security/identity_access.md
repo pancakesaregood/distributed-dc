@@ -6,9 +6,11 @@
 - Unique named accounts for all privileged access.
 
 ## MFA and Session Controls
-- MFA required for all privileged and remote access.
+- MFA required for all privileged and remote access, including all VPN connections.
+- VPN authentication integrates with the site AD domain controller. AD group membership determines which firewall zones are accessible after tunnel establishment.
 - Session recording for high-risk administration paths.
 - Time-bound elevation for emergency or break-glass operations.
+- VPN sessions are logged with user identity, source IP, connection duration, and destination zones accessed. Logs are shipped to the centralized logging stack.
 
 ## Service Account Governance
 - Separate service identities for production and backup systems.

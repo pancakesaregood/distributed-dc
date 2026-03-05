@@ -1,7 +1,7 @@
 ﻿# Architecture Overview
 
 ## Executive Summary
-This design defines a low-cost, four-site spanned datacenter architecture that prioritizes fault isolation, operational simplicity, and open-source tooling. Each site is an independent failure domain with local compute and network control planes. Sites are interconnected over a vendor-managed Layer 3 WAN handoff, and service continuity across sites is achieved through routing and data replication rather than Layer 2 extension.
+This design defines a low-cost, four-site spanned datacenter architecture that prioritizes fault isolation, operational simplicity, and open-source tooling. Each site is an independent failure domain with local compute and network control planes. Sites are interconnected over a vendor-managed Layer 3 WAN handoff, and service continuity across sites is achieved through routing and data replication rather than Layer 2 extension. Each site includes a dedicated vendor-agnostic stateful firewall pair that enforces zone policy and terminates remote access VPN, providing a clear inside/outside security boundary between the routed edge and internal segments.
 
 ## Core Design Principles
 - Layer 3 between sites.
@@ -21,8 +21,10 @@ This design defines a low-cost, four-site spanned datacenter architecture that p
 - Compute platform must support VMs and Podman containers.
 
 ## High-Level Architecture
-- Per site: edge pair, ToR pair, compute cluster, local backup target, and independent internet connection.
+- Per site: edge pair (L3 router), firewall pair (FW-A / FW-B), ToR pair, compute cluster, local backup target, and independent internet connection.
+- Traffic path inbound: edge pair → firewall outside interface → firewall inside interface → ToR → internal segments.
 - Inter-site: prefix-based routing with BGP as primary exchange method. BGP sessions and all data-plane traffic run over IPsec-encrypted tunnels between site edge pairs.
+- Remote access VPN: inbound VPN connections arrive at the edge, are forwarded to the firewall outside interface, and terminate on the firewall appliance or a dedicated VPN VM. Authenticated clients are granted access to internal zones per group policy. Reachable via `vpn.example.com`.
 - Internet egress: each site breaks out internet traffic locally through the site edge pair. Guest traffic is policy-routed to the local internet L3 interface and is blocked from entering the inter-site WAN.
 - Data resiliency: local fast restore plus cross-site replicated copies. All cross-site replication traffic is encrypted via the IPsec inter-site tunnels.
 - Optional global anycast for DNS and internal ingress endpoints.

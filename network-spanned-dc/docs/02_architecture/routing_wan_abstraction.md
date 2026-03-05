@@ -78,3 +78,10 @@ One site is designated to have full internet edge redundancy:
 - Guest traffic is explicitly blocked from entering the IPsec inter-site WAN tunnels.
 - Guest traffic must not reach any internal segment; the only permitted destination is the internet via the local edge.
 - If the local internet circuit is unavailable, guest service is suspended at that site. Guest traffic is not rerouted over the WAN to another site's internet path by default.
+
+### VPN Inbound Routing
+- Remote access VPN connections arrive from the internet at the edge router's internet-facing interface.
+- The edge router forwards VPN traffic to the firewall outside interface. The firewall handles VPN termination.
+- VPN can terminate on the firewall appliance itself (preferred for simplicity) or via DNAT to a dedicated VPN VM in the DMZ zone.
+- Authenticated VPN sessions are placed in the VPN zone on the firewall. Zone policy then permits traffic to inside zones based on group membership.
+- The public FQDN `vpn.example.com` resolves to the VPN endpoint IP at each site. DNS can be managed as per-site records or via GeoDNS for automatic client routing to the nearest site.

@@ -5,10 +5,12 @@
 - Racks: `r01`, `r02` per site.
 
 ## Device Naming
-- Edge: `site-a-edge-a`, `site-a-edge-b`.
+- Edge router: `site-a-edge-a`, `site-a-edge-b`.
+- Firewall: `site-a-fw-a`, `site-a-fw-b`.
 - ToR: `site-a-tor-a`, `site-a-tor-b`.
 - Hypervisor: `site-a-r01-hv01`.
 - Storage: `site-a-r02-st01`.
+- VPN VM (if not on-box on firewall): `site-a-vpn-01`.
 
 ## Service Naming
 - Tier 1 stateless apps: `svc-<name>-aa`.

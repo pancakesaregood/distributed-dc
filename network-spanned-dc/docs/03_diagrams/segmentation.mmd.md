@@ -1,7 +1,11 @@
 ﻿# Segmentation and Allowed Flows
 
+All zone enforcement is performed by FW-A / FW-B. Default deny between all zones.
+
 ```mermaid
 graph LR
+  OUTSIDE[Outside\nEdge Router Side]
+  VPN[VPN Zone\nAuthenticated Sessions]
   MGMT[Management]
   SRV[Servers and VMs]
   CTR[Containers]
@@ -9,8 +13,13 @@ graph LR
   IOT[IoT]
   GST[Guest]
   DMZ[DMZ]
-  INT[(Internet or External Services)]
+  INT[(Internet)]
   L3OUT[Local L3 Internet\nInterface at Edge]
+
+  OUTSIDE -->|VPN handshake\nAD auth + MFA| VPN
+  VPN -->|Per AD group policy| MGMT
+  VPN -->|Per AD group policy| SRV
+  VPN -->|Per AD group policy| USR
 
   USR -->|Admin + App Access| SRV
   SRV -->|Service Calls| CTR
@@ -25,7 +34,8 @@ graph LR
 
   GST -.Denied.-> SRV
   GST -.Denied.-> MGMT
-  GST -.Blocked from WAN tunnels.-> SRV
+  GST -.Blocked from WAN tunnels.-> OUTSIDE
   IOT -.Denied.-> MGMT
   USR -.Restricted.-> IOT
+  VPN -.Denied without policy.-> MGMT
 ```

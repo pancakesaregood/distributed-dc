@@ -7,14 +7,22 @@
 - User and endpoint domain for internal clients.
 - IoT and guest domains with restricted access.
 - DMZ domain for externally exposed internal services.
+- VPN domain: terminated remote access sessions before they are admitted to any inside zone. Traffic in this domain has been authenticated but not yet permitted to a specific inside zone.
 - Loopback and transit domains for routing control.
 - Internet domain: local ISP circuit on the site edge pair, used for direct internet breakout. Separate from the inter-site WAN domain.
 
 ## Inter-Site Connectivity Model
 - Sites exchange summarized routes over vendor-managed L3 handoff delivered as a private circuit service.
 - All inter-site traffic is carried inside IPsec tunnels terminated on site edge pairs. The WAN provider carries encrypted packets; it has no visibility into payload content.
-- East-west traffic between sites is routed through edge policy controls and enters the IPsec overlay before leaving the site edge.
+- East-west traffic between sites passes through the site firewall pair before reaching the edge router and entering the IPsec overlay.
 - No VLAN or broadcast domain is extended across sites.
+
+## Site Traffic Path
+Inbound: `Edge pair (outside) → Firewall outside interface → Firewall zone policy → Firewall inside interface → ToR → Internal segment`
+
+Outbound: `Internal segment → ToR → Firewall inside interface → Firewall zone policy → Firewall outside interface → Edge pair → WAN or Internet`
+
+VPN inbound: `Internet → Edge pair → Firewall outside interface → VPN termination (on-box or VPN VM via DMZ) → Firewall zone policy → Firewall inside interface → ToR → Permitted internal segment`
 
 ## Control Plane Expectations
 - BGP preferred for dynamic route exchange. BGP sessions run over the IPsec inter-site tunnels and are additionally hardened with TCP-AO or MD5 session authentication.

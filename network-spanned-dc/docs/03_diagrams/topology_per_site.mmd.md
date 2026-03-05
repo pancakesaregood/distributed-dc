@@ -1,13 +1,15 @@
 ﻿# Per-Site Logical Rack Topology
 
-Standard site template. The designated redundant internet site uses two separate ISP circuits (ISP-1 on Edge-A, ISP-2 on Edge-B) instead of a single shared circuit.
+Standard site template. The designated redundant internet site uses two separate ISP circuits (ISP-1 on Edge-A, ISP-2 on Edge-B) instead of a single shared circuit. VPN can terminate on FW-A/FW-B directly or via DNAT to a VPN VM in a DMZ segment.
 
 ```mermaid
 graph TD
   subgraph Site[Single Site Template - 1 to 2 Racks]
     subgraph Rack1[Rack 1]
-      E1[Edge-A]
-      E2[Edge-B]
+      E1[Edge-A\nL3 Router]
+      E2[Edge-B\nL3 Router]
+      F1[FW-A\nFirewall]
+      F2[FW-B\nFirewall]
       T1[ToR-A]
       T2[ToR-B]
       H1[HV-01]
@@ -22,19 +24,24 @@ graph TD
     end
 
     WAN[Vendor L3 Handoff\nPrivate Circuit]
-    INET[Local Internet\nISP Circuit]
+    INET[Local Internet\nISP Circuit\nvpn.example.com]
     MGMT[Mgmt Services VMs]
   end
 
   WAN -->|IPsec inter-site tunnels| E1
   WAN -->|IPsec inter-site tunnels| E2
-  INET -->|Local internet breakout| E1
-  INET -->|Local internet breakout| E2
+  INET -->|Internet + VPN inbound| E1
+  INET -->|Internet + VPN inbound| E2
 
-  E1 --> T1
-  E1 --> T2
-  E2 --> T1
-  E2 --> T2
+  E1 -->|Outside interface| F1
+  E1 -->|Outside interface| F2
+  E2 -->|Outside interface| F1
+  E2 -->|Outside interface| F2
+
+  F1 -->|Inside interface| T1
+  F1 -->|Inside interface| T2
+  F2 -->|Inside interface| T1
+  F2 -->|Inside interface| T2
 
   T1 --> H1
   T2 --> H1
