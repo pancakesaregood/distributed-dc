@@ -18,6 +18,9 @@
 - Private WAN circuits provide network-layer isolation in addition to the IPsec encryption layer.
 - BGP sessions between site edges run inside IPsec tunnels and are additionally protected with TCP-AO or MD5 session authentication.
 - IPsec tunnel health is monitored and failures alert at the same priority as WAN path failures.
+- Each site has a local internet circuit for direct internet breakout. Internet-facing edge interfaces are treated as untrusted and subject to strict ingress and egress filtering.
+- Guest zone traffic exits only through the local site internet interface. Guest traffic is explicitly blocked from entering IPsec inter-site tunnels or reaching any internal zone.
+- One designated site has dual ISP circuits terminating on separate edge nodes for redundant internet egress.
 - Edge policy restricts inter-site and north-south flows to approved ports.
 - Guest and IoT zones isolated from management and server zones.
 - Control-plane route filters prevent unauthorized prefix advertisement.

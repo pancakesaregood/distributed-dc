@@ -8,6 +8,7 @@
 - IoT and guest domains with restricted access.
 - DMZ domain for externally exposed internal services.
 - Loopback and transit domains for routing control.
+- Internet domain: local ISP circuit on the site edge pair, used for direct internet breakout. Separate from the inter-site WAN domain.
 
 ## Inter-Site Connectivity Model
 - Sites exchange summarized routes over vendor-managed L3 handoff delivered as a private circuit service.
@@ -23,5 +24,6 @@
 ## Data Plane Expectations
 - Service traffic uses IPv6 ULA internally.
 - Security zones are enforced at site edge and internal policy points.
-- All data-plane traffic leaving a site edge is encrypted by the IPsec inter-site tunnel before reaching the WAN handoff.
+- All data-plane traffic leaving a site edge toward other sites is encrypted by the IPsec inter-site tunnel before reaching the WAN handoff.
+- Internet-destined traffic exits through the local site internet interface, not the WAN. Guest traffic uses local internet breakout only and is blocked from the WAN.
 - Cross-site traffic for stateful services is replication-oriented, not chatty transaction-by-transaction, unless latency permits. Replication streams are encrypted end-to-end by the IPsec overlay; application-layer encryption is additional and optional.

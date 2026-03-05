@@ -1,5 +1,7 @@
 ﻿# Per-Site Logical Rack Topology
 
+Standard site template. The designated redundant internet site uses two separate ISP circuits (ISP-1 on Edge-A, ISP-2 on Edge-B) instead of a single shared circuit.
+
 ```mermaid
 graph TD
   subgraph Site[Single Site Template - 1 to 2 Racks]
@@ -19,12 +21,16 @@ graph TD
       S2[Storage-02]
     end
 
-    WAN[Vendor L3 Handoff]
+    WAN[Vendor L3 Handoff\nPrivate Circuit]
+    INET[Local Internet\nISP Circuit]
     MGMT[Mgmt Services VMs]
   end
 
-  WAN --> E1
-  WAN --> E2
+  WAN -->|IPsec inter-site tunnels| E1
+  WAN -->|IPsec inter-site tunnels| E2
+  INET -->|Local internet breakout| E1
+  INET -->|Local internet breakout| E2
+
   E1 --> T1
   E1 --> T2
   E2 --> T1

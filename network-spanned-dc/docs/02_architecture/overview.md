@@ -15,12 +15,15 @@ This design defines a low-cost, four-site spanned datacenter architecture that p
 ## Constraints
 - Budget-sensitive architecture with low recurring licensing overhead.
 - WAN transport is abstracted as a vendor-managed L3 service.
+- Each site has an independent local internet connection. Internet traffic breaks out locally and is never backhauled over the inter-site WAN.
+- One designated site has a redundant internet edge: dual ISP circuits, each terminating on a separate edge node, providing full edge and ISP redundancy for internet egress. All other sites use a single ISP circuit presented across both edge nodes.
 - Site design assumes 1 to 2 racks per location.
 - Compute platform must support VMs and Podman containers.
 
 ## High-Level Architecture
-- Per site: edge pair, ToR pair, compute cluster, and local backup target.
+- Per site: edge pair, ToR pair, compute cluster, local backup target, and independent internet connection.
 - Inter-site: prefix-based routing with BGP as primary exchange method. BGP sessions and all data-plane traffic run over IPsec-encrypted tunnels between site edge pairs.
+- Internet egress: each site breaks out internet traffic locally through the site edge pair. Guest traffic is policy-routed to the local internet L3 interface and is blocked from entering the inter-site WAN.
 - Data resiliency: local fast restore plus cross-site replicated copies. All cross-site replication traffic is encrypted via the IPsec inter-site tunnels.
 - Optional global anycast for DNS and internal ingress endpoints.
 

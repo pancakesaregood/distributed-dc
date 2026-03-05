@@ -6,6 +6,9 @@ This documentation defines a defendable architecture for a low-cost, four-site s
 - IPv6 ULA plan anchored on `fdca:fcaf:e000::/48`
 - Four sites connected through a vendor-managed L3 WAN abstraction
 - All inter-site traffic traverses private WAN circuits and is additionally protected by IPsec tunnels between site edge pairs
+- Each site has an independent local internet connection for direct internet breakout
+- One designated site has a redundant internet edge with dual ISP circuits terminating on separate edge nodes
+- Guest traffic exits at the local site internet connection; it is never backhauled over the inter-site WAN
 - Site-level failure domains with no stretched Layer 2 between sites
 - VM-first compute with Podman for containerized workloads
 - Service spanning through replication and routing, not shared L2 domains

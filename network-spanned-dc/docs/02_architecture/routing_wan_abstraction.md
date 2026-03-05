@@ -56,3 +56,25 @@ Approach:
 - IKEv2 pre-shared keys or certificate-based authentication; certificate-based preferred for rotation and audit.
 - Tunnel state is monitored and failures generate high-priority alerts equivalent to WAN path loss alerts.
 - IPsec SA lifetime and rekeying parameters are documented and consistent across all sites.
+
+## Internet Breakout Model
+Each site has an independent local internet connection terminating on the site edge pair. Internet traffic exits directly at the local site and is never backhauled over the inter-site WAN.
+
+### Standard Sites
+- A single ISP circuit connects to both Edge-A and Edge-B at the site.
+- Edge nodes share the ISP circuit via active-standby or ECMP depending on ISP handoff capability.
+- Loss of one edge node: internet traffic fails over to the surviving edge node automatically.
+- Loss of the ISP circuit: site loses internet egress; inter-site WAN and private services remain unaffected.
+
+### Designated Redundant Internet Site
+One site is designated to have full internet edge redundancy:
+- Edge-A connects to ISP-1 (primary internet circuit).
+- Edge-B connects to ISP-2 (secondary internet circuit from a different provider).
+- BGP or policy-based routing selects the preferred internet path; failover is automatic on path loss.
+- This site can optionally provide internet fallback egress for other sites during a local ISP outage, via the inter-site WAN, if explicitly enabled in policy. This path must be approved in design governance before activation.
+
+### Guest Internet Routing
+- Guest zone traffic is policy-routed to the local site internet L3 interface.
+- Guest traffic is explicitly blocked from entering the IPsec inter-site WAN tunnels.
+- Guest traffic must not reach any internal segment; the only permitted destination is the internet via the local edge.
+- If the local internet circuit is unavailable, guest service is suspended at that site. Guest traffic is not rerouted over the WAN to another site's internet path by default.
