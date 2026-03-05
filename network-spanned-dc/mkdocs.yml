@@ -32,6 +32,7 @@ nav:
       - Failover Matrix Diagram: 03_diagrams/failover_matrix.mmd.md
       - DHCP and AD Services: 03_diagrams/dhcp_ad_services.mmd.md
       - Remote Access VPN Flow: 03_diagrams/vpn_access.mmd.md
+      - Client and Service Interactions: 03_diagrams/client_service_interactions.mmd.md
   - 04 Failover and DR:
       - Failover Scenarios: 04_failover_dr/failover_scenarios.md
       - RTO and RPO Targets: 04_failover_dr/rto_rpo_targets.md

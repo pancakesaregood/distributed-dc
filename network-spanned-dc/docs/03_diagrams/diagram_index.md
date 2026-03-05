@@ -9,5 +9,6 @@
 - [Failover Matrix](failover_matrix.mmd.md)
 - [DHCP and Active Directory Services](dhcp_ad_services.mmd.md)
 - [Remote Access VPN Flow](vpn_access.mmd.md)
+- [Client and Service Interactions](client_service_interactions.mmd.md)
 
 All diagrams are Mermaid and render directly in Markdown-capable viewers.

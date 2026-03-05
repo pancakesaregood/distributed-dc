@@ -29,10 +29,10 @@ graph LR
   C1 --> CB
   D1 --> DB
 
-  AB -->|Cross-site replication\nIPsec-encrypted WAN tunnel| BB
-  BB -->|Cross-site replication\nIPsec-encrypted WAN tunnel| CB
-  CB -->|Cross-site replication\nIPsec-encrypted WAN tunnel| DB
-  DB -->|Cross-site replication\nIPsec-encrypted WAN tunnel| AB
+  AB -->|Cross-site replication - IPsec encrypted| BB
+  BB -->|Cross-site replication - IPsec encrypted| CB
+  CB -->|Cross-site replication - IPsec encrypted| DB
+  DB -->|Cross-site replication - IPsec encrypted| AB
 
   AB -->|IPsec-encrypted WAN tunnel| IMM
   BB -->|IPsec-encrypted WAN tunnel| IMM

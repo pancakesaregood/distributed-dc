@@ -4,8 +4,8 @@ All zone enforcement is performed by FW-A / FW-B. Default deny between all zones
 
 ```mermaid
 graph LR
-  OUTSIDE[Outside\nEdge Router Side]
-  VPN[VPN Zone\nAuthenticated Sessions]
+  OUTSIDE["Outside - Edge Router Side"]
+  VPN["VPN Zone<br/>Authenticated Sessions"]
   MGMT[Management]
   SRV[Servers and VMs]
   CTR[Containers]
@@ -14,9 +14,9 @@ graph LR
   GST[Guest]
   DMZ[DMZ]
   INT[(Internet)]
-  L3OUT[Local L3 Internet\nInterface at Edge]
+  L3OUT["Local L3 Internet<br/>Interface at Edge"]
 
-  OUTSIDE -->|VPN handshake\nAD auth + MFA| VPN
+  OUTSIDE -->|VPN handshake - AD auth + MFA| VPN
   VPN -->|Per AD group policy| MGMT
   VPN -->|Per AD group policy| SRV
   VPN -->|Per AD group policy| USR
@@ -27,9 +27,9 @@ graph LR
   MGMT -->|Privileged Admin| SRV
   MGMT -->|Privileged Admin| CTR
   IOT -->|Telemetry Only| SRV
-  GST -->|Local breakout only\nno WAN backhaul| L3OUT
+  GST -->|Local breakout only - no WAN backhaul| L3OUT
   L3OUT --> INT
-  SRV -->|Controlled egress\nDNS NTP packages| L3OUT
+  SRV -->|Controlled egress - DNS/NTP/packages| L3OUT
   DMZ -->|Controlled egress| L3OUT
 
   GST -.Denied.-> SRV

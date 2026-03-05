@@ -7,7 +7,7 @@ graph TD
 
   subgraph Internet
     USER[Remote User]
-    DNS[Public DNS\nvpn.example.com]
+    DNS["Public DNS<br/>vpn.example.com"]
   end
 
   subgraph SITE[Site - Any of Site A through D]
@@ -17,9 +17,9 @@ graph TD
     end
 
     subgraph FW[Firewall Pair - FW-A and FW-B]
-      FWOUT[Outside Interface\nUntrusted Zone]
-      VPNTERM[VPN Termination\nOn-box or DNAT to VPN VM]
-      FWPOL[Zone Policy\nAD Group Evaluation]
+      FWOUT["Outside Interface<br/>Untrusted Zone"]
+      VPNTERM["VPN Termination<br/>On-box or DNAT to VPN VM"]
+      FWPOL["Zone Policy<br/>AD Group Evaluation"]
       FWIN[Inside Interface]
     end
 
@@ -32,8 +32,8 @@ graph TD
 
   USER -->|1 Resolve FQDN| DNS
   DNS -->|2 Site VPN endpoint IP| USER
-  USER -->|3 VPN connection\nTLS or IPsec remote access| EA
-  USER -->|3 VPN connection\nfailover path| EB
+  USER -->|3 VPN connection - TLS or IPsec| EA
+  USER -->|3 VPN connection - failover| EB
   EA -->|4 Forward to FW outside| FWOUT
   EB -->|4 Forward to FW outside| FWOUT
   FWOUT --> VPNTERM

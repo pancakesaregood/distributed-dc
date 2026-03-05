@@ -9,35 +9,35 @@ graph TD
 
   subgraph SA[Site A]
     subgraph ADSA[AD VMs - Servers Segment fdca:fcaf:e000:0010::/64]
-      DCA1[DC-A-01\nDomain Controller\nPDC Emulator]
-      DCA2[DC-A-02\nDomain Controller]
+      DCA1["DC-A-01<br/>Domain Controller<br/>PDC Emulator"]
+      DCA2["DC-A-02<br/>Domain Controller"]
     end
-    DHCPA[DHCP-A VM\nServers Segment]
-    CLTA[Clients and Servers\nSite A]
+    DHCPA["DHCP-A VM<br/>Servers Segment"]
+    CLTA["Clients and Servers<br/>Site A"]
   end
 
   subgraph SB[Site B]
     subgraph ADSB[AD VMs - Servers Segment fdca:fcaf:e100:0010::/64]
-      DCB1[DC-B-01\nDomain Controller]
+      DCB1["DC-B-01<br/>Domain Controller"]
     end
-    DHCPB[DHCP-B VM\nServers Segment]
-    CLTB[Clients and Servers\nSite B]
+    DHCPB["DHCP-B VM<br/>Servers Segment"]
+    CLTB["Clients and Servers<br/>Site B"]
   end
 
   subgraph SC[Site C]
     subgraph ADSC[AD VMs - Servers Segment fdca:fcaf:e200:0010::/64]
-      DCC1[DC-C-01\nDomain Controller]
+      DCC1["DC-C-01<br/>Domain Controller"]
     end
-    DHCPC[DHCP-C VM\nServers Segment]
-    CLTC[Clients and Servers\nSite C]
+    DHCPC["DHCP-C VM<br/>Servers Segment"]
+    CLTC["Clients and Servers<br/>Site C"]
   end
 
   subgraph SD[Site D]
     subgraph ADSD[AD VMs - Servers Segment fdca:fcaf:e300:0010::/64]
-      DCD1[DC-D-01\nDomain Controller]
+      DCD1["DC-D-01<br/>Domain Controller"]
     end
-    DHCPD[DHCP-D VM\nServers Segment]
-    CLTD[Clients and Servers\nSite D]
+    DHCPD["DHCP-D VM<br/>Servers Segment"]
+    CLTD["Clients and Servers<br/>Site D"]
   end
 
   DCA1 <-->|AD Replication over IPsec-encrypted WAN tunnel| DCB1
@@ -52,10 +52,10 @@ graph TD
   DHCPC -->|DHCPv6 Lease| CLTC
   DHCPD -->|DHCPv6 Lease| CLTD
 
-  CLTA -->|Auth + Group Policy\nLocal-first| DCA1
-  CLTB -->|Auth + Group Policy\nLocal-first| DCB1
-  CLTC -->|Auth + Group Policy\nLocal-first| DCC1
-  CLTD -->|Auth + Group Policy\nLocal-first| DCD1
+  CLTA -->|Auth + Group Policy - Local-first| DCA1
+  CLTB -->|Auth + Group Policy - Local-first| DCB1
+  CLTC -->|Auth + Group Policy - Local-first| DCC1
+  CLTD -->|Auth + Group Policy - Local-first| DCD1
 ```
 
 ## Design Notes

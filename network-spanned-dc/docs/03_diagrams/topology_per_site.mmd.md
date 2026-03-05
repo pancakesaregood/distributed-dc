@@ -6,10 +6,10 @@ Standard site template. The designated redundant internet site uses two separate
 graph TD
   subgraph Site[Single Site Template - 1 to 2 Racks]
     subgraph Rack1[Rack 1]
-      E1[Edge-A\nL3 Router]
-      E2[Edge-B\nL3 Router]
-      F1[FW-A\nFirewall]
-      F2[FW-B\nFirewall]
+      E1["Edge-A<br/>L3 Router"]
+      E2["Edge-B<br/>L3 Router"]
+      F1["FW-A<br/>Firewall"]
+      F2["FW-B<br/>Firewall"]
       T1[ToR-A]
       T2[ToR-B]
       H1[HV-01]
@@ -23,8 +23,8 @@ graph TD
       S2[Storage-02]
     end
 
-    WAN[Vendor L3 Handoff\nPrivate Circuit]
-    INET[Local Internet\nISP Circuit\nvpn.example.com]
+    WAN["Vendor L3 Handoff<br/>Private Circuit"]
+    INET["Local Internet / ISP Circuit<br/>vpn.example.com"]
     MGMT[Mgmt Services VMs]
   end
 
