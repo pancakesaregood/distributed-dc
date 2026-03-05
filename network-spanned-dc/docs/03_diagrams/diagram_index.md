@@ -1,0 +1,11 @@
+﻿# Diagram Index
+
+- [Global Topology](topology_global.mmd.md)
+- [Per-Site Logical Topology](topology_per_site.mmd.md)
+- [Segmentation and Flow Model](segmentation.mmd.md)
+- [BGP Routing and Prefix Advertisement](routing_bgp.mmd.md)
+- [Services and Optional Anycast](services_anycast.mmd.md)
+- [Backup and DR Flow](backup_dr.mmd.md)
+- [Failover Matrix](failover_matrix.mmd.md)
+
+All diagrams are Mermaid and render directly in Markdown-capable viewers.

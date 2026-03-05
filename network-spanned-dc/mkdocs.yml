@@ -1,0 +1,58 @@
+﻿site_name: Spanned Datacenter Architecture
+site_description: Low-cost 4-site spanned datacenter architecture documentation
+docs_dir: docs
+theme:
+  name: mkdocs
+
+nav:
+  - Home: index.md
+  - 01 Scope:
+      - Scope of Work: 01_scope/scope_of_work.md
+      - Assumptions: 01_scope/assumptions.md
+      - Out of Scope: 01_scope/out_of_scope.md
+      - Acceptance Criteria: 01_scope/acceptance_criteria.md
+  - 02 Architecture:
+      - Overview: 02_architecture/overview.md
+      - Physical Layout: 02_architecture/physical_layout.md
+      - Logical Network: 02_architecture/logical_network.md
+      - IPv6 Addressing: 02_architecture/ipv6_addressing.md
+      - Segmentation: 02_architecture/segmentation.md
+      - Routing and WAN Abstraction: 02_architecture/routing_wan_abstraction.md
+      - SDN Options: 02_architecture/sdn_options.md
+      - Compute Platform: 02_architecture/compute_platform.md
+      - Services Spanning Model: 02_architecture/services_spanning_model.md
+  - 03 Diagrams:
+      - Diagram Index: 03_diagrams/diagram_index.md
+      - Global Topology: 03_diagrams/topology_global.mmd.md
+      - Per-Site Topology: 03_diagrams/topology_per_site.mmd.md
+      - Segmentation Diagram: 03_diagrams/segmentation.mmd.md
+      - Routing BGP Diagram: 03_diagrams/routing_bgp.mmd.md
+      - Services Anycast Diagram: 03_diagrams/services_anycast.mmd.md
+      - Backup and DR Diagram: 03_diagrams/backup_dr.mmd.md
+      - Failover Matrix Diagram: 03_diagrams/failover_matrix.mmd.md
+  - 04 Failover and DR:
+      - Failover Scenarios: 04_failover_dr/failover_scenarios.md
+      - RTO and RPO Targets: 04_failover_dr/rto_rpo_targets.md
+      - DR Runbooks: 04_failover_dr/dr_runbooks.md
+      - Test Plan: 04_failover_dr/test_plan.md
+  - 05 Backup:
+      - Backup Strategy: 05_backup/backup_strategy.md
+      - Backup Retention: 05_backup/backup_retention.md
+      - Restore Procedures: 05_backup/restore_procedures.md
+  - 06 Security:
+      - Security Baseline: 06_security/security_baseline.md
+      - Identity and Access: 06_security/identity_access.md
+      - Logging and Monitoring: 06_security/logging_monitoring.md
+  - 07 Operations:
+      - GitOps Operating Model: 07_operations/gitops_operating_model.md
+      - Naming Standards: 07_operations/naming_standards.md
+      - Lifecycle and Patch Management: 07_operations/lifecycle_patch_mgmt.md
+      - Observability: 07_operations/observability.md
+  - 08 Vendor WAN:
+      - WAN Service Requirements: 08_vendor_wan/wan_service_requirements.md
+      - Handoff Expectations: 08_vendor_wan/handoff_expectations.md
+      - BGP Requirements: 08_vendor_wan/bgp_requirements.md
+  - 09 Appendix:
+      - Glossary: 09_appendix/glossary.md
+      - References: 09_appendix/references.md
+      - Abstractions and Clarifications Needed: 09_appendix/abstractions_clarifications_needed.md
