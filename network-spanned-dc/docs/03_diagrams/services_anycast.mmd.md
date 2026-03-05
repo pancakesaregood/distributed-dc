@@ -31,5 +31,5 @@ graph LR
   IN1 --> APP1
   IN2 --> APP2
 
-  DB1 <--> DB2
+  DB1 <-->|Replication\nIPsec-encrypted WAN tunnel| DB2
 ```

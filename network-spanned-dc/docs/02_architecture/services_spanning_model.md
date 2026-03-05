@@ -10,10 +10,10 @@
 | Local-Only | Site facility services | Single-site | No cross-site failover requirement |
 
 ## Spanning Guidance
-- Use application-level replication for stateful services.
+- Use application-level replication for stateful services. All replication traffic crosses the IPsec-encrypted inter-site tunnels; no additional application-layer encryption is required for transport security, though it is permitted for defense-in-depth.
 - Use DNS or BGP anycast only for stateless ingress points.
 - Keep control-plane quorum odd-sized and failure-tolerant.
-- Avoid synchronous writes across all four sites unless strict latency targets are validated.
+- Avoid synchronous writes across all four sites unless strict latency targets are validated. Note that IPsec encapsulation adds a small overhead to inter-site round-trip time; account for this when measuring replication latency budgets.
 
 ## Dependency Ordering
 1. Identity and DNS availability.

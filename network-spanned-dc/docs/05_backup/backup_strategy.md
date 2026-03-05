@@ -7,7 +7,7 @@
 
 ## Backup Topology
 - Local fast-restore target at each site for short RTO recoveries.
-- Cross-site replication to at least one alternate site.
+- Cross-site replication to at least one alternate site. All cross-site replication traffic transits the IPsec-encrypted inter-site tunnels between edge pairs; no additional transport-layer encryption is required, though application-layer encryption of backup streams is permitted for defense-in-depth.
 - Optional immutable archive tier for ransomware-resilient retention.
 
 ## Credential Separation
@@ -31,5 +31,5 @@
 
 ## Design Guardrails
 - No backup credentials stored on application hosts in plaintext.
-- Backups are encrypted at rest and in transit.
+- Backups are encrypted at rest and in transit. In-transit encryption for cross-site flows is provided by the IPsec inter-site tunnel layer.
 - Replication lag and backup failures generate actionable alerts.

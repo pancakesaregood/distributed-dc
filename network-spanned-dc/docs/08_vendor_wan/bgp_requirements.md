@@ -2,8 +2,9 @@
 
 ## Session Model
 - eBGP between each site edge and WAN handoff.
+- Inter-site BGP sessions (site-to-site) run inside the IPsec encrypted tunnels between edge pairs. BGP sessions toward the WAN handoff peer are additionally hardened with TCP-AO or MD5 session authentication.
 - Redundant sessions per site where dual handoff exists.
-- Authentication and session hardening per security policy.
+- Authentication and session hardening per security policy. Minimum requirement: TCP-AO on all BGP sessions. IPsec tunnel transport for all inter-site BGP.
 
 ## Prefix Policy
 - Advertise only site summary `/56` prefixes.

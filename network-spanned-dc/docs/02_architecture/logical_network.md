@@ -10,16 +10,18 @@
 - Loopback and transit domains for routing control.
 
 ## Inter-Site Connectivity Model
-- Sites exchange summarized routes over vendor-managed L3 handoff.
-- East-west traffic between sites is routed through edge policy controls.
+- Sites exchange summarized routes over vendor-managed L3 handoff delivered as a private circuit service.
+- All inter-site traffic is carried inside IPsec tunnels terminated on site edge pairs. The WAN provider carries encrypted packets; it has no visibility into payload content.
+- East-west traffic between sites is routed through edge policy controls and enters the IPsec overlay before leaving the site edge.
 - No VLAN or broadcast domain is extended across sites.
 
 ## Control Plane Expectations
-- BGP preferred for dynamic route exchange.
-- Static route fallback available when BGP is unavailable.
+- BGP preferred for dynamic route exchange. BGP sessions run over the IPsec inter-site tunnels and are additionally hardened with TCP-AO or MD5 session authentication.
+- Static route fallback available when BGP is unavailable. Static fallback traffic also transits the IPsec overlay.
 - Prefix filters prevent accidental route leaks.
 
 ## Data Plane Expectations
 - Service traffic uses IPv6 ULA internally.
 - Security zones are enforced at site edge and internal policy points.
-- Cross-site traffic for stateful services is replication-oriented, not chatty transaction-by-transaction, unless latency permits.
+- All data-plane traffic leaving a site edge is encrypted by the IPsec inter-site tunnel before reaching the WAN handoff.
+- Cross-site traffic for stateful services is replication-oriented, not chatty transaction-by-transaction, unless latency permits. Replication streams are encrypted end-to-end by the IPsec overlay; application-layer encryption is additional and optional.

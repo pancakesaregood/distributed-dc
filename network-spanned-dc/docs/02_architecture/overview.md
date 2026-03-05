@@ -6,6 +6,7 @@ This design defines a low-cost, four-site spanned datacenter architecture that p
 ## Core Design Principles
 - Layer 3 between sites.
 - No stretched Layer 2 between sites.
+- All inter-site traffic is encrypted in transit. Site edge pairs terminate IPsec tunnels over the WAN; private WAN circuits provide network-layer isolation, and the IPsec overlay provides defense-in-depth encryption regardless of WAN provider trust assumptions.
 - Failure domains are bounded per site.
 - Spanning services use replication and deterministic failover.
 - Open-source platforms are preferred when they meet support and operational requirements.
@@ -19,8 +20,8 @@ This design defines a low-cost, four-site spanned datacenter architecture that p
 
 ## High-Level Architecture
 - Per site: edge pair, ToR pair, compute cluster, and local backup target.
-- Inter-site: prefix-based routing with BGP as primary exchange method.
-- Data resiliency: local fast restore plus cross-site replicated copies.
+- Inter-site: prefix-based routing with BGP as primary exchange method. BGP sessions and all data-plane traffic run over IPsec-encrypted tunnels between site edge pairs.
+- Data resiliency: local fast restore plus cross-site replicated copies. All cross-site replication traffic is encrypted via the IPsec inter-site tunnels.
 - Optional global anycast for DNS and internal ingress endpoints.
 
 ## Design Outcome
