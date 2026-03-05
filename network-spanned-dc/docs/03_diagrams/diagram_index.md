@@ -7,5 +7,6 @@
 - [Services and Optional Anycast](services_anycast.mmd.md)
 - [Backup and DR Flow](backup_dr.mmd.md)
 - [Failover Matrix](failover_matrix.mmd.md)
+- [DHCP and Active Directory Services](dhcp_ad_services.mmd.md)
 
 All diagrams are Mermaid and render directly in Markdown-capable viewers.

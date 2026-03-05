@@ -30,6 +30,7 @@ nav:
       - Services Anycast Diagram: 03_diagrams/services_anycast.mmd.md
       - Backup and DR Diagram: 03_diagrams/backup_dr.mmd.md
       - Failover Matrix Diagram: 03_diagrams/failover_matrix.mmd.md
+      - DHCP and AD Services: 03_diagrams/dhcp_ad_services.mmd.md
   - 04 Failover and DR:
       - Failover Scenarios: 04_failover_dr/failover_scenarios.md
       - RTO and RPO Targets: 04_failover_dr/rto_rpo_targets.md
