@@ -5,27 +5,27 @@ graph LR
   WAN[(Vendor-Managed WAN L3 Cloud)]
 
   subgraph SA[Site A]
-    SAE[Edge Pair]\nBGP + Policy
+    SAE["Edge Pair<br/>BGP + Policy"]
     SAT[ToR Pair]
-    SAC[Compute Cluster]\nVMs + Podman
+    SAC["Compute Cluster<br/>VMs + Podman"]
   end
 
   subgraph SB[Site B]
-    SBE[Edge Pair]\nBGP + Policy
+    SBE["Edge Pair<br/>BGP + Policy"]
     SBT[ToR Pair]
-    SBC[Compute Cluster]\nVMs + Podman
+    SBC["Compute Cluster<br/>VMs + Podman"]
   end
 
   subgraph SC[Site C]
-    SCE[Edge Pair]\nBGP + Policy
+    SCE["Edge Pair<br/>BGP + Policy"]
     SCT[ToR Pair]
-    SCC[Compute Cluster]\nVMs + Podman
+    SCC["Compute Cluster<br/>VMs + Podman"]
   end
 
   subgraph SD[Site D]
-    SDE[Edge Pair]\nBGP + Policy
+    SDE["Edge Pair<br/>BGP + Policy"]
     SDT[ToR Pair]
-    SDC[Compute Cluster]\nVMs + Podman
+    SDC["Compute Cluster<br/>VMs + Podman"]
   end
 
   SAE --- WAN

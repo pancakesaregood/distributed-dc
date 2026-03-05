@@ -4,10 +4,10 @@
 graph TD
   WAN[(Vendor-Managed WAN)]
 
-  A[Site A Edge]\nAdvertise fdca:fcaf:e000::/56
-  B[Site B Edge]\nAdvertise fdca:fcaf:e100::/56
-  C[Site C Edge]\nAdvertise fdca:fcaf:e200::/56
-  D[Site D Edge]\nAdvertise fdca:fcaf:e300::/56
+  A["Site A Edge<br/>Advertise fdca:fcaf:e000::/56"]
+  B["Site B Edge<br/>Advertise fdca:fcaf:e100::/56"]
+  C["Site C Edge<br/>Advertise fdca:fcaf:e200::/56"]
+  D["Site D Edge<br/>Advertise fdca:fcaf:e300::/56"]
 
   ANYA[Site A Anycast /128]
   ANYB[Site B Anycast /128]
@@ -24,7 +24,7 @@ graph TD
   ANYC --> C
   ANYD --> D
 
-  FALLBACK[Static Route Fallback]\nUsed only during BGP outage
+  FALLBACK["Static Route Fallback<br/>Used only during BGP outage"]
   FALLBACK -.-> A
   FALLBACK -.-> B
   FALLBACK -.-> C
