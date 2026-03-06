@@ -8,13 +8,13 @@ Inbound internet request reaching a published app at one site, traversing the fu
 graph TD
 
   INET["Internet Client<br/>External user or bot"]
-  DNS["Public DNS<br/>app.example.com → site edge IP"]
+  DNS["Public DNS<br/>app.example.com -> site edge IP"]
 
   subgraph SITE[Site - Single Publishing Site]
     EDGE["Edge Router<br/>Internet interface<br/>Public IP"]
 
     subgraph FW[Firewall Pair - FW-A and FW-B]
-      FWDMZ["DMZ Rule<br/>Outside → DMZ - TCP 443 only"]
+      FWDMZ["DMZ Rule<br/>Outside -> DMZ - TCP 443 only"]
     end
 
     subgraph DMZ[DMZ Zone]
@@ -50,7 +50,7 @@ Stateless app published at multiple sites behind a shared anycast ingress VIP. B
 graph LR
 
   INET["Internet Client"]
-  ANYDNS["Public DNS<br/>app.example.com → anycast VIP /128"]
+  ANYDNS["Public DNS<br/>app.example.com -> anycast VIP /128"]
   ANYING["Anycast VIP /128<br/>BGP-advertised from all active sites"]
 
   subgraph SA[Site A]
@@ -139,7 +139,7 @@ graph LR
 
 ## App Publish Workflow
 
-Steps from request to live service. All configuration changes flow through GitOps — no manual changes on production systems.
+Steps from request to live service. All configuration changes flow through GitOps - no manual changes on production systems.
 
 ```mermaid
 flowchart TD
