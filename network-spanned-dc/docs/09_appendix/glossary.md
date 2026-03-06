@@ -78,6 +78,26 @@
 - **TOTP (Time-based One-Time Password)**: Short-lived numeric code used as an MFA factor.
 - **Split tunnel**: VPN mode where only selected traffic traverses the tunnel.
 
+## Campus and Edge Services
+
+- **SIP (Session Initiation Protocol)**: Signaling protocol used to establish, modify, and end voice sessions.
+- **SIP trunk**: Carrier or provider connection used to route enterprise calls to and from the PSTN.
+- **SBC (Session Border Controller)**: Telephony edge control that secures SIP signaling/media and enforces routing policy.
+- **RTP (Real-time Transport Protocol)**: Media transport protocol carrying real-time voice streams.
+- **PSTN (Public Switched Telephone Network)**: External public voice network for inbound and outbound calling.
+- **QoS (Quality of Service)**: Traffic classification and priority model used to protect latency-sensitive flows such as voice.
+- **DSCP (Differentiated Services Code Point)**: IP header marking used for QoS class assignment.
+- **WLC (Wireless LAN Controller)**: Control-plane system that manages AP policy, roaming, and SSID behavior.
+- **WAP / AP (Wireless Access Point)**: Wireless radio endpoint providing client network access.
+- **SSID (Service Set Identifier)**: Wireless network name mapped to authentication and segmentation policy.
+- **802.1X**: Port and WLAN access control framework using EAP-based identity authentication.
+- **RADIUS**: AAA protocol commonly used by network access controls for authentication and authorization.
+- **PoE (Power over Ethernet)**: Ethernet power delivery standard used to power APs and other edge devices.
+- **NAC (Network Access Control)**: Policy framework enforcing who or what can connect to network segments.
+- **IPP (Internet Printing Protocol)**: Standard protocol for print job submission and printer capability control.
+- **MFP (Multi-Function Printer)**: Printer device that combines print, scan, and often copy/fax capabilities.
+- **Secure release printing**: Printing workflow requiring user verification at device before job output.
+
 ## Operations and Reliability
 
 - **GitOps**: Operating model where configuration changes are made through version-controlled pull requests and automated deployment.
