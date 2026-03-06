@@ -1,11 +1,10 @@
 ﻿# BGP Requirements
 
 ## Session Model
-- eBGP between each site edge node and WAN handoff.
-- Inter-site BGP sessions run inside the IPsec encrypted tunnels between edge nodes. BGP sessions toward the WAN handoff peer are additionally hardened with TCP-AO authentication.
-- Minimum requirement: TCP-AO on all BGP sessions. IPsec tunnel transport for all inter-site BGP.
+- eBGP between each site edge node and WAN handoff, hardened with TCP-AO authentication.
+- All inter-site BGP sessions run inside IPsec tunnels. The full tunnel redundancy model is defined in [Routing and WAN Abstraction — Multi-Tunnel Redundancy Model](routing_wan_abstraction.md).
 
-## Multi-Tunnel BGP Assignment
+## BGP Session Assignment per Tunnel
 
 Each site pair maintains four IPsec tunnels. BGP sessions are assigned as follows:
 

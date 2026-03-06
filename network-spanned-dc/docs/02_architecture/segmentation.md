@@ -32,17 +32,17 @@ All zone enforcement is performed by the site firewall pair (FW-A / FW-B). The f
 - Controlled north-south paths for infrastructure include DNS, NTP, package repositories, and approved internet-bound service paths, all through the local edge internet interface.
 
 ## VPN Zone Policy
-- VPN clients authenticate against the site AD domain controller with MFA enforced at the VPN gateway.
-- On successful auth, clients are placed in the VPN zone and permitted only to segments allowed by their AD group membership.
-- Default VPN group: access to User and Servers/VMs zones on approved ports.
-- Admin VPN group: access to Management zone in addition to default permissions.
-- No split-tunnel exemptions are permitted without an explicit policy change reviewed in GitOps.
+- Clients enter the VPN zone after AD authentication and MFA. They are not admitted directly to any inside zone.
+- Default group: access to User and Servers/VMs zones on approved ports.
+- Admin group: access to Management zone in addition to default permissions.
+- No split-tunnel exemptions without a GitOps-reviewed policy change.
+- Authentication requirements, session logging, and certificate rotation are defined in [Security Baseline — VPN](../06_security/security_baseline.md).
 
 ## DMZ Service Components
-- **WAF**: Deployed as a VM in the DMZ zone. Inspects all inbound HTTP/HTTPS traffic for OWASP Top 10 threats, injection attacks, and protocol anomalies. Default deny on unknown patterns. Logs all blocked and permitted requests. Configuration version-controlled in GitOps.
-- **nginx Load Balancer**: Deployed as a VM (or HA pair) in the DMZ zone. Terminates TLS for published services and distributes requests across backend instances in the Servers/VMs zone. Provides health checking and removes unhealthy backends automatically. Also used for internal API load balancing where multiple container or VM instances exist.
-- Inbound path for published services: `Outside → FW DMZ rule → WAF → nginx LB → backend (Servers/VMs zone)`.
-- WAF and nginx LB VMs are Tier 1 stateless components; configuration is ephemeral and rebuilt from GitOps on replacement.
+- **WAF**: inspects inbound HTTP/HTTPS at the DMZ boundary before traffic reaches the load balancer or any backend.
+- **nginx Load Balancer**: terminates TLS and distributes requests across backend instances in the Servers/VMs zone. Removes unhealthy backends automatically.
+- Inbound path: `Outside → FW DMZ rule → WAF → nginx LB → backend (Servers/VMs zone)`.
+- Both are Tier 1 stateless. Security controls, OWASP baseline, and operational requirements are in [Security Baseline — WAF and Load Balancer](../06_security/security_baseline.md).
 
 ## Implementation Notes
 - The firewall pair is vendor-agnostic. Select a platform that supports stateful inspection, zone-based policy, VPN (SSL-VPN or IPsec remote access or WireGuard), AD/LDAP authentication integration, and HA session sync.
