@@ -1,7 +1,11 @@
 # Architecture Overview
 
 ## Executive Summary
-This design defines a low-cost, four-site spanned datacenter architecture focused on failure isolation, deterministic recovery, and operational practicality. Each site is an independent failure domain with its own edge, security boundary, compute footprint, and internet breakout path. Sites are connected through a vendor-managed Layer 3 handoff, while service continuity is achieved through routed reachability and replication rather than stretched Layer 2.
+This design proposes a low-cost, four-site distributed datacenter built to improve resilience and operational flexibility. Each site operates as an independent failure domain with its own compute capacity, security boundary, and internet access, ensuring that the loss of any single location does not interrupt critical services.
+
+The sites are interconnected through a vendor-managed Layer 3 network, allowing workloads and traffic to shift between locations without relying on fragile Layer 2 extensions. Service continuity is maintained through routing and data replication, rather than stretched networks, which simplifies operations and reduces the risk of cascading failures.
+
+This architecture prioritizes predictable failure behavior, gradual scaling, and practical operations, allowing capacity to grow incrementally while maintaining service availability across all locations.
 
 ## Core Design Principles
 - Layer 3 between sites.
