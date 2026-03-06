@@ -504,13 +504,13 @@
 <pre><code class="language-mermaid">graph TD
 
   INET[&quot;Internet Client&lt;br/&gt;External user or bot&quot;]
-  DNS[&quot;Public DNS&lt;br/&gt;app.example.com → site edge IP&quot;]
+  DNS[&quot;Public DNS&lt;br/&gt;app.example.com -&gt; site edge IP&quot;]
 
   subgraph SITE[Site - Single Publishing Site]
     EDGE[&quot;Edge Router&lt;br/&gt;Internet interface&lt;br/&gt;Public IP&quot;]
 
     subgraph FW[Firewall Pair - FW-A and FW-B]
-      FWDMZ[&quot;DMZ Rule&lt;br/&gt;Outside → DMZ - TCP 443 only&quot;]
+      FWDMZ[&quot;DMZ Rule&lt;br/&gt;Outside -&gt; DMZ - TCP 443 only&quot;]
     end
 
     subgraph DMZ[DMZ Zone]
@@ -542,7 +542,7 @@
 <pre><code class="language-mermaid">graph LR
 
   INET[&quot;Internet Client&quot;]
-  ANYDNS[&quot;Public DNS&lt;br/&gt;app.example.com → anycast VIP /128&quot;]
+  ANYDNS[&quot;Public DNS&lt;br/&gt;app.example.com -&gt; anycast VIP /128&quot;]
   ANYING[&quot;Anycast VIP /128&lt;br/&gt;BGP-advertised from all active sites&quot;]
 
   subgraph SA[Site A]
@@ -625,7 +625,7 @@
   linkStyle default color:#CC5500
 </code></pre>
 <h2 id="app-publish-workflow">App Publish Workflow</h2>
-<p>Steps from request to live service. All configuration changes flow through GitOps — no manual changes on production systems.</p>
+<p>Steps from request to live service. All configuration changes flow through GitOps - no manual changes on production systems.</p>
 <pre><code class="language-mermaid">flowchart TD
 
   REQ[&quot;App Publish Request&lt;br/&gt;FQDN - backend IPs - port&lt;br/&gt;TLS cert source - WAF exceptions&quot;]
