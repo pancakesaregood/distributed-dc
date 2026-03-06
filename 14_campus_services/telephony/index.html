@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Telephony - Spanned Datacenter Architecture</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../assets/styles/site.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Spanned Datacenter Architecture</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+  
+  <div class="site-nav-stack">
+    <div class="page-jump-bar" aria-label="Page navigation">
+      <a rel="prev" href="../readme/" class="page-jump-arrow" aria-label="Previous page">
+        <i class="fa fa-arrow-left"></i>
+      </a>
+
+      <div class="page-jump-select-wrap">
+        <label for="page-jump-select" class="visually-hidden">Current page</label>
+        <select id="page-jump-select" class="page-jump-select" onchange="if(this.value){window.location.href=this.value;}">
+          
+            
+              <option value="../..">Home</option>
+            
+          
+            
+              <optgroup label="01 Scope">
+                
+                  
+                    <option value="../../01_scope/scope_of_work/">Scope of Work</option>
+                  
+                
+                  
+                    <option value="../../01_scope/assumptions/">Assumptions</option>
+                  
+                
+                  
+                    <option value="../../01_scope/out_of_scope/">Out of Scope</option>
+                  
+                
+                  
+                    <option value="../../01_scope/acceptance_criteria/">Acceptance Criteria</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="02 Architecture">
+                
+                  
+                    <option value="../../02_architecture/overview/">Overview</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/physical_layout/">Physical Layout</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/logical_network/">Logical Network</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/ipv6_addressing/">IPv6 Addressing</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/segmentation/">Segmentation</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/routing_wan_abstraction/">Routing and WAN Abstraction</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/wan_transport_abstraction/">WAN Transport Abstraction</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/sdn_options/">SDN Options</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/compute_platform/">Compute Platform</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/services_spanning_model/">Services Spanning Model</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/vdi_service/">VDI as a Service</option>
+                  
+                
+                  
+                    <option value="../../02_architecture/published_apps/">Published Applications</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="03 Diagrams">
+                
+                  
+                    <option value="../../03_diagrams/diagram_index/">Diagram Index</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/topology_global.mmd/">Global Topology</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/topology_per_site.mmd/">Per-Site Topology</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/physical_rack_topology_2rack.mmd/">Physical Rack Topology (Two-Rack Site)</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/site_full_stack_upstream_abstracted.mmd/">One-Site Full Stack (Upstream Abstracted)</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/segmentation.mmd/">Segmentation Diagram</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/routing_bgp.mmd/">Routing BGP Diagram</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/services_anycast.mmd/">Services Anycast Diagram</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/backup_dr.mmd/">Backup and DR Diagram</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/failover_matrix.mmd/">Failover Matrix Diagram</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/dhcp_ad_services.mmd/">DHCP and AD Services</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/vpn_access.mmd/">Remote Access VPN Flow</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/wan_transport.mmd/">WAN Transport Modes</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/vdi_service.mmd/">VDI Service Architecture</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/published_apps_flow.mmd/">Published App Flows</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/client_service_interactions.mmd/">Client and Service Interactions</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/telephony_flow.mmd/">Telephony Service Flow</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/printing_flow.mmd/">Printing Service Flow</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/wlc_waps_topology.mmd/">WLC and WAP Topology</option>
+                  
+                
+                  
+                    <option value="../../03_diagrams/campus_networks_topology.mmd/">Campus Network Topology</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="04 Failover and DR">
+                
+                  
+                    <option value="../../04_failover_dr/failover_scenarios/">Failover Scenarios</option>
+                  
+                
+                  
+                    <option value="../../04_failover_dr/rto_rpo_targets/">RTO and RPO Targets</option>
+                  
+                
+                  
+                    <option value="../../04_failover_dr/dr_runbooks/">DR Runbooks</option>
+                  
+                
+                  
+                    <option value="../../04_failover_dr/test_plan/">Test Plan</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="05 Backup">
+                
+                  
+                    <option value="../../05_backup/backup_strategy/">Backup Strategy</option>
+                  
+                
+                  
+                    <option value="../../05_backup/backup_retention/">Backup Retention</option>
+                  
+                
+                  
+                    <option value="../../05_backup/restore_procedures/">Restore Procedures</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="06 Security">
+                
+                  
+                    <option value="../../06_security/security_baseline/">Security Baseline</option>
+                  
+                
+                  
+                    <option value="../../06_security/identity_access/">Identity and Access</option>
+                  
+                
+                  
+                    <option value="../../06_security/logging_monitoring/">Logging and Monitoring</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="07 Operations">
+                
+                  
+                    <option value="../../07_operations/gitops_operating_model/">GitOps Operating Model</option>
+                  
+                
+                  
+                    <option value="../../07_operations/naming_standards/">Naming Standards</option>
+                  
+                
+                  
+                    <option value="../../07_operations/lifecycle_patch_mgmt/">Lifecycle and Patch Management</option>
+                  
+                
+                  
+                    <option value="../../07_operations/observability/">Observability</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="08 Vendor WAN">
+                
+                  
+                    <option value="../../08_vendor_wan/wan_service_requirements/">WAN Service Requirements</option>
+                  
+                
+                  
+                    <option value="../../08_vendor_wan/handoff_expectations/">Handoff Expectations</option>
+                  
+                
+                  
+                    <option value="../../08_vendor_wan/bgp_requirements/">BGP Requirements</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="09 Appendix">
+                
+                  
+                    <option value="../../09_appendix/glossary/">Glossary</option>
+                  
+                
+                  
+                    <option value="../../09_appendix/references/">References</option>
+                  
+                
+                  
+                    <option value="../../09_appendix/abstractions_clarifications_needed/">Abstractions and Clarifications Needed</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="10 Implementation">
+                
+                  
+                    <option value="../../10_implementation/readme/">Implementation Proposal</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="11 FAQ">
+                
+                  
+                    <option value="../../11_FAQ/readme/">FAQ Home</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/team_faq/">Team FAQ</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/server_team_faq/">Server Team FAQ</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/executive_faq/">Executive FAQ</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/vp_faq/">VP FAQ</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/user_faq/">User FAQ</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/admin_faq/">Admin FAQ</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/service_desk_faq/">Service Desk FAQ</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/network_admin_faq/">Network Admin FAQ</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/security_team_faq/">Security Team FAQ</option>
+                  
+                
+                  
+                    <option value="../../11_FAQ/backup_admin_faq/">Backup Admin FAQ</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="12 Business Cases">
+                
+                  
+                    <option value="../../12_business_cases/readme/">Business Cases Home</option>
+                  
+                
+                  
+                    <option value="../../12_business_cases/business_case_01_multi_site_resilience/">Multi-Site Resilience Baseline</option>
+                  
+                
+                  
+                    <option value="../../12_business_cases/business_case_02_security_control_uplift/">Security Control Uplift</option>
+                  
+                
+                  
+                    <option value="../../12_business_cases/business_case_03_gitops_automation/">GitOps and Operations Automation</option>
+                  
+                
+                  
+                    <option value="../../12_business_cases/business_case_04_vdi_enablement/">VDI Service Enablement</option>
+                  
+                
+                  
+                    <option value="../../12_business_cases/business_case_05_backup_dr_assurance/">Backup and DR Assurance</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="13 Operations Foundations">
+                
+                  
+                    <option value="../../13_operations_foundations/readme/">Foundations Home</option>
+                  
+                
+                  
+                    <option value="../../13_operations_foundations/monitoring/">Monitoring</option>
+                  
+                
+                  
+                    <option value="../../13_operations_foundations/observability/">Observability</option>
+                  
+                
+                  
+                    <option value="../../13_operations_foundations/identity/">Identity</option>
+                  
+                
+                  
+                    <option value="../../13_operations_foundations/authentication/">Authentication</option>
+                  
+                
+                  
+                    <option value="../../13_operations_foundations/storage/">Storage</option>
+                  
+                
+                  
+                    <option value="../../13_operations_foundations/capacity_planning/">Capacity Planning</option>
+                  
+                
+              </optgroup>
+            
+          
+            
+              <optgroup label="14 Campus and Edge Services">
+                
+                  
+                    <option value="../readme/">Services Home</option>
+                  
+                
+                  
+                    <option value="./" selected>Telephony</option>
+                  
+                
+                  
+                    <option value="../printing/">Printing</option>
+                  
+                
+                  
+                    <option value="../wlc_waps/">WLC and WAPs</option>
+                  
+                
+                  
+                    <option value="../campus_networks/">Campus Networks</option>
+                  
+                
+              </optgroup>
+            
+          
+        </select>
+      </div>
+
+      <a rel="next" href="../printing/" class="page-jump-arrow" aria-label="Next page">
+        <i class="fa fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+  
+
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#telephony" class="nav-link">Telephony</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#purpose" class="nav-link">Purpose</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#reference-diagram" class="nav-link">Reference diagram</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#scope" class="nav-link">Scope</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#core-components" class="nav-link">Core components</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#network-and-security-controls" class="nav-link">Network and security controls</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#availability-and-failover-model" class="nav-link">Availability and failover model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#implementation-checklist" class="nav-link">Implementation checklist</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#validation-evidence" class="nav-link">Validation evidence</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="telephony">Telephony</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define a resilient telephony pattern for IP phones, softphones, call routing, and PSTN connectivity across all sites.</p>
+<h2 id="reference-diagram">Reference diagram</h2>
+<p>See <a href="../../03_diagrams/telephony_flow.mmd/">Telephony Service Flow</a>.</p>
+<h2 id="scope">Scope</h2>
+<ul>
+<li>Enterprise voice for users at all sites.</li>
+<li>Inbound and outbound PSTN calling through controlled SIP trunks.</li>
+<li>Emergency calling behavior and site-aware call routing.</li>
+</ul>
+<h2 id="core-components">Core components</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP phones and softphones</td>
+<td>User endpoints for voice calls</td>
+</tr>
+<tr>
+<td>Voice VLAN and access policy</td>
+<td>Isolates voice endpoints from data clients</td>
+</tr>
+<tr>
+<td>Call control cluster</td>
+<td>Registration, routing, policy, and failover</td>
+</tr>
+<tr>
+<td>Session border controller (SBC)</td>
+<td>SIP demarcation, security, and trunk control</td>
+</tr>
+<tr>
+<td>SIP trunk provider</td>
+<td>External PSTN connectivity</td>
+</tr>
+<tr>
+<td>Voicemail and call recording</td>
+<td>Message and compliance retention where required</td>
+</tr>
+</tbody>
+</table>
+<h2 id="network-and-security-controls">Network and security controls</h2>
+<ul>
+<li>Dedicated voice VLAN per site with explicit ACL policy.</li>
+<li>QoS marking and trust model enforced at access and uplink layers.</li>
+<li>SIP signaling and RTP media flows limited to documented ports and peers.</li>
+<li>Management interfaces placed in admin segments, not user voice segments.</li>
+<li>Admin access protected by MFA and role-based access policy.</li>
+</ul>
+<h2 id="availability-and-failover-model">Availability and failover model</h2>
+<ul>
+<li>Per-site call handling for local survivability when WAN paths are impaired.</li>
+<li>Inter-site peer routing for overflow and failover when primary services fail.</li>
+<li>SIP trunk failover policy documented and tested with the carrier.</li>
+<li>Emergency dialing must keep working during inter-site WAN failure.</li>
+</ul>
+<h2 id="implementation-checklist">Implementation checklist</h2>
+<ol>
+<li>Define dialing plan, extension ranges, and site-based routing rules.</li>
+<li>Build call control nodes and SBC policy with backup paths.</li>
+<li>Configure voice VLAN, QoS class mapping, and ACL enforcement.</li>
+<li>Register pilot phones and validate call quality under load.</li>
+<li>Test PSTN, inter-site failover, and emergency dialing scenarios.</li>
+<li>Document runbooks, alerts, and ownership before production handoff.</li>
+</ol>
+<h2 id="validation-evidence">Validation evidence</h2>
+<ul>
+<li>Baseline call quality metrics under normal and degraded conditions.</li>
+<li>Successful failover test records for call control and SIP trunks.</li>
+<li>Security review for signaling/media paths and admin access controls.</li>
+<li>Runbook sign-off by network, platform, and operations owners.</li>
+</ul></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+        <script src="../../assets/scripts/mermaid-init.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
