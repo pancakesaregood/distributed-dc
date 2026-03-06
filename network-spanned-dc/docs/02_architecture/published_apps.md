@@ -10,7 +10,15 @@ A published application is any service intentionally exposed to internet clients
 
 Every published app uses the following per-site component chain:
 
-![Published app component stack](../assets/diagrams/published_apps_component_stack.svg)
+```
+Public DNS (FQDN)
+  -> Edge router internet interface (public IP or anycast VIP)
+    -> Firewall Outside -> DMZ rule (HTTPS 443 only)
+      -> WAF (OWASP inspection + app-specific rules)
+        -> nginx LB (TLS termination, upstream pool, health checks)
+          -> Backend service (Servers/VMs zone, approved app port)
+            -> Database if required (Servers/VMs zone, stateful, same or replicated site)
+```
 
 Each layer is required. There is no bypass path from the internet to a backend without traversing the WAF and LB.
 
@@ -79,12 +87,22 @@ Each published app has a WAF profile applied at the WAF VM:
 
 ## nginx Upstream Configuration
 
-Each published app has a named upstream block in the nginx configuration:
+Each published app has an nginx server block that proxies to a named upstream pool:
+
+```mermaid
+flowchart LR
+  C["Client (HTTPS 443)"] --> N["nginx server block<br/>app.example.com"]
+  N --> U["upstream app_web"]
+  U --> B1["[2001:db8:100::11]:8443"]
+  U --> B2["[2001:db8:100::12]:8443"]
+```
+
+Example configuration:
 
 ```nginx
-upstream app-<name> {
-    server <backend-ipv6-1>:<port> max_fails=3 fail_timeout=10s;
-    server <backend-ipv6-2>:<port> max_fails=3 fail_timeout=10s;
+upstream app_web {
+    server [2001:db8:100::11]:8443 max_fails=3 fail_timeout=10s;
+    server [2001:db8:100::12]:8443 max_fails=3 fail_timeout=10s;
     keepalive 32;
 }
 
@@ -99,7 +117,7 @@ server {
     add_header Strict-Transport-Security "max-age=63072000" always;
 
     location / {
-        proxy_pass http://app-<name>;
+        proxy_pass http://app_web;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
