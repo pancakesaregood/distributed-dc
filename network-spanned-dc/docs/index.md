@@ -1,8 +1,59 @@
 # Spanned Datacenter Documentation Home
 
-This documentation defines a defendable architecture for a low-cost, four-site spanned datacenter using open-source components where practical.
+<div class="hero-panel">
+  <p class="hero-kicker">Four-Site Architecture Blueprint</p>
+  <p class="hero-lead">Build for failure. Operate with clarity. Recover with evidence.</p>
+  <p class="hero-copy">
+    This documentation set is built to move from architecture intent to implementable operations.
+    Use it as a working playbook for design review, implementation planning, and day-2 ownership.
+  </p>
+  <div class="hero-actions">
+    <a class="hero-chip" href="01_scope/scope_of_work/">Start with Scope</a>
+    <a class="hero-chip" href="03_diagrams/diagram_index/">Open Diagram Set</a>
+    <a class="hero-chip" href="10_implementation/readme/">View Implementation Plan</a>
+  </div>
+</div>
 
-See [Architecture Overview](02_architecture/overview.md) for the executive summary, design principles, and constraints.
+## Fast Paths
+
+<div class="home-grid">
+  <a class="home-card" href="01_scope/scope_of_work/">
+    <h3>Scope and Gates</h3>
+    <p>Objectives, boundaries, assumptions, and acceptance criteria.</p>
+  </a>
+  <a class="home-card" href="02_architecture/overview/">
+    <h3>Architecture Core</h3>
+    <p>Executive overview, topology model, and design constraints.</p>
+  </a>
+  <a class="home-card" href="03_diagrams/diagram_index/">
+    <h3>Visual Design Pack</h3>
+    <p>Logical, physical, routing, service, and recovery diagrams.</p>
+  </a>
+  <a class="home-card" href="04_failover_dr/failover_scenarios/">
+    <h3>Failover and DR</h3>
+    <p>Scenario matrix, RTO/RPO targets, runbooks, and test plans.</p>
+  </a>
+  <a class="home-card" href="06_security/security_baseline/">
+    <h3>Security Baseline</h3>
+    <p>Segmentation, identity controls, telemetry, and response guardrails.</p>
+  </a>
+  <a class="home-card" href="07_operations/gitops_operating_model/">
+    <h3>Operations Model</h3>
+    <p>GitOps workflow, lifecycle management, and observability alignment.</p>
+  </a>
+  <a class="home-card" href="10_implementation/readme/">
+    <h3>Implementation Proposal</h3>
+    <p>Phased rollout plan, ownership model, risks, and success criteria.</p>
+  </a>
+  <a class="home-card" href="11_FAQ/readme/">
+    <h3>Role-Based FAQs</h3>
+    <p>Team, executive, operations, security, and support focused FAQs.</p>
+  </a>
+  <a class="home-card" href="12_business_cases/readme/">
+    <h3>Business Cases</h3>
+    <p>Decision-ready cases for resilience, security, automation, and DR.</p>
+  </a>
+</div>
 
 ## Start Here
 - [Scope of Work](01_scope/scope_of_work.md)
@@ -27,9 +78,9 @@ See [Architecture Overview](02_architecture/overview.md) for the executive summa
 - [Operations Foundations](13_operations_foundations/readme.md)
 
 ## Reading Path for Design Reviews
-1. Review scope and acceptance criteria.
+1. Review scope, assumptions, and acceptance criteria.
 2. Review architecture overview, physical layout, and addressing strategy.
-3. Review routing, segmentation, and service spanning model.
-4. Review diagram set (logical, physical, and service flow views).
+3. Review routing, segmentation, service spanning, and WAN abstraction.
+4. Review diagrams for logical and physical implementation views.
 5. Review failover, backup, security, and operations controls.
-6. Confirm unresolved clarifications before implementation.
+6. Close or explicitly accept remaining open decisions.

@@ -3,6 +3,8 @@ site_description: Low-cost 4-site spanned datacenter architecture documentation
 docs_dir: docs
 theme:
   name: mkdocs
+extra_css:
+  - assets/styles/site.css
 
 nav:
   - Home: index.md
