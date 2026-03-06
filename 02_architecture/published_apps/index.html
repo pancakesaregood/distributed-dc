@@ -530,15 +530,19 @@
 <p>Every published app uses the following per-site component chain:</p>
 <pre><code class="language-mermaid">flowchart TD
   DNS[&quot;Public DNS (FQDN)&quot;]
-  EDGE[&quot;Edge Router Internet Interface&lt;br/&gt;(Public IP or Anycast VIP)&quot;]
-  FWRULE[&quot;Firewall Outside -&gt; DMZ Rule&lt;br/&gt;(HTTPS 443 only)&quot;]
-  WAF[&quot;WAF&lt;br/&gt;(OWASP inspection + app-specific rules)&quot;]
-  LB[&quot;nginx LB&lt;br/&gt;(TLS termination, upstream pool, health checks)&quot;]
-  APP[&quot;Backend Service&lt;br/&gt;(Servers/VMs zone, approved app port)&quot;]
-  DB[&quot;Database (optional)&lt;br/&gt;(Servers/VMs zone, same or replicated site)&quot;]
+  EDGE[&quot;Edge Router Internet Interface&quot;]
+  FWRULE[&quot;Firewall DMZ Rule: HTTPS 443&quot;]
+  WAF[&quot;WAF Inspection&quot;]
+  LB[&quot;nginx Load Balancer&quot;]
+  APP[&quot;Backend Service&quot;]
+  DB[&quot;Database (optional)&quot;]
 
-  DNS --&gt; EDGE --&gt; FWRULE --&gt; WAF --&gt; LB --&gt; APP
-  APP -. If required .-&gt; DB
+  DNS --&gt; EDGE
+  EDGE --&gt; FWRULE
+  FWRULE --&gt; WAF
+  WAF --&gt; LB
+  LB --&gt; APP
+  APP --&gt;|if required| DB
 </code></pre>
 <p>Each layer is required. There is no bypass path from the internet to a backend without traversing the WAF and LB.</p>
 <hr />
