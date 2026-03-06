@@ -471,23 +471,23 @@
             
             <li class="nav-item" data-bs-level="1"><a href="#security-team-faq" class="nav-link">Security Team FAQ</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#what-are-the-baseline-controls" class="nav-link">What are the baseline controls?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#what-security-controls-are-always-required-even-before-advanced-features" class="nav-link">What security controls are always required, even before advanced features?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-is-inter-site-traffic-protected" class="nav-link">How is inter-site traffic protected?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-is-traffic-protected-between-sites" class="nav-link">How is traffic protected between sites?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#where-is-internet-ingress-policy-enforced" class="nav-link">Where is internet ingress policy enforced?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#where-do-we-enforce-internet-facing-policy" class="nav-link">Where do we enforce internet-facing policy?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-are-identity-and-access-managed" class="nav-link">How are identity and access managed?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-are-identity-and-permissions-handled" class="nav-link">How are identity and permissions handled?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#what-telemetry-is-expected-for-security-operations" class="nav-link">What telemetry is expected for security operations?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#what-telemetry-is-required-for-security-operations" class="nav-link">What telemetry is required for security operations?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -499,26 +499,16 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="security-team-faq">Security Team FAQ</h1>
-<h2 id="what-are-the-baseline-controls">What are the baseline controls?</h2>
-<ul>
-<li>Zone-based segmentation, default deny, MFA for privileged and remote access, and centralized logging/monitoring.</li>
-</ul>
-<h2 id="how-is-inter-site-traffic-protected">How is inter-site traffic protected?</h2>
-<ul>
-<li>Encrypted with IPsec (IKEv2, AES-256-GCM, PFS) regardless of transport mode.</li>
-</ul>
-<h2 id="where-is-internet-ingress-policy-enforced">Where is internet ingress policy enforced?</h2>
-<ul>
-<li>Through site firewall policy and DMZ controls, including WAF and load balancer tiers.</li>
-</ul>
-<h2 id="how-are-identity-and-access-managed">How are identity and access managed?</h2>
-<ul>
-<li>AD-backed authentication with RBAC policy and LDAPS integrations for services.</li>
-</ul>
-<h2 id="what-telemetry-is-expected-for-security-operations">What telemetry is expected for security operations?</h2>
-<ul>
-<li>Centralized logs, authentication events, firewall/WAF events, and alert-to-runbook mapping for response.</li>
-</ul></div>
+<h2 id="what-security-controls-are-always-required-even-before-advanced-features">What security controls are always required, even before advanced features?</h2>
+<p>We start with strong baseline controls that are simple and dependable: zone-based segmentation, default-deny policy, MFA for privileged and remote access, and centralized logging/monitoring. Think of this as locking internal doors before adding extra cameras and sensors. These controls limit lateral movement, raise authentication confidence, and improve investigation quality. Advanced tooling can be added later, but the baseline cannot be optional.</p>
+<h2 id="how-is-traffic-protected-between-sites">How is traffic protected between sites?</h2>
+<p>Inter-site traffic is encrypted with IPsec using modern parameters (including IKEv2, AES-256-GCM, and PFS) regardless of which WAN transport mode is in use. This means confidentiality and integrity protections are consistent across links, not dependent on provider assumptions. In practical terms, we treat all inter-site paths as untrusted and secure them by design. The encryption policy is meant to be a default operating condition, not a special mode.</p>
+<h2 id="where-do-we-enforce-internet-facing-policy">Where do we enforce internet-facing policy?</h2>
+<p>Internet ingress policy is enforced at site firewalls and DMZ control layers, including WAF and load-balancer tiers where relevant. This creates clear checkpoints for filtering, protocol handling, and exposure management before traffic reaches internal services. It also improves ownership clarity: edge controls are not scattered randomly through the environment. The model is "concentrated enforcement at known control points."</p>
+<h2 id="how-are-identity-and-permissions-handled">How are identity and permissions handled?</h2>
+<p>Identity is anchored in AD-backed authentication, with RBAC policy deciding what each role can do and LDAPS integrations used by dependent services. This allows centralized control, auditability, and policy consistency across systems that need identity decisions. Put simply, authentication answers "who are you?" and RBAC answers "what are you allowed to do?" Keeping both aligned is essential for reliable access governance.</p>
+<h2 id="what-telemetry-is-required-for-security-operations">What telemetry is required for security operations?</h2>
+<p>Security operations need centralized logs plus high-value events such as authentication activity, firewall/WAF events, and alert-to-runbook mappings for response. Logs without response mapping create noise, while response mapping without logs creates blind spots. The goal is actionable visibility: evidence that can drive triage, containment, and post-incident learning. If telemetry cannot support rapid operator decisions, it is incomplete.</p></div>
             </div>
         </div>
 

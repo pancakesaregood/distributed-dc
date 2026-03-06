@@ -471,23 +471,23 @@
             
             <li class="nav-item" data-bs-level="1"><a href="#network-admin-faq" class="nav-link">Network Admin FAQ</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#what-is-the-inter-site-routing-model" class="nav-link">What is the inter-site routing model?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#in-simple-terms-how-do-the-sites-route-traffic-to-each-other" class="nav-link">In simple terms, how do the sites route traffic to each other?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#are-we-stretching-layer-2-between-sites" class="nav-link">Are we stretching Layer 2 between sites?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#are-we-building-one-big-layer-2-network-across-all-sites" class="nav-link">Are we building one big Layer 2 network across all sites?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-are-prefixes-advertised" class="nav-link">How are prefixes advertised?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-are-route-prefixes-announced-and-controlled" class="nav-link">How are route prefixes announced and controlled?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#what-redundancy-is-expected" class="nav-link">What redundancy is expected?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#what-redundancy-should-i-assume-is-present" class="nav-link">What redundancy should I assume is present?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-is-guest-internet-handled" class="nav-link">How is guest internet handled?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-is-guest-internet-access-handled-safely" class="nav-link">How is guest internet access handled safely?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -499,26 +499,16 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="network-admin-faq">Network Admin FAQ</h1>
-<h2 id="what-is-the-inter-site-routing-model">What is the inter-site routing model?</h2>
-<ul>
-<li>BGP over IPsec tunnels across a vendor-managed Layer 3 WAN abstraction.</li>
-</ul>
-<h2 id="are-we-stretching-layer-2-between-sites">Are we stretching Layer 2 between sites?</h2>
-<ul>
-<li>No. Inter-site design is Layer 3 only.</li>
-</ul>
-<h2 id="how-are-prefixes-advertised">How are prefixes advertised?</h2>
-<ul>
-<li>Per-site summary prefixes with policy controls and optional anycast advertisements where appropriate.</li>
-</ul>
-<h2 id="what-redundancy-is-expected">What redundancy is expected?</h2>
-<ul>
-<li>Edge pair per site, dual ToR paths, and multi-tunnel inter-site model with documented failover behavior.</li>
-</ul>
-<h2 id="how-is-guest-internet-handled">How is guest internet handled?</h2>
-<ul>
-<li>Local breakout only, with NAT64/DNS64 for IPv6-only guest clients and no guest access to inter-site WAN paths.</li>
-</ul></div>
+<h2 id="in-simple-terms-how-do-the-sites-route-traffic-to-each-other">In simple terms, how do the sites route traffic to each other?</h2>
+<p>Sites exchange routes using BGP across encrypted IPsec tunnels that run over a vendor-managed Layer 3 WAN abstraction. Think of it as each site having secure "roadways" to every other site, with dynamic signs telling traffic where to go. BGP gives path control and visibility, while IPsec protects data in transit regardless of transport mode underneath. This combination provides operational flexibility without exposing inter-site traffic in plain text.</p>
+<h2 id="are-we-building-one-big-layer-2-network-across-all-sites">Are we building one big Layer 2 network across all sites?</h2>
+<p>No, and that is a deliberate safety choice. Inter-site connectivity stays Layer 3 only, which keeps broadcast domains local and limits blast radius during faults. Stretching Layer 2 across distance can increase failure complexity and make troubleshooting harder under pressure. Layer 3 boundaries make the design easier to reason about, scale, and recover.</p>
+<h2 id="how-are-route-prefixes-announced-and-controlled">How are route prefixes announced and controlled?</h2>
+<p>Routes are advertised primarily as per-site summary prefixes, with policy controls deciding what is accepted and preferred. Anycast can be used where it improves service behavior, but only where it is operationally justified and documented. Summary and policy-based control keep routing tables cleaner and reduce unintended path behavior. In plain language: we advertise intentionally, not everything by default.</p>
+<h2 id="what-redundancy-should-i-assume-is-present">What redundancy should I assume is present?</h2>
+<p>Each site expects an edge pair, dual top-of-rack paths, and multiple inter-site tunnels with documented failover behavior. Redundancy exists at several layers so one device, one cable path, or one tunnel failure does not automatically become a user-visible outage. This does not eliminate incidents, but it gives the system room to absorb failures while teams respond. The key is that failover behavior is known, tested, and documented ahead of time.</p>
+<h2 id="how-is-guest-internet-access-handled-safely">How is guest internet access handled safely?</h2>
+<p>Guest traffic breaks out locally at each site and does not get routed into inter-site corporate paths. For IPv6-only guest clients, NAT64 and DNS64 provide practical access to IPv4 destinations without weakening segmentation intent. This keeps guest usage isolated from internal production traffic and simplifies policy enforcement. The model is straightforward: guest access to internet, not guest access to internal WAN transport.</p></div>
             </div>
         </div>
 

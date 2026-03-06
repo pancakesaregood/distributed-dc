@@ -471,23 +471,23 @@
             
             <li class="nav-item" data-bs-level="1"><a href="#service-desk-faq" class="nav-link">Service Desk FAQ</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#what-should-be-checked-first-during-an-outage-ticket" class="nav-link">What should be checked first during an outage ticket?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#when-an-outage-ticket-arrives-what-should-i-check-first" class="nav-link">When an outage ticket arrives, what should I check first?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#what-are-common-early-indicators-of-platform-issues" class="nav-link">What are common early indicators of platform issues?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#what-are-early-warning-signs-of-platform-trouble" class="nav-link">What are early warning signs of platform trouble?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-should-tickets-be-escalated" class="nav-link">How should tickets be escalated?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-should-i-escalate-tickets-to-the-right-team" class="nav-link">How should I escalate tickets to the right team?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#what-evidence-is-required-before-escalation" class="nav-link">What evidence is required before escalation?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#what-evidence-should-i-attach-before-escalation" class="nav-link">What evidence should I attach before escalation?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#where-are-response-steps-documented" class="nav-link">Where are response steps documented?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#where-are-the-official-response-steps-documented" class="nav-link">Where are the official response steps documented?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -499,26 +499,16 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="service-desk-faq">Service Desk FAQ</h1>
-<h2 id="what-should-be-checked-first-during-an-outage-ticket">What should be checked first during an outage ticket?</h2>
-<ul>
-<li>Scope (single user, single site, multi-site), service impact, and current alert state in monitoring.</li>
-</ul>
-<h2 id="what-are-common-early-indicators-of-platform-issues">What are common early indicators of platform issues?</h2>
-<ul>
-<li>Authentication failures, VPN complaints, API timeout spikes, and site-local service degradation.</li>
-</ul>
-<h2 id="how-should-tickets-be-escalated">How should tickets be escalated?</h2>
-<ul>
-<li>Use documented severity and ownership: network/security/platform based on failing control point.</li>
-</ul>
-<h2 id="what-evidence-is-required-before-escalation">What evidence is required before escalation?</h2>
-<ul>
-<li>Timestamp, affected users/services, site impact, error messages, and any correlated alerts.</li>
-</ul>
-<h2 id="where-are-response-steps-documented">Where are response steps documented?</h2>
-<ul>
-<li>In DR runbooks, failover scenarios, and service-specific operations procedures in <code>docs/</code>.</li>
-</ul></div>
+<h2 id="when-an-outage-ticket-arrives-what-should-i-check-first">When an outage ticket arrives, what should I check first?</h2>
+<p>Start by sizing the problem clearly: is it one user, one site, or multiple sites, and which services are affected? Then check monitoring and alert context so your triage starts from real signals, not assumptions. This first pass defines urgency and helps route the ticket correctly the first time. In plain language, your job is to quickly answer "how big is this?" and "what is most likely broken?"</p>
+<h2 id="what-are-early-warning-signs-of-platform-trouble">What are early warning signs of platform trouble?</h2>
+<p>Common early indicators include repeated authentication failures, VPN complaints, API timeout spikes, and noticeable site-local degradation. One symptom alone may be noisy, but correlated symptoms often indicate a real shared issue. Capturing these patterns early helps reduce mean time to escalation and improves handoff quality. Think of this as recognizing smoke before the fire spreads.</p>
+<h2 id="how-should-i-escalate-tickets-to-the-right-team">How should I escalate tickets to the right team?</h2>
+<p>Escalate using the documented severity model and ownership mapping, selecting network, security, or platform based on the most likely failing control point. Avoid broad "everyone join" escalations unless the impact is critical and ownership is unclear after initial checks. Targeted escalation reduces confusion and gets the right specialist engaged faster. Good triage is less about speed alone and more about precision with evidence.</p>
+<h2 id="what-evidence-should-i-attach-before-escalation">What evidence should I attach before escalation?</h2>
+<p>Include timestamp, affected users or services, site impact, exact error messages, and any correlated alerts from monitoring. This package gives responders immediate context and avoids repeating discovery steps under pressure. Missing context slows incident response and increases the chance of misrouting. If your handoff would let a new responder act within minutes, the evidence quality is good.</p>
+<h2 id="where-are-the-official-response-steps-documented">Where are the official response steps documented?</h2>
+<p>Response steps are documented in DR runbooks, failover scenario documentation, and service-specific procedures in <code>docs/</code>. These documents provide repeatable actions, ownership expectations, and validation checkpoints during incident handling. The service desk should use them as operating guides, not optional references. Consistent use of runbooks is what turns individual experience into team-level reliability.</p></div>
             </div>
         </div>
 

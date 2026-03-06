@@ -471,23 +471,23 @@
             
             <li class="nav-item" data-bs-level="1"><a href="#user-faq" class="nav-link">User FAQ</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#will-this-change-how-i-access-services" class="nav-link">Will this change how I access services?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#will-this-change-how-i-log-in-and-use-services-every-day" class="nav-link">Will this change how I log in and use services every day?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#will-there-be-planned-downtime" class="nav-link">Will there be planned downtime?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#should-i-expect-planned-downtime-during-rollout" class="nav-link">Should I expect planned downtime during rollout?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-is-remote-access-handled" class="nav-link">How is remote access handled?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-does-remote-access-work-in-this-model" class="nav-link">How does remote access work in this model?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#will-my-data-stay-available-if-one-site-fails" class="nav-link">Will my data stay available if one site fails?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#if-one-site-fails-will-my-services-and-data-still-be-available" class="nav-link">If one site fails, will my services and data still be available?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#who-do-i-contact-if-something-is-not-working" class="nav-link">Who do I contact if something is not working?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#who-should-i-contact-if-something-is-not-working" class="nav-link">Who should I contact if something is not working?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -499,26 +499,16 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="user-faq">User FAQ</h1>
-<h2 id="will-this-change-how-i-access-services">Will this change how I access services?</h2>
-<ul>
-<li>Most users should see no workflow change; access continues through approved internal and remote paths.</li>
-</ul>
-<h2 id="will-there-be-planned-downtime">Will there be planned downtime?</h2>
-<ul>
-<li>Some maintenance windows are expected during rollout, with advance communication and staged cutovers.</li>
-</ul>
-<h2 id="how-is-remote-access-handled">How is remote access handled?</h2>
-<ul>
-<li>Through VPN and policy-based access controls with MFA requirements.</li>
-</ul>
-<h2 id="will-my-data-stay-available-if-one-site-fails">Will my data stay available if one site fails?</h2>
-<ul>
-<li>Critical services are designed for multi-site continuity based on service tier and replication model.</li>
-</ul>
-<h2 id="who-do-i-contact-if-something-is-not-working">Who do I contact if something is not working?</h2>
-<ul>
-<li>Contact the service desk first; they follow documented triage and escalation paths.</li>
-</ul></div>
+<h2 id="will-this-change-how-i-log-in-and-use-services-every-day">Will this change how I log in and use services every day?</h2>
+<p>For most people, day-to-day workflows should look the same or very similar. You will still use approved internal access paths on-site and approved remote paths when off-site. The underlying architecture changes are mostly about resilience and operations, not forcing users to relearn normal tasks. If a user-facing change is required, it should be communicated ahead of time with clear instructions.</p>
+<h2 id="should-i-expect-planned-downtime-during-rollout">Should I expect planned downtime during rollout?</h2>
+<p>Some planned maintenance windows are expected as the rollout proceeds in stages. These windows are used to apply controlled changes with validation checkpoints, which is safer than large unannounced cutovers. Teams should communicate timing and expected impact in advance so users can plan around it. The goal is short, predictable disruption now to avoid longer, unplanned disruption later.</p>
+<h2 id="how-does-remote-access-work-in-this-model">How does remote access work in this model?</h2>
+<p>Remote access is provided through VPN and policy-based access controls, with MFA required for stronger identity assurance. This means access decisions are based on both who you are and the policy tied to your role and context. From a user perspective, it may feel similar to current remote access, but controls are more explicit and consistent. In short, the experience aims to stay practical while security confidence improves.</p>
+<h2 id="if-one-site-fails-will-my-services-and-data-still-be-available">If one site fails, will my services and data still be available?</h2>
+<p>Critical services are designed for multi-site continuity based on service tier and replication patterns. That does not mean every service fails over instantly in every scenario, but the architecture is built so major dependencies are not trapped in one location. Recovery targets and behavior are documented so teams know what to expect under different failure cases. The practical outcome is better continuity and clearer recovery behavior during incidents.</p>
+<h2 id="who-should-i-contact-if-something-is-not-working">Who should I contact if something is not working?</h2>
+<p>Start with the service desk so incidents enter the standard triage and escalation workflow. The service desk gathers initial evidence and routes the issue to the right specialist team if needed. This avoids fragmented reporting and helps responders see the full pattern of impact. One consistent intake path improves resolution speed and communication quality.</p></div>
             </div>
         </div>
 

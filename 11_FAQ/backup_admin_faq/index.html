@@ -471,23 +471,23 @@
             
             <li class="nav-item" data-bs-level="1"><a href="#backup-admin-faq" class="nav-link">Backup Admin FAQ</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#what-backup-strategy-is-required" class="nav-link">What backup strategy is required?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#what-is-our-backup-strategy-in-plain-english" class="nav-link">What is our backup strategy in plain English?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#what-data-classes-are-covered" class="nav-link">What data classes are covered?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#what-exactly-do-we-have-to-back-up" class="nav-link">What exactly do we have to back up?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-often-are-restore-tests-required" class="nav-link">How often are restore tests required?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-often-do-we-prove-restores-actually-work" class="nav-link">How often do we prove restores actually work?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-is-ransomware-resilience-addressed" class="nav-link">How is ransomware resilience addressed?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-do-we-design-backups-to-resist-ransomware" class="nav-link">How do we design backups to resist ransomware?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#what-proves-backup-readiness" class="nav-link">What proves backup readiness?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#what-counts-as-proof-that-backup-readiness-is-real" class="nav-link">What counts as proof that backup readiness is real?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -499,26 +499,16 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="backup-admin-faq">Backup Admin FAQ</h1>
-<h2 id="what-backup-strategy-is-required">What backup strategy is required?</h2>
-<ul>
-<li>3-2-1 aligned model with local recoverability plus at least one off-domain or immutable copy.</li>
-</ul>
-<h2 id="what-data-classes-are-covered">What data classes are covered?</h2>
-<ul>
-<li>Tier 1 stateful data, platform configs, repositories, VM images, and supporting service metadata.</li>
-</ul>
-<h2 id="how-often-are-restore-tests-required">How often are restore tests required?</h2>
-<ul>
-<li>Scheduled restore exercises per documented cadence, including monthly sampling and broader periodic tests.</li>
-</ul>
-<h2 id="how-is-ransomware-resilience-addressed">How is ransomware resilience addressed?</h2>
-<ul>
-<li>Through immutability controls, credential separation, and validated restore workflows.</li>
-</ul>
-<h2 id="what-proves-backup-readiness">What proves backup readiness?</h2>
-<ul>
-<li>Successful restore evidence, retention compliance, and alignment with RTO/RPO targets in DR documentation.</li>
-</ul></div>
+<h2 id="what-is-our-backup-strategy-in-plain-english">What is our backup strategy in plain English?</h2>
+<p>We follow a "3-2-1" style strategy because it is a practical safety net: keep multiple copies, keep them on different storage types, and keep at least one copy separated from the main environment. One copy should be recoverable quickly for common incidents, while another should be isolated or immutable so it cannot be easily altered by an attacker or admin mistake. This gives us both speed and durability. The short version is: one backup is not a strategy, and two similar backups in one blast radius are still risky.</p>
+<h2 id="what-exactly-do-we-have-to-back-up">What exactly do we have to back up?</h2>
+<p>We back up the important business data and also the technical pieces needed to rebuild services correctly. That includes Tier 1 stateful data, platform configurations, repositories, VM images, and related service metadata. If you can recover files but cannot recover identity mappings, configs, or automation state, your restore is incomplete. A good backup scope restores service behavior, not just raw bytes.</p>
+<h2 id="how-often-do-we-prove-restores-actually-work">How often do we prove restores actually work?</h2>
+<p>Backups are tested on a documented cadence, with regular monthly sampling plus broader scheduled recovery exercises. This matters because "backup completed" is not the same as "recovery will succeed under pressure." Restore tests prove that retention, integrity, permissions, and runbook steps still match reality. If a team cannot restore predictably in test, it should assume risk in production until fixed.</p>
+<h2 id="how-do-we-design-backups-to-resist-ransomware">How do we design backups to resist ransomware?</h2>
+<p>We combine immutability controls, separated credentials, and restore workflows that are tested end to end. Immutability helps prevent silent modification or deletion of backup sets, and credential separation limits how far one compromised account can reach. We also verify that restore procedures work without requiring compromised systems to be trusted. In practical terms, resilience is not just storage configuration; it is the full process from compromise to clean recovery.</p>
+<h2 id="what-counts-as-proof-that-backup-readiness-is-real">What counts as proof that backup readiness is real?</h2>
+<p>Readiness is demonstrated by evidence, not intent. We need successful restore results, retention policy compliance, and alignment with documented RTO/RPO goals in DR materials. Evidence should be timestamped, reproducible, and understandable by operations and audit stakeholders. If we cannot show recent proof, we should treat recovery confidence as unknown and close the gap quickly.</p></div>
             </div>
         </div>
 

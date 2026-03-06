@@ -471,23 +471,23 @@
             
             <li class="nav-item" data-bs-level="1"><a href="#server-team-faq" class="nav-link">Server Team FAQ</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#what-is-the-server-platform-baseline" class="nav-link">What is the server platform baseline?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#what-is-our-default-server-platform-in-simple-terms" class="nav-link">What is our default server platform, in simple terms?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-many-hosts-are-required-per-site" class="nav-link">How many hosts are required per site?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-many-hosts-should-each-site-have-at-minimum" class="nav-link">How many hosts should each site have at minimum?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-should-hosts-connect-to-the-network" class="nav-link">How should hosts connect to the network?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-should-hosts-be-connected-to-the-network" class="nav-link">How should hosts be connected to the network?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#how-are-workloads-placed" class="nav-link">How are workloads placed?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-do-we-place-workloads-so-failures-hurt-less" class="nav-link">How do we place workloads so failures hurt less?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#what-are-the-patching-expectations" class="nav-link">What are the patching expectations?</a>
+            <li class="nav-item" data-bs-level="2"><a href="#how-should-patching-be-executed-safely" class="nav-link">How should patching be executed safely?</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -499,26 +499,16 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="server-team-faq">Server Team FAQ</h1>
-<h2 id="what-is-the-server-platform-baseline">What is the server platform baseline?</h2>
-<ul>
-<li>KVM-based virtualization with Podman for containerized services where appropriate.</li>
-</ul>
-<h2 id="how-many-hosts-are-required-per-site">How many hosts are required per site?</h2>
-<ul>
-<li>Minimum two hypervisor nodes per site, expanding to additional hosts by capacity and resilience targets.</li>
-</ul>
-<h2 id="how-should-hosts-connect-to-the-network">How should hosts connect to the network?</h2>
-<ul>
-<li>Dual-homed to ToR-A and ToR-B with A/B cable path separation.</li>
-</ul>
-<h2 id="how-are-workloads-placed">How are workloads placed?</h2>
-<ul>
-<li>Tier 1 services are spread across hosts and sites; anti-affinity prevents critical replicas on the same host.</li>
-</ul>
-<h2 id="what-are-the-patching-expectations">What are the patching expectations?</h2>
-<ul>
-<li>Staged maintenance by site and tier, with pre-checks, rollback plans, and post-change validation.</li>
-</ul></div>
+<h2 id="what-is-our-default-server-platform-in-simple-terms">What is our default server platform, in simple terms?</h2>
+<p>The baseline is KVM virtualization for core compute, with Podman used when containerized services are the right fit. You can think of KVM as the main apartment building and containers as lightweight units used when speed and portability help. This approach keeps the platform predictable while still allowing modern service packaging patterns. The intent is practical flexibility without uncontrolled platform sprawl.</p>
+<h2 id="how-many-hosts-should-each-site-have-at-minimum">How many hosts should each site have at minimum?</h2>
+<p>Each site needs at least two hypervisor hosts so one host failure does not immediately remove the site from service. Additional hosts are added based on capacity forecasts and resilience targets, not by guesswork. Minimum counts provide fault tolerance; scaling decisions provide performance headroom. In short, two is the floor, not the long-term plan for growth-heavy workloads.</p>
+<h2 id="how-should-hosts-be-connected-to-the-network">How should hosts be connected to the network?</h2>
+<p>Hosts should be dual-homed to ToR-A and ToR-B, with physical A/B cable path separation. This avoids single points of failure in both switching and physical cabling paths. If one switch or one cable path fails, the host should still maintain network connectivity. The design assumes real-world failures and builds survivability directly into host wiring standards.</p>
+<h2 id="how-do-we-place-workloads-so-failures-hurt-less">How do we place workloads so failures hurt less?</h2>
+<p>Tier 1 services are spread across hosts and sites, and anti-affinity rules prevent critical replicas from landing on the same host. That means one host outage is less likely to remove all copies of an important service. Placement policy is a resilience control, not just a scheduling preference. A good placement strategy turns hardware failures into manageable events instead of major incidents.</p>
+<h2 id="how-should-patching-be-executed-safely">How should patching be executed safely?</h2>
+<p>Patching is done in staged waves by site and service tier, with pre-checks, rollback plans, and post-change validation required each time. This prevents all risk from being concentrated in one maintenance window and gives teams controlled stopping points. The goal is not to patch quickly at all costs; the goal is to patch safely and keep service quality stable. Good patch practice is measured by reliable outcomes, not just patch count.</p></div>
             </div>
         </div>
 
