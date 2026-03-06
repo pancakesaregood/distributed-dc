@@ -13,15 +13,19 @@ Every published app uses the following per-site component chain:
 ```mermaid
 flowchart TD
   DNS["Public DNS (FQDN)"]
-  EDGE["Edge Router Internet Interface<br/>(Public IP or Anycast VIP)"]
-  FWRULE["Firewall Outside -> DMZ Rule<br/>(HTTPS 443 only)"]
-  WAF["WAF<br/>(OWASP inspection + app-specific rules)"]
-  LB["nginx LB<br/>(TLS termination, upstream pool, health checks)"]
-  APP["Backend Service<br/>(Servers/VMs zone, approved app port)"]
-  DB["Database (optional)<br/>(Servers/VMs zone, same or replicated site)"]
+  EDGE["Edge Router Internet Interface"]
+  FWRULE["Firewall DMZ Rule: HTTPS 443"]
+  WAF["WAF Inspection"]
+  LB["nginx Load Balancer"]
+  APP["Backend Service"]
+  DB["Database (optional)"]
 
-  DNS --> EDGE --> FWRULE --> WAF --> LB --> APP
-  APP -. If required .-> DB
+  DNS --> EDGE
+  EDGE --> FWRULE
+  FWRULE --> WAF
+  WAF --> LB
+  LB --> APP
+  APP -->|if required| DB
 ```
 
 Each layer is required. There is no bypass path from the internet to a backend without traversing the WAF and LB.
