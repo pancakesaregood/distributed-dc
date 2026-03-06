@@ -2,7 +2,7 @@
 
 ## What a Published App Is
 
-A published application is any service intentionally exposed to internet clients through the DMZ stack at one or more sites. Published apps are not directly reachable from the internet — all inbound traffic passes through the firewall DMZ rule, the WAF, and the nginx load balancer before reaching any backend. Internal users reaching the same service from inside the network are served directly by the firewall zone policy without traversing the DMZ stack.
+A published application is any service intentionally exposed to internet clients through the DMZ stack at one or more sites. Published apps are not directly reachable from the internet - all inbound traffic passes through the firewall DMZ rule, the WAF, and the nginx load balancer before reaching any backend. Internal users reaching the same service from inside the network are served directly by the firewall zone policy without traversing the DMZ stack.
 
 ---
 
@@ -12,12 +12,12 @@ Every published app uses the following per-site component chain:
 
 ```
 Public DNS (FQDN)
-  → Edge router internet interface (public IP or anycast VIP)
-    → Firewall Outside → DMZ rule (HTTPS 443 only)
-      → WAF (OWASP inspection + app-specific rules)
-        → nginx LB (TLS termination, upstream pool, health checks)
-          → Backend service (Servers/VMs zone, approved app port)
-            → Database if required (Servers/VMs zone, stateful, same or replicated site)
+  -> Edge router internet interface (public IP or anycast VIP)
+    -> Firewall Outside -> DMZ rule (HTTPS 443 only)
+      -> WAF (OWASP inspection + app-specific rules)
+        -> nginx LB (TLS termination, upstream pool, health checks)
+          -> Backend service (Servers/VMs zone, approved app port)
+            -> Database if required (Servers/VMs zone, stateful, same or replicated site)
 ```
 
 Each layer is required. There is no bypass path from the internet to a backend without traversing the WAF and LB.
@@ -53,11 +53,11 @@ A public A/AAAA record points to the edge router's internet-facing IPv4 or IPv6 
 
 - Simple to operate.
 - If the site is unavailable, the service is unavailable until DNS is manually updated or TTL expires.
-- Use low TTLs (60–300 seconds) if manual failover is a recovery option.
+- Use low TTLs (60-300 seconds) if manual failover is a recovery option.
 
 ### Multi-Site with GeoDNS
 
-Multiple A/AAAA records — one per publishing site — with a GeoDNS provider routing clients to the nearest site by geography or latency. Each site publishes the same FQDN with its own IP.
+Multiple A/AAAA records - one per publishing site - with a GeoDNS provider routing clients to the nearest site by geography or latency. Each site publishes the same FQDN with its own IP.
 
 - No single IP dependency. Failure of one site causes GeoDNS to remove its record.
 - Health checks at the GeoDNS provider gate record withdrawal on site-level health.
@@ -67,7 +67,7 @@ Multiple A/AAAA records — one per publishing site — with a GeoDNS provider r
 
 An anycast `/128` loopback address is advertised from multiple sites via BGP. All sites advertise the same address; routing selects the nearest. The nginx LB VIP at each site is bound to this loopback.
 
-- No DNS dependency for routing decisions — BGP handles path selection.
+- No DNS dependency for routing decisions - BGP handles path selection.
 - Withdraw the advertisement from a site when the local service is unhealthy (health-gated route advertisement).
 - Preferred for stateless services with consistent backend state or read-only workloads.
 - Do not use anycast for stateful write paths unless write coordination is explicitly handled at the application layer.
@@ -129,7 +129,7 @@ Two firewall rules are created per published app:
 | Inbound to WAF | Outside | DMZ | TCP 443 (HTTPS) | Permit |
 | LB to backend | DMZ | Servers/VMs | TCP `<app port>` | Permit |
 
-No other ports are opened. If the app requires HTTP-to-HTTPS redirect, an additional rule for TCP 80 → DMZ is added with the redirect handled at nginx (302 to HTTPS). HTTP 80 never reaches the backend.
+No other ports are opened. If the app requires HTTP-to-HTTPS redirect, an additional rule for TCP 80 -> DMZ is added with the redirect handled at nginx (302 to HTTPS). HTTP 80 never reaches the backend.
 
 ---
 
@@ -148,7 +148,7 @@ No other ports are opened. If the app requires HTTP-to-HTTPS redirect, an additi
 |---|---|
 | Stateless frontends and APIs | Run at all publishing sites independently. No coordination required. |
 | Session state | Store in a shared backend (Redis or DB) replicated across sites. Do not use sticky sessions at the LB layer unless the session store is unavailable. |
-| Stateful DB (writes) | Single primary DB site. Read replicas at other sites for read traffic. Writes must route to the primary via internal routing — do not expose write endpoints externally. |
+| Stateful DB (writes) | Single primary DB site. Read replicas at other sites for read traffic. Writes must route to the primary via internal routing - do not expose write endpoints externally. |
 | Uploaded/stored files | Replicate to object storage accessible at all sites over IPsec-encrypted inter-site tunnels. |
 
 ---
@@ -159,19 +159,19 @@ See the [Published App Publish Workflow diagram](../03_diagrams/published_apps_f
 
 ### Steps
 
-1. **Request and scope** — app owner submits publish request with FQDN, backend IPs/ports, TLS cert source, and WAF exception requirements (if any).
-2. **Architecture review** — confirm backend tier (stateless or stateful), spanning model, and DNS strategy. Assign a site or set of sites.
-3. **GitOps PRs** — open PRs for all configuration:
+1. **Request and scope** - app owner submits publish request with FQDN, backend IPs/ports, TLS cert source, and WAF exception requirements (if any).
+2. **Architecture review** - confirm backend tier (stateless or stateful), spanning model, and DNS strategy. Assign a site or set of sites.
+3. **GitOps PRs** - open PRs for all configuration:
    - nginx upstream and server block
    - WAF profile (base + app-specific rules)
    - Firewall DMZ rule (inbound) and DMZ-to-backend rule
    - TLS certificate (stored in secrets manager, referenced by nginx)
-4. **Peer review and merge** — all PRs reviewed and merged to main. Automation applies configuration to staging environment.
-5. **Staging validation** — verify:
+4. **Peer review and merge** - all PRs reviewed and merged to main. Automation applies configuration to staging environment.
+5. **Staging validation** - verify:
    - HTTPS reachable, correct cert, HSTS header present
    - WAF blocking a test injection payload (e.g., `?q=<script>alert(1)</script>`)
    - nginx upstream health check green
    - Firewall correctly denying non-HTTPS ports
-6. **DNS cutover** — update public DNS to point FQDN at the edge IP or anycast VIP. Use a short TTL during cutover.
-7. **Production smoke test** — verify reachability, cert, and basic app function from an external connection.
-8. **Monitoring** — confirm traffic appears in nginx access logs, WAF event log, and observability dashboards. Set alert thresholds for error rate and latency.
+6. **DNS cutover** - update public DNS to point FQDN at the edge IP or anycast VIP. Use a short TTL during cutover.
+7. **Production smoke test** - verify reachability, cert, and basic app function from an external connection.
+8. **Monitoring** - confirm traffic appears in nginx access logs, WAF event log, and observability dashboards. Set alert thresholds for error rate and latency.
