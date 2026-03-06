@@ -18,6 +18,7 @@ nav:
       - IPv6 Addressing: 02_architecture/ipv6_addressing.md
       - Segmentation: 02_architecture/segmentation.md
       - Routing and WAN Abstraction: 02_architecture/routing_wan_abstraction.md
+      - WAN Transport Abstraction: 02_architecture/wan_transport_abstraction.md
       - SDN Options: 02_architecture/sdn_options.md
       - Compute Platform: 02_architecture/compute_platform.md
       - Services Spanning Model: 02_architecture/services_spanning_model.md
@@ -32,6 +33,7 @@ nav:
       - Failover Matrix Diagram: 03_diagrams/failover_matrix.mmd.md
       - DHCP and AD Services: 03_diagrams/dhcp_ad_services.mmd.md
       - Remote Access VPN Flow: 03_diagrams/vpn_access.mmd.md
+      - WAN Transport Modes: 03_diagrams/wan_transport.mmd.md
       - Client and Service Interactions: 03_diagrams/client_service_interactions.mmd.md
   - 04 Failover and DR:
       - Failover Scenarios: 04_failover_dr/failover_scenarios.md
