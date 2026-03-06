@@ -11,7 +11,7 @@ flowchart LR
   PRN --> OUT["Printed Output"]
 
   SEC["Secure Release Station (optional)"] --> PRN
-  LOG["Central Logging"] <-- PS
+  PS --> LOG["Central Logging"]
 
   style PS fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
   style PRN fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
