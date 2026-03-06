@@ -81,3 +81,10 @@ nav:
       - Network Admin FAQ: 11_FAQ/network_admin_faq.md
       - Security Team FAQ: 11_FAQ/security_team_faq.md
       - Backup Admin FAQ: 11_FAQ/backup_admin_faq.md
+  - 12 Business Cases:
+      - Business Cases Home: 12_business_cases/readme.md
+      - Multi-Site Resilience Baseline: 12_business_cases/business_case_01_multi_site_resilience.md
+      - Security Control Uplift: 12_business_cases/business_case_02_security_control_uplift.md
+      - GitOps and Operations Automation: 12_business_cases/business_case_03_gitops_automation.md
+      - VDI Service Enablement: 12_business_cases/business_case_04_vdi_enablement.md
+      - Backup and DR Assurance: 12_business_cases/business_case_05_backup_dr_assurance.md

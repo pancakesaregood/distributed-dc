@@ -23,6 +23,7 @@ See [Architecture Overview](02_architecture/overview.md) for the executive summa
 - [Abstractions and Clarifications Needed](09_appendix/abstractions_clarifications_needed.md)
 - [Implementation Proposal](10_implementation/readme.md)
 - [FAQ Home](11_FAQ/readme.md)
+- [Business Cases Home](12_business_cases/readme.md)
 
 ## Reading Path for Design Reviews
 1. Review scope and acceptance criteria.
