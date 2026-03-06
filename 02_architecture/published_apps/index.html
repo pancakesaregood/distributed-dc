@@ -528,22 +528,7 @@
 <hr />
 <h2 id="component-stack">Component Stack</h2>
 <p>Every published app uses the following per-site component chain:</p>
-<pre><code class="language-mermaid">flowchart TD
-  DNS[&quot;Public DNS (FQDN)&quot;]
-  EDGE[&quot;Edge Router Internet Interface&quot;]
-  FWRULE[&quot;Firewall DMZ Rule: HTTPS 443&quot;]
-  WAF[&quot;WAF Inspection&quot;]
-  LB[&quot;nginx Load Balancer&quot;]
-  APP[&quot;Backend Service&quot;]
-  DB[&quot;Database (optional)&quot;]
-
-  DNS --&gt; EDGE
-  EDGE --&gt; FWRULE
-  FWRULE --&gt; WAF
-  WAF --&gt; LB
-  LB --&gt; APP
-  APP --&gt;|if required| DB
-</code></pre>
+<p><img alt="Published app component stack" src="../../assets/diagrams/published_apps_component_stack.svg" /></p>
 <p>Each layer is required. There is no bypass path from the internet to a backend without traversing the WAF and LB.</p>
 <hr />
 <h2 id="application-types">Application Types</h2>
