@@ -23,6 +23,7 @@ nav:
       - Compute Platform: 02_architecture/compute_platform.md
       - Services Spanning Model: 02_architecture/services_spanning_model.md
       - VDI as a Service: 02_architecture/vdi_service.md
+      - Published Applications: 02_architecture/published_apps.md
   - 03 Diagrams:
       - Diagram Index: 03_diagrams/diagram_index.md
       - Global Topology: 03_diagrams/topology_global.mmd.md
@@ -36,6 +37,7 @@ nav:
       - Remote Access VPN Flow: 03_diagrams/vpn_access.mmd.md
       - WAN Transport Modes: 03_diagrams/wan_transport.mmd.md
       - VDI Service Architecture: 03_diagrams/vdi_service.mmd.md
+      - Published App Flows: 03_diagrams/published_apps_flow.mmd.md
       - Client and Service Interactions: 03_diagrams/client_service_interactions.mmd.md
   - 04 Failover and DR:
       - Failover Scenarios: 04_failover_dr/failover_scenarios.md

@@ -11,6 +11,7 @@
 - [Remote Access VPN Flow](vpn_access.mmd.md)
 - [WAN Transport Modes](wan_transport.mmd.md)
 - [VDI Service Architecture](vdi_service.mmd.md)
+- [Published App Flows](published_apps_flow.mmd.md)
 - [Client and Service Interactions](client_service_interactions.mmd.md)
 
 All diagrams are Mermaid and render directly in Markdown-capable viewers.
