@@ -1,13 +1,36 @@
-﻿# Out of Scope
+# Out of Scope
 
-The following items are intentionally excluded from this design set:
+The following items are intentionally excluded from this architecture documentation set.
 
-- WAN carrier selection, circuit procurement, and contract negotiation.
-- Application rewrite projects required for cloud-native conversion.
-- Site construction, facilities engineering, and physical security build-outs.
-- Proprietary management appliances when open-source alternatives satisfy requirements.
-- Production secret distribution and credential rotation implementation details.
-- Endpoint device lifecycle and desktop support processes.
-- Regulatory audit execution or legal attestation activities.
+## Procurement and Commercial Activities
+- Carrier selection, contract negotiation, and circuit procurement.
+- Hardware vendor selection, quote comparison, and purchase approvals.
+- Licensing negotiation for commercial software or managed services.
 
-These exclusions protect delivery focus and avoid coupling architecture decisions to unresolved procurement or policy workflows.
+## Build and Migration Execution
+- Hands-on production implementation of network, firewall, compute, or storage systems.
+- Application migration planning, cutover execution, and rollback ownership.
+- Data migration tooling, sequencing, and dry-run execution.
+- End-user endpoint rollout or desktop migration programs.
+
+## Facilities and Physical Works
+- Site construction, cage design, and raised-floor or containment projects.
+- Electrical and HVAC engineering design or commissioning.
+- Physical access control systems, surveillance deployment, and guard operations.
+
+## Runtime Operations Delivery
+- Day-to-day NOC/SOC staffing model and shift scheduling.
+- Help desk process design for endpoint or user support.
+- Continuous incident triage operations beyond runbook definition.
+
+## Compliance and Legal Deliverables
+- Formal compliance audit execution and evidence submission.
+- Legal attestation, policy certification, or regulator-facing reporting.
+- Jurisdiction-specific legal interpretation and counsel.
+
+## Secret Material and Trust Fabric Operations
+- Production key generation, certificate authority governance, and root-of-trust ceremonies.
+- Secret distribution implementation and credential rotation operations.
+- Privileged access workstation build and hardening execution.
+
+These exclusions keep this project focused on architecture quality, implementation guidance, and operational readiness documentation.
