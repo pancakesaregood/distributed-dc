@@ -25,6 +25,10 @@ The same suffix map is used at every site for operational consistency.
 | `:00f0` | Loopbacks | Router and service loopback /128 addresses |
 | `:00ff` | Transit | Point-to-point routed links |
 
+## Number of IP Addresses per Segment
+2⁶⁴ = 18,446,744,073,709,551,616 addresses
+18.4 quintillion IP addresses
+
 ## Examples by Site
 
 ### Site A (`fdca:fcaf:e000::/56`)
