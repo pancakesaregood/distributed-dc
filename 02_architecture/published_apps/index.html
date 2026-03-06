@@ -528,7 +528,14 @@
 <hr />
 <h2 id="component-stack">Component Stack</h2>
 <p>Every published app uses the following per-site component chain:</p>
-<p><img alt="Published app component stack" src="../../assets/diagrams/published_apps_component_stack.svg" /></p>
+<pre><code>Public DNS (FQDN)
+  -&gt; Edge router internet interface (public IP or anycast VIP)
+    -&gt; Firewall Outside -&gt; DMZ rule (HTTPS 443 only)
+      -&gt; WAF (OWASP inspection + app-specific rules)
+        -&gt; nginx LB (TLS termination, upstream pool, health checks)
+          -&gt; Backend service (Servers/VMs zone, approved app port)
+            -&gt; Database if required (Servers/VMs zone, stateful, same or replicated site)
+</code></pre>
 <p>Each layer is required. There is no bypass path from the internet to a backend without traversing the WAF and LB.</p>
 <hr />
 <h2 id="application-types">Application Types</h2>
@@ -612,10 +619,17 @@
 </ul>
 <hr />
 <h2 id="nginx-upstream-configuration">nginx Upstream Configuration</h2>
-<p>Each published app has a named upstream block in the nginx configuration:</p>
-<pre><code class="language-nginx">upstream app-&lt;name&gt; {
-    server &lt;backend-ipv6-1&gt;:&lt;port&gt; max_fails=3 fail_timeout=10s;
-    server &lt;backend-ipv6-2&gt;:&lt;port&gt; max_fails=3 fail_timeout=10s;
+<p>Each published app has an nginx server block that proxies to a named upstream pool:</p>
+<pre><code class="language-mermaid">flowchart LR
+  C[&quot;Client (HTTPS 443)&quot;] --&gt; N[&quot;nginx server block&lt;br/&gt;app.example.com&quot;]
+  N --&gt; U[&quot;upstream app_web&quot;]
+  U --&gt; B1[&quot;[2001:db8:100::11]:8443&quot;]
+  U --&gt; B2[&quot;[2001:db8:100::12]:8443&quot;]
+</code></pre>
+<p>Example configuration:</p>
+<pre><code class="language-nginx">upstream app_web {
+    server [2001:db8:100::11]:8443 max_fails=3 fail_timeout=10s;
+    server [2001:db8:100::12]:8443 max_fails=3 fail_timeout=10s;
     keepalive 32;
 }
 
@@ -630,7 +644,7 @@ server {
     add_header Strict-Transport-Security &quot;max-age=63072000&quot; always;
 
     location / {
-        proxy_pass http://app-&lt;name&gt;;
+        proxy_pass http://app_web;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
