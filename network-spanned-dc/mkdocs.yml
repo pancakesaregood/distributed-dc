@@ -88,3 +88,11 @@ nav:
       - GitOps and Operations Automation: 12_business_cases/business_case_03_gitops_automation.md
       - VDI Service Enablement: 12_business_cases/business_case_04_vdi_enablement.md
       - Backup and DR Assurance: 12_business_cases/business_case_05_backup_dr_assurance.md
+  - 13 Operations Foundations:
+      - Foundations Home: 13_operations_foundations/readme.md
+      - Monitoring: 13_operations_foundations/monitoring.md
+      - Observability: 13_operations_foundations/observability.md
+      - Identity: 13_operations_foundations/identity.md
+      - Authentication: 13_operations_foundations/authentication.md
+      - Storage: 13_operations_foundations/storage.md
+      - Capacity Planning: 13_operations_foundations/capacity_planning.md

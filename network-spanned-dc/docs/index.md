@@ -24,6 +24,7 @@ See [Architecture Overview](02_architecture/overview.md) for the executive summa
 - [Implementation Proposal](10_implementation/readme.md)
 - [FAQ Home](11_FAQ/readme.md)
 - [Business Cases Home](12_business_cases/readme.md)
+- [Operations Foundations](13_operations_foundations/readme.md)
 
 ## Reading Path for Design Reviews
 1. Review scope and acceptance criteria.
