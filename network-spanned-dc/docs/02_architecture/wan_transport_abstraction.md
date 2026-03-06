@@ -84,10 +84,12 @@ These parameters apply regardless of transport mode:
 
 ## Topology Implications
 
-- Full-mesh IPsec tunnels are maintained between all site edge pairs regardless of transport mode.
-- Sites can run different transport modes simultaneously. For example, Site A and Site B may have private circuits (Mode A) while Site C and Site D use consumer internet (Mode B). All four sites remain in the same full-mesh IPsec overlay.
-- BGP sessions run inside the IPsec tunnels on both modes. BGP peer addresses are IPv6 ULA addresses reachable only through the tunnel.
-- Route advertisement, prefix policy, and anycast behavior are identical on both transports.
+- Each site operates two edge nodes (Edge-A and Edge-B). Each edge node establishes independent IPsec tunnels to each edge node at every other site.
+- Per site pair, four tunnels are maintained: Edge-A to remote Edge-A (A–A), Edge-A to remote Edge-B (A–B), Edge-B to remote Edge-A (B–A), and Edge-B to remote Edge-B (B–B). With four sites and six site pairs, the fabric carries 24 tunnels in total.
+- All four tunnels per site pair are held established at all times. Cross-connect tunnels are not brought up on demand; they must be immediately ready to carry traffic without a new IKEv2 negotiation cycle.
+- Sites can run different transport modes simultaneously. For example, Site A and Site B may have private circuits (Mode A) while Site C and Site D use consumer internet (Mode B). All four sites remain in the same full-mesh IPsec overlay with the same 4-tunnel-per-pair model.
+- BGP primary sessions run on A–A matched-pair tunnels. BGP secondary sessions run on B–B matched-pair tunnels. Cross-connect tunnels (A–B, B–A) forward traffic under routing policy without additional BGP sessions by default.
+- Route advertisement, prefix policy, and anycast behavior are identical on both transports and across all tunnel roles.
 
 ---
 

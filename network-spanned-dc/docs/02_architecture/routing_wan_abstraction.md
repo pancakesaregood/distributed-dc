@@ -8,8 +8,33 @@ The WAN is treated as a vendor-managed L3 handoff. This design specifies require
 - IPsec mode: tunnel mode with IKEv2 key exchange.
 - Cipher suite: AES-256-GCM for encryption, SHA-256 or stronger for integrity, Perfect Forward Secrecy enabled.
 - IPsec tunnels are established between every pair of sites, forming a full-mesh encrypted overlay.
-- BGP sessions run inside the IPsec tunnel; BGP MD5 or TCP-AO session authentication is applied as an additional control-plane hardening measure.
+- BGP sessions run inside the IPsec tunnels; BGP TCP-AO session authentication is applied as an additional control-plane hardening measure.
 - IPsec session keys are rotated on a defined schedule and on any security incident involving edge credentials.
+
+## Multi-Tunnel Redundancy Model
+
+Each site operates an edge pair (Edge-A and Edge-B). Each edge node establishes independent IPsec tunnels to **each** edge node at every remote site. This produces four tunnels per site pair rather than one:
+
+| Tunnel | Local | Remote | Role |
+|---|---|---|---|
+| A–A | Edge-A | Remote Edge-A | Primary — matched pair, preferred path |
+| B–B | Edge-B | Remote Edge-B | Secondary — matched pair, failover path |
+| A–B | Edge-A | Remote Edge-B | Cross-connect — available if remote Edge-A fails |
+| B–A | Edge-B | Remote Edge-A | Cross-connect — available if local Edge-A fails |
+
+With 4 sites and 6 site pairs, the fabric carries 24 IPsec tunnels in total.
+
+**Redundancy properties:**
+- Loss of one local edge node: 2 of 4 tunnels to each remote site remain active. Traffic reroutes automatically over the surviving edge.
+- Loss of one remote edge node: same — 2 tunnels per affected site pair remain.
+- Loss of one WAN path for a single edge: that edge's tunnels reroute or re-establish over its surviving path. The other edge's tunnels are unaffected.
+- Simultaneous loss of a local edge AND the primary path on the remaining edge: the B–A or A–B cross-connect tunnel carries traffic on the surviving path until the failed components recover.
+
+**BGP session assignment:**
+- Primary BGP sessions run on A–A tunnels (Edge-A to remote Edge-A for each site pair).
+- Secondary BGP sessions run on B–B tunnels (Edge-B to remote Edge-B for each site pair).
+- Cross-connect tunnels (A–B, B–A) carry forwarded traffic under routing policy but do not carry additional BGP sessions by default. Add cross-connect BGP sessions if stricter convergence guarantees are required.
+- Each edge node therefore maintains `(n-1) × 2` BGP sessions where n is the number of sites (6 sessions per edge, 12 per site across both edges).
 
 ## Required WAN Capabilities
 - Private circuit or VPN service providing logically isolated inter-site L3 connectivity.
@@ -45,17 +70,19 @@ Approach:
 - Keep stateful backends non-anycast unless replication semantics are proven safe.
 
 ## Failure Behavior Expectations
-- Loss of one edge node: traffic fails over to surviving local edge without manual route changes. The surviving edge continues terminating IPsec tunnels.
-- Loss of one WAN path: BGP convergence reroutes through remaining path. IPsec tunnels re-establish over the surviving path.
+- Loss of one edge node: the surviving local edge retains 2 of 4 tunnels to each remote site (B–B and B–A if Edge-B survives, or A–A and A–B if Edge-A survives). BGP withdraws routes learned via the failed edge. No manual intervention required.
+- Loss of one WAN path on a single edge: IPsec tunnels from that edge re-establish over its surviving internet path (for Mode B) or fail if the only WAN path is gone. The paired edge and its tunnels are unaffected.
+- Loss of both tunnels to a remote site from one local edge: cross-connect tunnels from the other local edge carry traffic to that remote site. BGP routes are still available via the secondary BGP session.
 - Loss of BGP control plane: static fallback procedure restores minimal inter-site reachability. IPsec tunnels must remain operational for any static fallback traffic to be encrypted.
-- Full site failure: failed site routes withdraw; traffic shifts to available sites hosting replicated services. IPsec tunnels from failed site tear down on IKEv2 dead-peer detection timeout.
-- IPsec tunnel failure without WAN failure: treat as equivalent to edge node loss; route traffic through surviving local edge and its tunnel set while investigating the tunnel failure.
+- Full site failure: all 8 tunnels from the failed site tear down on IKEv2 dead-peer detection timeout. Failed site routes withdraw from all remaining sites via BGP. Traffic shifts to available sites hosting replicated services.
+- IPsec tunnel failure without WAN failure: BGP withdraws routes using that tunnel. Remaining tunnels carry the load. Investigate and re-establish the failed tunnel without traffic impact.
 
 ## IPsec Operational Requirements
-- Each site edge pair shares an IPsec configuration sourced from version control.
+- Each site edge pair shares an IPsec configuration sourced from version control. Tunnel definitions are templated per edge role (Edge-A or Edge-B) and applied consistently across all sites.
 - IKEv2 pre-shared keys or certificate-based authentication; certificate-based preferred for rotation and audit.
-- Tunnel state is monitored and failures generate high-priority alerts equivalent to WAN path loss alerts.
-- IPsec SA lifetime and rekeying parameters are documented and consistent across all sites.
+- All 24 tunnel states are monitored individually. Any single tunnel failure generates a high-priority alert. Loss of both tunnels in a matched pair (A–A and A–B, or B–B and B–A) generates a critical alert.
+- IPsec SA lifetime and rekeying parameters are documented and consistent across all sites and all tunnel roles.
+- Cross-connect tunnels (A–B, B–A) are held in a ready-established state at all times, not brought up on demand. This ensures they are immediately available for traffic without an IKEv2 negotiation delay at the moment they are needed.
 
 ## Internet Breakout Model
 Each site has an independent local internet connection terminating on the site edge pair. Internet traffic exits directly at the local site and is never backhauled over the inter-site WAN.

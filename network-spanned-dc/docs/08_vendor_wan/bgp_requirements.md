@@ -1,10 +1,24 @@
 ﻿# BGP Requirements
 
 ## Session Model
-- eBGP between each site edge and WAN handoff.
-- Inter-site BGP sessions (site-to-site) run inside the IPsec encrypted tunnels between edge pairs. BGP sessions toward the WAN handoff peer are additionally hardened with TCP-AO or MD5 session authentication.
-- Redundant sessions per site where dual handoff exists.
-- Authentication and session hardening per security policy. Minimum requirement: TCP-AO on all BGP sessions. IPsec tunnel transport for all inter-site BGP.
+- eBGP between each site edge node and WAN handoff.
+- Inter-site BGP sessions run inside the IPsec encrypted tunnels between edge nodes. BGP sessions toward the WAN handoff peer are additionally hardened with TCP-AO authentication.
+- Minimum requirement: TCP-AO on all BGP sessions. IPsec tunnel transport for all inter-site BGP.
+
+## Multi-Tunnel BGP Assignment
+
+Each site pair maintains four IPsec tunnels. BGP sessions are assigned as follows:
+
+| Tunnel | BGP Session | Purpose |
+|---|---|---|
+| A–A (Edge-A to remote Edge-A) | Yes — primary | Preferred path; carries primary routing table |
+| B–B (Edge-B to remote Edge-B) | Yes — secondary | Failover path; active session, lower local preference |
+| A–B (Edge-A to remote Edge-B) | No — traffic only | Cross-connect; forwards traffic by routing policy, no BGP |
+| B–A (Edge-B to remote Edge-A) | No — traffic only | Cross-connect; forwards traffic by routing policy, no BGP |
+
+Each edge node therefore maintains `(n-1) × 2` BGP sessions where n is the number of sites. With four sites: 6 BGP sessions per edge node, 12 per site across both edge nodes.
+
+Cross-connect BGP sessions may be added if faster convergence is required during a matched-pair tunnel failure. This increases session count to `(n-1) × 4` per site but eliminates the routing policy failover delay.
 
 ## Prefix Policy
 - Advertise only site summary `/56` prefixes.

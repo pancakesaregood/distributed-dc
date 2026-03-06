@@ -58,38 +58,148 @@ graph TD
   end
 ```
 
-## Mixed-Mode Full-Mesh Example
+## Per-Site-Pair Tunnel Detail
 
-Sites can run different transport modes simultaneously. All remain in the same IPsec overlay.
+Each site pair maintains four independent IPsec tunnels — two matched-pair and two cross-connect. All four are held established at all times.
 
 ```mermaid
 graph LR
 
   subgraph SA[Site A]
-    EAA["Edge pair<br/>Private circuit + internet"]
+    SAA["Edge-A"]
+    SAB["Edge-B"]
   end
 
   subgraph SB[Site B]
-    EBB["Edge pair<br/>Private circuit + internet"]
+    SBA["Edge-A"]
+    SBB["Edge-B"]
+  end
+
+  SAA <-->|"A-A tunnel - primary<br/>BGP primary session"| SBA
+  SAB <-->|"B-B tunnel - secondary<br/>BGP secondary session"| SBB
+  SAA <-->|"A-B cross-connect<br/>traffic only"| SBB
+  SAB <-->|"B-A cross-connect<br/>traffic only"| SBA
+```
+
+With 4 sites (6 site pairs) × 4 tunnels each = **24 tunnels total** in the full fabric.
+
+## Full-Mesh Multi-Tunnel View
+
+All edge nodes shown explicitly. Each line represents one IPsec tunnel.
+
+```mermaid
+graph LR
+
+  subgraph SA[Site A]
+    SAED_A["Edge-A"]
+    SAED_B["Edge-B"]
+  end
+
+  subgraph SB[Site B]
+    SBED_A["Edge-A"]
+    SBED_B["Edge-B"]
   end
 
   subgraph SC[Site C]
-    ECC["Edge pair<br/>Consumer IPv4 only"]
+    SCED_A["Edge-A"]
+    SCED_B["Edge-B"]
   end
 
   subgraph SD[Site D]
-    EDD["Edge pair<br/>Consumer IPv4 only"]
+    SDED_A["Edge-A"]
+    SDED_B["Edge-B"]
   end
 
-  EAA <-->|"Mode A<br/>Private circuit"| EBB
-  EAA <-->|"Mode B<br/>Consumer IPv4"| ECC
-  EAA <-->|"Mode B<br/>Consumer IPv4"| EDD
-  EBB <-->|"Mode B<br/>Consumer IPv4"| ECC
-  EBB <-->|"Mode B<br/>Consumer IPv4"| EDD
-  ECC <-->|"Mode B<br/>Consumer IPv4"| EDD
+  SAED_A <--> SBED_A
+  SAED_A <--> SBED_B
+  SAED_B <--> SBED_A
+  SAED_B <--> SBED_B
+
+  SAED_A <--> SCED_A
+  SAED_A <--> SCED_B
+  SAED_B <--> SCED_A
+  SAED_B <--> SCED_B
+
+  SAED_A <--> SDED_A
+  SAED_A <--> SDED_B
+  SAED_B <--> SDED_A
+  SAED_B <--> SDED_B
+
+  SBED_A <--> SCED_A
+  SBED_A <--> SCED_B
+  SBED_B <--> SCED_A
+  SBED_B <--> SCED_B
+
+  SBED_A <--> SDED_A
+  SBED_A <--> SDED_B
+  SBED_B <--> SDED_A
+  SBED_B <--> SDED_B
+
+  SCED_A <--> SDED_A
+  SCED_A <--> SDED_B
+  SCED_B <--> SDED_A
+  SCED_B <--> SDED_B
 ```
 
-All tunnels above carry IPsec AES-256-GCM with IKEv2 regardless of the underlay. IPv6 ULA routes are reachable from every site through any tunnel mode.
+## Mixed-Mode Full-Mesh Example
+
+Sites can run different transport modes simultaneously. The 4-tunnel-per-pair model applies regardless of transport mode.
+
+```mermaid
+graph LR
+
+  subgraph SA[Site A - Mode A]
+    MA_A["Edge-A<br/>Private circuit"]
+    MA_B["Edge-B<br/>Private circuit"]
+  end
+
+  subgraph SB[Site B - Mode A]
+    MB_A["Edge-A<br/>Private circuit"]
+    MB_B["Edge-B<br/>Private circuit"]
+  end
+
+  subgraph SC[Site C - Mode B]
+    MC_A["Edge-A<br/>Static public IPv4"]
+    MC_B["Edge-B<br/>Static public IPv4"]
+  end
+
+  subgraph SD[Site D - Mode B]
+    MD_A["Edge-A<br/>Static public IPv4"]
+    MD_B["Edge-B<br/>Static public IPv4"]
+  end
+
+  MA_A <-->|"Mode A - 4 tunnels"| MB_A
+  MA_A <-->|"Mode A"| MB_B
+  MA_B <-->|"Mode A"| MB_A
+  MA_B <-->|"Mode A"| MB_B
+
+  MA_A <-->|"Mode B - 4 tunnels"| MC_A
+  MA_A <-->|"Mode B"| MC_B
+  MA_B <-->|"Mode B"| MC_A
+  MA_B <-->|"Mode B"| MC_B
+
+  MA_A <-->|"Mode B - 4 tunnels"| MD_A
+  MA_A <-->|"Mode B"| MD_B
+  MA_B <-->|"Mode B"| MD_A
+  MA_B <-->|"Mode B"| MD_B
+
+  MB_A <-->|"Mode B - 4 tunnels"| MC_A
+  MB_A <-->|"Mode B"| MC_B
+  MB_B <-->|"Mode B"| MC_A
+  MB_B <-->|"Mode B"| MC_B
+
+  MB_A <-->|"Mode B - 4 tunnels"| MD_A
+  MB_A <-->|"Mode B"| MD_B
+  MB_B <-->|"Mode B"| MD_A
+  MB_B <-->|"Mode B"| MD_B
+
+  MC_A <-->|"Mode B - 4 tunnels"| MD_A
+  MC_A <-->|"Mode B"| MD_B
+  MC_B <-->|"Mode B"| MD_A
+  MC_B <-->|"Mode B"| MD_B
+```
+
+All tunnels carry IPsec AES-256-GCM with IKEv2 regardless of the underlay. IPv6 ULA routes are reachable from every site through any tunnel mode.
 
 ## Key Parameters
 
