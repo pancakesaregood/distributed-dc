@@ -43,6 +43,20 @@ Each layer is required. There is no bypass path from the internet to a backend w
 - Minimum TLS version: 1.2. Preferred: TLS 1.3 only. Cipher suite list is defined in the nginx GitOps template and reviewed quarterly.
 - HSTS is enabled for all externally published HTTPS services.
 
+### How Certbot helps internet-accessible apps use public PKI
+
+See [Certbot and Public PKI Flow](../03_diagrams/certbot_public_pki_flow.mmd.md).
+
+- Certbot requests a certificate from a public CA (for example, Let's Encrypt) using ACME.
+- The CA validates domain control using HTTP-01 or DNS-01 challenge checks.
+- After validation, Certbot installs the public certificate chain and private key on the nginx LB.
+- nginx reloads to present the new certificate for `app.example.com` without service restart.
+- Internet clients can validate the certificate chain against built-in public trust stores, confirming hostname and CA trust.
+- Once the TLS handshake succeeds, payloads are encrypted in transit between client and edge LB.
+- Renewal automation keeps certificates current so browsers do not hit expiration errors.
+
+Note: This secures payloads in transit over the internet path. If full end-to-end encryption is required, configure nginx to re-encrypt traffic to backends as well.
+
 ---
 
 ## DNS Models

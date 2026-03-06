@@ -46,6 +46,7 @@ nav:
       - WAN Transport Modes: 03_diagrams/wan_transport.mmd.md
       - VDI Service Architecture: 03_diagrams/vdi_service.mmd.md
       - Published App Flows: 03_diagrams/published_apps_flow.mmd.md
+      - Certbot and Public PKI Flow: 03_diagrams/certbot_public_pki_flow.mmd.md
       - Client and Service Interactions: 03_diagrams/client_service_interactions.mmd.md
       - Telephony Service Flow: 03_diagrams/telephony_flow.mmd.md
       - Printing Service Flow: 03_diagrams/printing_flow.mmd.md
