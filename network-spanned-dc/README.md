@@ -2,6 +2,8 @@
 
 This project contains a complete, meeting-defendable architecture documentation set for a low-cost, four-site spanned datacenter design.
 
+https://pancakesaregood.github.io/distributed-dc
+
 Core design constraints:
 - IPv6 ULA prefix: `fdca:fcaf:e000::/48`
 - Four placeholder sites: Site A, Site B, Site C, Site D
