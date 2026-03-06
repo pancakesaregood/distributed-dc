@@ -26,8 +26,8 @@ The same suffix map is used at every site for operational consistency.
 | `:00ff` | Transit | Point-to-point routed links |
 
 ## Number of IP Addresses per Segment
-2⁶⁴ = 18,446,744,073,709,551,616 addresses
-18.4 quintillion IP addresses
+- 2⁶⁴ = 18,446,744,073,709,551,616 addresses
+- 18.4 quintillion IP addresses
 
 ## Examples by Site
 
