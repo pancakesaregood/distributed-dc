@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block site_nav %}
+  {% if nav|length>1 and page %}
+  <div class="site-nav-stack">
+    <div class="page-jump-bar" aria-label="Page navigation">
+      <a rel="prev" {% if page.previous_page %}href="{{ page.previous_page.url|url }}" class="page-jump-arrow"{% else %}class="page-jump-arrow disabled"{% endif %} aria-label="Previous page">
+        <i class="fa fa-arrow-left"></i>
+      </a>
+
+      <div class="page-jump-select-wrap">
+        <label for="page-jump-select" class="visually-hidden">Current page</label>
+        <select id="page-jump-select" class="page-jump-select" onchange="if(this.value){window.location.href=this.value;}">
+          {% for nav_item in nav %}
+            {% if nav_item.children %}
+              <optgroup label="{{ nav_item.title }}">
+                {% for child in nav_item.children recursive %}
+                  {% if child.children %}
+                    {{ loop(child.children) }}
+                  {% else %}
+                    <option value="{{ child.url|url }}"{% if child.active %} selected{% endif %}>{{ "-- " * loop.depth0 }}{{ child.title }}</option>
+                  {% endif %}
+                {% endfor %}
+              </optgroup>
+            {% else %}
+              <option value="{{ nav_item.url|url }}"{% if nav_item.active %} selected{% endif %}>{{ nav_item.title }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+
+      <a rel="next" {% if page.next_page %}href="{{ page.next_page.url|url }}" class="page-jump-arrow"{% else %}class="page-jump-arrow disabled"{% endif %} aria-label="Next page">
+        <i class="fa fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% block next_prev %}{% endblock %}

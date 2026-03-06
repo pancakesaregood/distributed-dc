@@ -3,8 +3,12 @@ site_description: Low-cost 4-site spanned datacenter architecture documentation
 docs_dir: docs
 theme:
   name: mkdocs
+  custom_dir: theme_overrides
 extra_css:
   - assets/styles/site.css
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js
+  - assets/scripts/mermaid-init.js
 
 nav:
   - Home: index.md
