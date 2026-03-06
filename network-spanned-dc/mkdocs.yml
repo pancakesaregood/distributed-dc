@@ -47,6 +47,10 @@ nav:
       - VDI Service Architecture: 03_diagrams/vdi_service.mmd.md
       - Published App Flows: 03_diagrams/published_apps_flow.mmd.md
       - Client and Service Interactions: 03_diagrams/client_service_interactions.mmd.md
+      - Telephony Service Flow: 03_diagrams/telephony_flow.mmd.md
+      - Printing Service Flow: 03_diagrams/printing_flow.mmd.md
+      - WLC and WAP Topology: 03_diagrams/wlc_waps_topology.mmd.md
+      - Campus Network Topology: 03_diagrams/campus_networks_topology.mmd.md
   - 04 Failover and DR:
       - Failover Scenarios: 04_failover_dr/failover_scenarios.md
       - RTO and RPO Targets: 04_failover_dr/rto_rpo_targets.md
@@ -102,3 +106,9 @@ nav:
       - Authentication: 13_operations_foundations/authentication.md
       - Storage: 13_operations_foundations/storage.md
       - Capacity Planning: 13_operations_foundations/capacity_planning.md
+  - 14 Campus and Edge Services:
+      - Services Home: 14_campus_services/readme.md
+      - Telephony: 14_campus_services/telephony.md
+      - Printing: 14_campus_services/printing.md
+      - WLC and WAPs: 14_campus_services/wlc_waps.md
+      - Campus Networks: 14_campus_services/campus_networks.md

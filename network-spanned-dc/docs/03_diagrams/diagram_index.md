@@ -15,5 +15,9 @@
 - [VDI Service Architecture](vdi_service.mmd.md)
 - [Published App Flows](published_apps_flow.mmd.md)
 - [Client and Service Interactions](client_service_interactions.mmd.md)
+- [Telephony Service Flow](telephony_flow.mmd.md)
+- [Printing Service Flow](printing_flow.mmd.md)
+- [WLC and WAP Topology](wlc_waps_topology.mmd.md)
+- [Campus Network Topology](campus_networks_topology.mmd.md)
 
 All diagrams are Mermaid and render directly in Markdown-capable viewers.
