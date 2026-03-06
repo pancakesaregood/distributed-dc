@@ -10,14 +10,18 @@ A published application is any service intentionally exposed to internet clients
 
 Every published app uses the following per-site component chain:
 
-```
-Public DNS (FQDN)
-  -> Edge router internet interface (public IP or anycast VIP)
-    -> Firewall Outside -> DMZ rule (HTTPS 443 only)
-      -> WAF (OWASP inspection + app-specific rules)
-        -> nginx LB (TLS termination, upstream pool, health checks)
-          -> Backend service (Servers/VMs zone, approved app port)
-            -> Database if required (Servers/VMs zone, stateful, same or replicated site)
+```mermaid
+flowchart TD
+  DNS["Public DNS (FQDN)"]
+  EDGE["Edge Router Internet Interface<br/>(Public IP or Anycast VIP)"]
+  FWRULE["Firewall Outside -> DMZ Rule<br/>(HTTPS 443 only)"]
+  WAF["WAF<br/>(OWASP inspection + app-specific rules)"]
+  LB["nginx LB<br/>(TLS termination, upstream pool, health checks)"]
+  APP["Backend Service<br/>(Servers/VMs zone, approved app port)"]
+  DB["Database (optional)<br/>(Servers/VMs zone, same or replicated site)"]
+
+  DNS --> EDGE --> FWRULE --> WAF --> LB --> APP
+  APP -. If required .-> DB
 ```
 
 Each layer is required. There is no bypass path from the internet to a backend without traversing the WAF and LB.
