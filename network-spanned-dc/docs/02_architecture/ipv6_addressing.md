@@ -21,6 +21,7 @@ The same suffix map is used at every site for operational consistency.
 | `:0040` | IoT | Sensors and non-user embedded devices |
 | `:0050` | Guest | Isolated guest and contractor access |
 | `:0060` | DMZ | Exposed internal services behind policy controls |
+| `:0070` | VDI | Virtual desktop VM pool — isolated desktop workloads |
 | `:00f0` | Loopbacks | Router and service loopback /128 addresses |
 | `:00ff` | Transit | Point-to-point routed links |
 

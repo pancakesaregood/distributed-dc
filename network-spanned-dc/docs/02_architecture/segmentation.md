@@ -12,6 +12,7 @@ All zone enforcement is performed by the site firewall pair (FW-A / FW-B). The f
 - `Guest`: isolated internet-only access.
 - `DMZ`: reverse proxies, WAF (Web Application Firewall), nginx load balancers, published internal services, and optionally the VPN VM if VPN is not hosted on the firewall appliance. All inbound internet-facing HTTP/HTTPS traffic passes through the WAF before reaching any backend service. The nginx load balancer distributes traffic across stateless application and API backend instances.
 - `VPN`: authenticated remote access sessions. Clients enter this zone after VPN authentication and MFA. Zone policy then admits traffic to permitted inside zones based on AD group membership.
+- `VDI`: virtual desktop VM pool. Desktop VMs provisioned for enterprise VDI users. Isolated from Management and Guest zones. Access to application services is permitted per AD group. Reachable only from guacd (Containers zone) on RDP/VNC ports; no direct user access to this zone.
 
 ## High-Level Policy Intent
 - Default deny between zones unless explicitly required.
@@ -19,6 +20,7 @@ All zone enforcement is performed by the site firewall pair (FW-A / FW-B). The f
 - Guest to internal networks denied. Guest traffic is permitted only to the local internet via the site's local L3 internet interface. Guest traffic is explicitly blocked from entering the IPsec inter-site WAN tunnels.
 - IoT to management denied except telemetry collectors.
 - DMZ to backend services only on approved application ports.
+- VDI zone to Management denied. VDI zone to Guest denied. VDI desktop VMs access application services in the Servers/VMs and Containers zones only, on permitted ports, per AD group.
 - All inbound HTTP/HTTPS from the Outside zone passes through the WAF in the DMZ before the nginx LB forwards to the Servers/VMs zone.
 - WAF inspects and filters requests before they reach any application backend; blocked requests are dropped at the WAF and never forwarded.
 

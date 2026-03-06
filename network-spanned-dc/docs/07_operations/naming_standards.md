@@ -13,6 +13,9 @@
 - VPN VM (if not on-box on firewall): `site-a-vpn-01`.
 - WAF VM: `site-a-waf-01`, `site-a-waf-02` (if HA pair).
 - nginx Load Balancer VM: `site-a-lb-01`, `site-a-lb-02` (if HA pair).
+- Guacamole DB VM: `site-a-guac-db-01` (primary at site), `site-a-guac-db-02` (replica).
+- VDI desktop VM (persistent): `site-a-vdi-<username>`.
+- VDI desktop VM (pooled): `site-a-vdi-pool-<index>` (e.g., `site-a-vdi-pool-01`).
 
 ## Service Naming
 - Tier 1 stateless apps: `svc-<name>-aa`.
