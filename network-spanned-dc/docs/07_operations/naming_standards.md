@@ -16,6 +16,8 @@
 - Guacamole DB VM: `site-a-guac-db-01` (primary at site), `site-a-guac-db-02` (replica).
 - VDI desktop VM (persistent): `site-a-vdi-<username>`.
 - VDI desktop VM (pooled): `site-a-vdi-pool-<index>` (e.g., `site-a-vdi-pool-01`).
+- NAT64 gateway VM (if not on firewall): `site-a-nat64-01`.
+- DNS64 resolver VM: `site-a-dns64-01`.
 
 ## Service Naming
 - Tier 1 stateless apps: `svc-<name>-aa`.

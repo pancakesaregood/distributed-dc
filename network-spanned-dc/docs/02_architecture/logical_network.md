@@ -33,5 +33,5 @@ VPN inbound: `Internet → Edge pair → Firewall outside interface → VPN term
 - Service traffic uses IPv6 ULA internally.
 - Security zones are enforced at site edge and internal policy points.
 - All data-plane traffic leaving a site edge toward other sites is encrypted by the IPsec inter-site tunnel before reaching the WAN handoff.
-- Internet-destined traffic exits through the local site internet interface, not the WAN. Guest traffic uses local internet breakout only and is blocked from the WAN.
+- Internet-destined traffic exits through the local site internet interface, not the WAN. Guest traffic uses local internet breakout only and is blocked from the WAN. Guest devices receive a DNS64 resolver via DHCP; NAT64 translates IPv6 ULA traffic to IPv4 for IPv4-only internet destinations using the Well-Known Prefix `64:ff9b::/96`. IPv4 PAT is applied at the edge internet interface. NPTv6 handles IPv6-native internet destinations where the ISP provides a public IPv6 prefix.
 - Cross-site traffic for stateful services is replication-oriented, not chatty transaction-by-transaction, unless latency permits. Replication streams are encrypted end-to-end by the IPsec overlay; application-layer encryption is additional and optional.

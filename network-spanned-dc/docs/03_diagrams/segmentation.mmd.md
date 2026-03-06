@@ -12,6 +12,9 @@ graph LR
   USR[User]
   IOT[IoT]
   GST[Guest]
+  DNS64["DNS64 Resolver<br/>Synthesizes AAAA for IPv4-only hosts"]
+  NAT64["NAT64 Gateway<br/>IPv6 ULA to IPv4 translation<br/>WKP 64:ff9b::/96"]
+  PAT["IPv4 PAT - Masquerade<br/>Edge internet interface"]
   INT[(Internet)]
   L3OUT["Local L3 Internet<br/>Interface at Edge"]
 
@@ -36,7 +39,11 @@ graph LR
   MGMT -->|Privileged Admin| SRV
   MGMT -->|Privileged Admin| CTR
   IOT -->|Telemetry Only| SRV
-  GST -->|Local breakout only - no WAN backhaul| L3OUT
+  GST -->|DNS query| DNS64
+  DNS64 -->|Synthesized AAAA - 64:ff9b::/96| GST
+  GST -->|IPv6 to 64:ff9b::/96| NAT64
+  NAT64 -->|Translated IPv4| PAT
+  PAT -->|Masqueraded IPv4| L3OUT
   L3OUT --> INT
   SRV -->|Controlled egress - DNS/NTP/packages| L3OUT
   LB -->|Controlled egress| L3OUT

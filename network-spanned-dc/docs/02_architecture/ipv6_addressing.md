@@ -55,6 +55,10 @@ The same suffix map is used at every site for operational consistency.
 - Loopbacks: `fdca:fcaf:e300:00f0::/64`
 - Transit: `fdca:fcaf:e300:00ff::/64`
 
+## NAT64 Well-Known Prefix
+
+Guest devices use the IANA-reserved NAT64 Well-Known Prefix (WKP) `64:ff9b::/96` (RFC 6052) for IPv4-only internet destinations. This prefix is not part of the ULA addressing plan and must not be advertised into the inter-site WAN tunnels. Firewall policy routes traffic destined for `64:ff9b::/96` from the guest zone to the NAT64 gateway at the local site internet L3 interface only.
+
 ## Why /64 per Segment
 - IPv6 Neighbor Discovery and host behavior are standardized around `/64` subnets.
 - Using `/64` avoids interoperability edge cases in network tools and operating systems.

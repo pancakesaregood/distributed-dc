@@ -101,10 +101,43 @@ One site is designated to have full internet edge redundancy:
 - This site can optionally provide internet fallback egress for other sites during a local ISP outage, via the inter-site WAN, if explicitly enabled in policy. This path must be approved in design governance before activation.
 
 ### Guest Internet Routing
-- Guest zone traffic is policy-routed to the local site internet L3 interface.
+- Guest zone traffic is policy-routed to the local site internet L3 interface. All guest internet egress exits at the closest site L3OUT — no WAN backhaul.
 - Guest traffic is explicitly blocked from entering the IPsec inter-site WAN tunnels.
 - Guest traffic must not reach any internal segment; the only permitted destination is the internet via the local edge.
 - If the local internet circuit is unavailable, guest service is suspended at that site. Guest traffic is not rerouted over the WAN to another site's internet path by default.
+
+#### NAT64 and DNS64 for Guest Internet
+
+The internal network is IPv6-only (ULA). Guest devices need to reach both IPv6-native and IPv4-only internet destinations. Two translation functions are deployed at each site for the guest path:
+
+**NAT64 (RFC 6146)**
+- Translates outbound IPv6 packets from guest devices into IPv4 packets at the local internet L3 interface.
+- Uses the Well-Known Prefix `64:ff9b::/96` as the NAT64 destination range. Packets from guests addressed to `64:ff9b::<ipv4>` are translated to the corresponding IPv4 destination.
+- NAT64 is implemented on the site firewall pair where the platform supports it (e.g., VyOS, OPNsense with Jool). If the firewall does not support NAT64 natively, a dedicated NAT64 gateway VM (`site-<x>-nat64-01`) is deployed in the Guest zone and traffic is steered to it via firewall policy.
+- All NAT64 state is local to the site. Cross-site NAT64 failover is not provided; guest internet access is site-local.
+
+**DNS64 (RFC 6147)**
+- A DNS64 resolver is provided to the guest segment as the authoritative DNS for guest clients. DHCP for guests delivers the DNS64 resolver address.
+- The DNS64 resolver synthesizes AAAA records for IPv4-only internet hosts by prepending the NAT64 Well-Known Prefix to the host's A record address. Guest devices then connect to the synthesized IPv6 address, which NAT64 translates to IPv4.
+- For hosts with native AAAA records, DNS64 returns the real AAAA record unchanged. NAT64 is not involved for IPv6-native destinations.
+- DNS64 runs as a lightweight VM or container (`site-<x>-dns64-01`) in the Guest zone, or as a separate resolver view on the site DNS resolver with guest-facing DNSSEC validation adjusted for synthesis.
+
+**IPv4 PAT (Masquerade)**
+- NAT64-translated IPv4 packets exit the site through the edge internet interface with IPv4 PAT (NAPT/masquerade). The edge masquerades all outbound IPv4 behind the ISP-assigned public IPv4 address(es).
+- This is standard IPv4 NAT at the edge internet interface, applied to all IPv4 traffic destined for the internet regardless of origin (NAT64-translated guest traffic or any other IPv4 egress path).
+- On the designated redundant internet site with dual ISP circuits, PAT is applied per-edge to the respective ISP address.
+
+**NPTv6 (Optional)**
+- If the ISP provides a public IPv6 prefix (GUA), NPTv6 (Network Prefix Translation, RFC 6296) at the edge translates the ULA guest source address to a GUA address for IPv6-native internet destinations. This eliminates the NAT64/DNS64 path for IPv6-capable sites and provides a direct IPv6 path.
+- NPTv6 is stateless and has no session table overhead. Enable it if the ISP provides a stable IPv6 prefix.
+
+**Guest translation path summary:**
+
+| Destination type | Guest source | Path |
+|---|---|---|
+| IPv4-only internet | ULA guest | DNS64 synthesis → NAT64 → IPv4 PAT → ISP IPv4 |
+| IPv6-native internet | ULA guest | NPTv6 (ULA→GUA) → ISP IPv6 (if available) or NAT64 fallback |
+| Any internal segment | ULA guest | Denied by firewall — guest zone isolation |
 
 ### VPN Inbound Routing
 - Remote access VPN connections arrive from the internet at the edge router's internet-facing interface.
