@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>WAN Transport Abstraction - Spanned Datacenter Architecture</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../assets/styles/site.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Spanned Datacenter Architecture</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">01 Scope</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../01_scope/scope_of_work/" class="dropdown-item">Scope of Work</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/assumptions/" class="dropdown-item">Assumptions</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/out_of_scope/" class="dropdown-item">Out of Scope</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/acceptance_criteria/" class="dropdown-item">Acceptance Criteria</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">02 Architecture</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../overview/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../physical_layout/" class="dropdown-item">Physical Layout</a>
+</li>
+                                    
+<li>
+    <a href="../logical_network/" class="dropdown-item">Logical Network</a>
+</li>
+                                    
+<li>
+    <a href="../ipv6_addressing/" class="dropdown-item">IPv6 Addressing</a>
+</li>
+                                    
+<li>
+    <a href="../segmentation/" class="dropdown-item">Segmentation</a>
+</li>
+                                    
+<li>
+    <a href="../routing_wan_abstraction/" class="dropdown-item">Routing and WAN Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">WAN Transport Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="../sdn_options/" class="dropdown-item">SDN Options</a>
+</li>
+                                    
+<li>
+    <a href="../compute_platform/" class="dropdown-item">Compute Platform</a>
+</li>
+                                    
+<li>
+    <a href="../services_spanning_model/" class="dropdown-item">Services Spanning Model</a>
+</li>
+                                    
+<li>
+    <a href="../vdi_service/" class="dropdown-item">VDI as a Service</a>
+</li>
+                                    
+<li>
+    <a href="../published_apps/" class="dropdown-item">Published Applications</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">03 Diagrams</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../03_diagrams/diagram_index/" class="dropdown-item">Diagram Index</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/topology_global.mmd/" class="dropdown-item">Global Topology</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/topology_per_site.mmd/" class="dropdown-item">Per-Site Topology</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/physical_rack_topology_2rack.mmd/" class="dropdown-item">Physical Rack Topology (Two-Rack Site)</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/site_full_stack_upstream_abstracted.mmd/" class="dropdown-item">One-Site Full Stack (Upstream Abstracted)</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/segmentation.mmd/" class="dropdown-item">Segmentation Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/routing_bgp.mmd/" class="dropdown-item">Routing BGP Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/services_anycast.mmd/" class="dropdown-item">Services Anycast Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/backup_dr.mmd/" class="dropdown-item">Backup and DR Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/failover_matrix.mmd/" class="dropdown-item">Failover Matrix Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/dhcp_ad_services.mmd/" class="dropdown-item">DHCP and AD Services</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/vpn_access.mmd/" class="dropdown-item">Remote Access VPN Flow</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/wan_transport.mmd/" class="dropdown-item">WAN Transport Modes</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/vdi_service.mmd/" class="dropdown-item">VDI Service Architecture</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/published_apps_flow.mmd/" class="dropdown-item">Published App Flows</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/client_service_interactions.mmd/" class="dropdown-item">Client and Service Interactions</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">04 Failover and DR</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../04_failover_dr/failover_scenarios/" class="dropdown-item">Failover Scenarios</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/rto_rpo_targets/" class="dropdown-item">RTO and RPO Targets</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/dr_runbooks/" class="dropdown-item">DR Runbooks</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/test_plan/" class="dropdown-item">Test Plan</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">05 Backup</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../05_backup/backup_strategy/" class="dropdown-item">Backup Strategy</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/backup_retention/" class="dropdown-item">Backup Retention</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/restore_procedures/" class="dropdown-item">Restore Procedures</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">06 Security</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../06_security/security_baseline/" class="dropdown-item">Security Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/identity_access/" class="dropdown-item">Identity and Access</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/logging_monitoring/" class="dropdown-item">Logging and Monitoring</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">07 Operations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../07_operations/gitops_operating_model/" class="dropdown-item">GitOps Operating Model</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/naming_standards/" class="dropdown-item">Naming Standards</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/lifecycle_patch_mgmt/" class="dropdown-item">Lifecycle and Patch Management</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">08 Vendor WAN</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../08_vendor_wan/wan_service_requirements/" class="dropdown-item">WAN Service Requirements</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/handoff_expectations/" class="dropdown-item">Handoff Expectations</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/bgp_requirements/" class="dropdown-item">BGP Requirements</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">09 Appendix</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../09_appendix/glossary/" class="dropdown-item">Glossary</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/references/" class="dropdown-item">References</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/abstractions_clarifications_needed/" class="dropdown-item">Abstractions and Clarifications Needed</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">10 Implementation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../10_implementation/readme/" class="dropdown-item">Implementation Proposal</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">11 FAQ</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../11_FAQ/readme/" class="dropdown-item">FAQ Home</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/team_faq/" class="dropdown-item">Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/server_team_faq/" class="dropdown-item">Server Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/executive_faq/" class="dropdown-item">Executive FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/vp_faq/" class="dropdown-item">VP FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/user_faq/" class="dropdown-item">User FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/admin_faq/" class="dropdown-item">Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/service_desk_faq/" class="dropdown-item">Service Desk FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/network_admin_faq/" class="dropdown-item">Network Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/security_team_faq/" class="dropdown-item">Security Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/backup_admin_faq/" class="dropdown-item">Backup Admin FAQ</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">12 Business Cases</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../12_business_cases/readme/" class="dropdown-item">Business Cases Home</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_01_multi_site_resilience/" class="dropdown-item">Multi-Site Resilience Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_02_security_control_uplift/" class="dropdown-item">Security Control Uplift</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_03_gitops_automation/" class="dropdown-item">GitOps and Operations Automation</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_04_vdi_enablement/" class="dropdown-item">VDI Service Enablement</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_05_backup_dr_assurance/" class="dropdown-item">Backup and DR Assurance</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">13 Operations Foundations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../13_operations_foundations/readme/" class="dropdown-item">Foundations Home</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/monitoring/" class="dropdown-item">Monitoring</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/identity/" class="dropdown-item">Identity</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/authentication/" class="dropdown-item">Authentication</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/storage/" class="dropdown-item">Storage</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/capacity_planning/" class="dropdown-item">Capacity Planning</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../routing_wan_abstraction/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../sdn_options/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#wan-transport-abstraction" class="nav-link">WAN Transport Abstraction</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#design-principle" class="nav-link">Design Principle</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#transport-mode-a-private-circuit" class="nav-link">Transport Mode A — Private Circuit</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#transport-mode-b-consumer-ipv4-internet-ipv6-over-ipv4-ipsec" class="nav-link">Transport Mode B — Consumer IPv4 Internet (IPv6-over-IPv4 IPsec)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#common-ipsec-parameters-both-modes" class="nav-link">Common IPsec Parameters (Both Modes)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#topology-implications" class="nav-link">Topology Implications</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#operational-differences-between-modes" class="nav-link">Operational Differences Between Modes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#upgrade-path" class="nav-link">Upgrade Path</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="wan-transport-abstraction">WAN Transport Abstraction</h1>
+<h2 id="design-principle">Design Principle</h2>
+<p>The inter-site IPsec overlay is transport-agnostic. The overlay operates identically regardless of what carries the outer packets between site edges. This is a deliberate design constraint: all architecture, addressing, routing, and security decisions are made at the IPsec overlay level and above. The physical transport beneath the tunnels is swappable without changing any internal design.</p>
+<p>Two transport modes are supported. Both terminate on the same site edge pair with the same IPsec parameters. Both carry IPv6 ULA as the inner protocol. Internal architecture, segmentation, BGP topology, and service design are unchanged between modes.</p>
+<hr />
+<h2 id="transport-mode-a-private-circuit">Transport Mode A — Private Circuit</h2>
+<p>The preferred transport. A vendor-managed private L3 circuit (MPLS VPN or equivalent dedicated service) connects site edge pairs. The WAN provider offers logically isolated inter-site paths and an IPv6-capable L3 handoff.</p>
+<p><strong>Stack:</strong></p>
+<pre><code>[IPv6 ULA inner traffic]
+    encapsulated in IPsec tunnel mode (IKEv2 / AES-256-GCM)
+        carried over IPv6 or IPv4 private circuit underlay
+</code></pre>
+<ul>
+<li>Edge pair addresses on the WAN handoff can be IPv6 or IPv4 depending on the provider's handoff model.</li>
+<li>IPsec outer headers match the handoff address family.</li>
+<li>Private circuit provides network-layer isolation in addition to IPsec encryption; both layers are active simultaneously and are complementary controls.</li>
+<li>MTU: WAN provider must support at least 1400-byte inner MTU after IPsec overhead. Prefer 1500+ byte L2 MTU on the handoff.</li>
+</ul>
+<hr />
+<h2 id="transport-mode-b-consumer-ipv4-internet-ipv6-over-ipv4-ipsec">Transport Mode B — Consumer IPv4 Internet (IPv6-over-IPv4 IPsec)</h2>
+<p>The fallback transport for sites where a private circuit is not available or cost-prohibitive. Consumer-grade IPv4 internet connections (broadband, business DSL, cable, fixed wireless) carry the IPsec tunnels. IPv6 ULA runs as the overlay inside the IPv4 IPsec tunnels.</p>
+<p><strong>Stack:</strong></p>
+<pre><code>[IPv6 ULA inner traffic]
+    encapsulated in IPsec tunnel mode (IKEv2 / AES-256-GCM)
+        encapsulated in IPv4 outer headers (ESP protocol 50)
+            carried over consumer IPv4 internet
+</code></pre>
+<p>This is a 6-in-4 arrangement via IPsec tunnel mode. The edge routers see IPv4 on the WAN-facing interface; all internal addressing and routing remain IPv6 ULA without modification.</p>
+<h3 id="requirements-for-mode-b">Requirements for Mode B</h3>
+<ul>
+<li><strong>Static public IPv4 per edge node</strong> — each edge node requires a static, routable public IPv4 address. Dynamic addressing is not recommended; if unavoidable, use a stable FQDN via dynamic DNS and configure IKEv2 to use FQDN-based peer identity. A static IP is strongly preferred.</li>
+<li><strong>NAT traversal (NAT-T)</strong> — if the edge is behind CGN or a site NAT device, IKEv2 NAT-T must be enabled (UDP port 4500 for ESP encapsulation). Prefer direct public IPv4 on the edge interface to avoid double-NAT complications.</li>
+<li><strong>ISP passthrough</strong> — the ISP must pass ESP (IP protocol 50) or UDP 4500 (NAT-T) without blocking, stripping, or deep-packet inspection that breaks IKEv2 negotiation.</li>
+<li><strong>IKEv2 DPD (Dead Peer Detection)</strong> — enable DPD with a conservative timeout. Consumer paths have variable quality; DPD detects silent tunnel failures and triggers rekeying automatically.</li>
+<li><strong>Sufficient bandwidth</strong> — IPsec adds approximately 60–80 bytes of overhead per packet on an IPv4 transport (IPv4 outer 20 + ESP header ~8 + IV 8 + ICV 16 + padding). Account for this in bandwidth planning. Effective inner MTU is approximately 1380 bytes on a 1500-byte-MTU consumer connection.</li>
+</ul>
+<h3 id="mtu-handling-for-mode-b">MTU Handling for Mode B</h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Header Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consumer IPv4 MTU</td>
+<td>1500 bytes</td>
+</tr>
+<tr>
+<td>IPv4 outer header</td>
+<td>20 bytes</td>
+</tr>
+<tr>
+<td>ESP header + IV + ICV</td>
+<td>~40 bytes</td>
+</tr>
+<tr>
+<td><strong>Available inner MTU</strong></td>
+<td><strong>~1440 bytes</strong></td>
+</tr>
+<tr>
+<td>IPv6 inner header</td>
+<td>40 bytes</td>
+</tr>
+<tr>
+<td><strong>Available for inner payload</strong></td>
+<td><strong>~1400 bytes</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Set the edge tunnel interface MTU to 1400 bytes (inner) to avoid fragmentation. Enable PMTUD on the edge and ensure the firewall does not block ICMPv6 Packet Too Big messages needed for path MTU discovery inside the tunnel.</p>
+<hr />
+<h2 id="common-ipsec-parameters-both-modes">Common IPsec Parameters (Both Modes)</h2>
+<p>These parameters apply regardless of transport mode:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IKE version</td>
+<td>IKEv2</td>
+</tr>
+<tr>
+<td>Encryption</td>
+<td>AES-256-GCM</td>
+</tr>
+<tr>
+<td>Integrity</td>
+<td>SHA-256 or stronger (implicit in GCM; explicit for IKE SA)</td>
+</tr>
+<tr>
+<td>Key exchange</td>
+<td>Diffie-Hellman Group 14 or higher (Group 19/20 preferred)</td>
+</tr>
+<tr>
+<td>PFS</td>
+<td>Required</td>
+</tr>
+<tr>
+<td>Authentication</td>
+<td>Certificate-based preferred; PSK acceptable with strong key management</td>
+</tr>
+<tr>
+<td>SA lifetime (IKE)</td>
+<td>24 hours</td>
+</tr>
+<tr>
+<td>SA lifetime (IPsec)</td>
+<td>1 hour</td>
+</tr>
+<tr>
+<td>DPD</td>
+<td>Enabled, 30-second probe interval</td>
+</tr>
+<tr>
+<td>NAT-T</td>
+<td>Enabled (required for Mode B; harmless for Mode A)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="topology-implications">Topology Implications</h2>
+<p>The full multi-tunnel redundancy model and BGP session assignment are defined in <a href="../routing_wan_abstraction/">Routing and WAN Abstraction</a>. From a transport mode perspective:</p>
+<ul>
+<li>Each edge pair (Edge-A and Edge-B) holds four IPsec tunnels to each remote site simultaneously: matched-pair (A–A, B–B) and cross-connect (A–B, B–A). All four are kept established at all times — cross-connect tunnels are not on-demand.</li>
+<li>Sites can mix transport modes. A Mode A site and a Mode B site use the same 4-tunnel-per-pair model; only the underlay endpoint type differs.</li>
+<li>Route advertisement, prefix policy, and anycast behavior are identical on both transports.</li>
+</ul>
+<hr />
+<h2 id="operational-differences-between-modes">Operational Differences Between Modes</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Mode A (Private Circuit)</th>
+<th>Mode B (Consumer IPv4)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Underlay reliability</td>
+<td>Carrier SLA, dedicated path</td>
+<td>Best-effort, shared internet</td>
+</tr>
+<tr>
+<td>Latency predictability</td>
+<td>High</td>
+<td>Variable</td>
+</tr>
+<tr>
+<td>Tunnel endpoint type</td>
+<td>IPv6 or IPv4 private handoff</td>
+<td>Static public IPv4 required</td>
+</tr>
+<tr>
+<td>NAT traversal</td>
+<td>Typically not needed</td>
+<td>Required if behind NAT/CGN</td>
+</tr>
+<tr>
+<td>MTU</td>
+<td>Provider-confirmed, generally 1500+</td>
+<td>~1400 inner MTU after overhead</td>
+</tr>
+<tr>
+<td>Monitoring</td>
+<td>WAN SLA + IPsec tunnel state</td>
+<td>IPsec tunnel state only (no SLA)</td>
+</tr>
+<tr>
+<td>Failure detection</td>
+<td>WAN alarm + DPD</td>
+<td>DPD only</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>Higher</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Privacy</td>
+<td>Private circuit isolation + IPsec</td>
+<td>IPsec only</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="upgrade-path">Upgrade Path</h2>
+<p>Sites may transition from Mode B to Mode A without any change to internal addressing, routing, or security policy. The only change required is:</p>
+<ol>
+<li>Provision a private circuit handoff at the site edge pair.</li>
+<li>Reconfigure the IPsec peer addresses on both ends to use the new private circuit addresses.</li>
+<li>Validate tunnel establishment and BGP convergence.</li>
+<li>Decommission the consumer internet tunnel for that site pair.</li>
+</ol>
+<p>All other configuration, including BGP policy, prefix advertisement, firewall rules, and internal segments, is unaffected.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

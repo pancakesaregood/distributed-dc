@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Published App Flows - Spanned Datacenter Architecture</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../assets/styles/site.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Spanned Datacenter Architecture</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">01 Scope</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../01_scope/scope_of_work/" class="dropdown-item">Scope of Work</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/assumptions/" class="dropdown-item">Assumptions</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/out_of_scope/" class="dropdown-item">Out of Scope</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/acceptance_criteria/" class="dropdown-item">Acceptance Criteria</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">02 Architecture</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../02_architecture/overview/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/physical_layout/" class="dropdown-item">Physical Layout</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/logical_network/" class="dropdown-item">Logical Network</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/ipv6_addressing/" class="dropdown-item">IPv6 Addressing</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/segmentation/" class="dropdown-item">Segmentation</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/routing_wan_abstraction/" class="dropdown-item">Routing and WAN Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/wan_transport_abstraction/" class="dropdown-item">WAN Transport Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/sdn_options/" class="dropdown-item">SDN Options</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/compute_platform/" class="dropdown-item">Compute Platform</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/services_spanning_model/" class="dropdown-item">Services Spanning Model</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/vdi_service/" class="dropdown-item">VDI as a Service</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/published_apps/" class="dropdown-item">Published Applications</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">03 Diagrams</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../diagram_index/" class="dropdown-item">Diagram Index</a>
+</li>
+                                    
+<li>
+    <a href="../topology_global.mmd/" class="dropdown-item">Global Topology</a>
+</li>
+                                    
+<li>
+    <a href="../topology_per_site.mmd/" class="dropdown-item">Per-Site Topology</a>
+</li>
+                                    
+<li>
+    <a href="../physical_rack_topology_2rack.mmd/" class="dropdown-item">Physical Rack Topology (Two-Rack Site)</a>
+</li>
+                                    
+<li>
+    <a href="../site_full_stack_upstream_abstracted.mmd/" class="dropdown-item">One-Site Full Stack (Upstream Abstracted)</a>
+</li>
+                                    
+<li>
+    <a href="../segmentation.mmd/" class="dropdown-item">Segmentation Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../routing_bgp.mmd/" class="dropdown-item">Routing BGP Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../services_anycast.mmd/" class="dropdown-item">Services Anycast Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../backup_dr.mmd/" class="dropdown-item">Backup and DR Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../failover_matrix.mmd/" class="dropdown-item">Failover Matrix Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../dhcp_ad_services.mmd/" class="dropdown-item">DHCP and AD Services</a>
+</li>
+                                    
+<li>
+    <a href="../vpn_access.mmd/" class="dropdown-item">Remote Access VPN Flow</a>
+</li>
+                                    
+<li>
+    <a href="../wan_transport.mmd/" class="dropdown-item">WAN Transport Modes</a>
+</li>
+                                    
+<li>
+    <a href="../vdi_service.mmd/" class="dropdown-item">VDI Service Architecture</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Published App Flows</a>
+</li>
+                                    
+<li>
+    <a href="../client_service_interactions.mmd/" class="dropdown-item">Client and Service Interactions</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">04 Failover and DR</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../04_failover_dr/failover_scenarios/" class="dropdown-item">Failover Scenarios</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/rto_rpo_targets/" class="dropdown-item">RTO and RPO Targets</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/dr_runbooks/" class="dropdown-item">DR Runbooks</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/test_plan/" class="dropdown-item">Test Plan</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">05 Backup</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../05_backup/backup_strategy/" class="dropdown-item">Backup Strategy</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/backup_retention/" class="dropdown-item">Backup Retention</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/restore_procedures/" class="dropdown-item">Restore Procedures</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">06 Security</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../06_security/security_baseline/" class="dropdown-item">Security Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/identity_access/" class="dropdown-item">Identity and Access</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/logging_monitoring/" class="dropdown-item">Logging and Monitoring</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">07 Operations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../07_operations/gitops_operating_model/" class="dropdown-item">GitOps Operating Model</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/naming_standards/" class="dropdown-item">Naming Standards</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/lifecycle_patch_mgmt/" class="dropdown-item">Lifecycle and Patch Management</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">08 Vendor WAN</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../08_vendor_wan/wan_service_requirements/" class="dropdown-item">WAN Service Requirements</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/handoff_expectations/" class="dropdown-item">Handoff Expectations</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/bgp_requirements/" class="dropdown-item">BGP Requirements</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">09 Appendix</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../09_appendix/glossary/" class="dropdown-item">Glossary</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/references/" class="dropdown-item">References</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/abstractions_clarifications_needed/" class="dropdown-item">Abstractions and Clarifications Needed</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">10 Implementation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../10_implementation/readme/" class="dropdown-item">Implementation Proposal</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">11 FAQ</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../11_FAQ/readme/" class="dropdown-item">FAQ Home</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/team_faq/" class="dropdown-item">Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/server_team_faq/" class="dropdown-item">Server Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/executive_faq/" class="dropdown-item">Executive FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/vp_faq/" class="dropdown-item">VP FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/user_faq/" class="dropdown-item">User FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/admin_faq/" class="dropdown-item">Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/service_desk_faq/" class="dropdown-item">Service Desk FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/network_admin_faq/" class="dropdown-item">Network Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/security_team_faq/" class="dropdown-item">Security Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/backup_admin_faq/" class="dropdown-item">Backup Admin FAQ</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">12 Business Cases</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../12_business_cases/readme/" class="dropdown-item">Business Cases Home</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_01_multi_site_resilience/" class="dropdown-item">Multi-Site Resilience Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_02_security_control_uplift/" class="dropdown-item">Security Control Uplift</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_03_gitops_automation/" class="dropdown-item">GitOps and Operations Automation</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_04_vdi_enablement/" class="dropdown-item">VDI Service Enablement</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_05_backup_dr_assurance/" class="dropdown-item">Backup and DR Assurance</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">13 Operations Foundations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../13_operations_foundations/readme/" class="dropdown-item">Foundations Home</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/monitoring/" class="dropdown-item">Monitoring</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/identity/" class="dropdown-item">Identity</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/authentication/" class="dropdown-item">Authentication</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/storage/" class="dropdown-item">Storage</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/capacity_planning/" class="dropdown-item">Capacity Planning</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../vdi_service.mmd/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../client_service_interactions.mmd/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#published-application-diagrams" class="nav-link">Published Application Diagrams</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#single-site-traffic-flow" class="nav-link">Single-Site Traffic Flow</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#multi-site-anycast-flow" class="nav-link">Multi-Site Anycast Flow</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#multi-site-geodns-flow" class="nav-link">Multi-Site GeoDNS Flow</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#app-publish-workflow" class="nav-link">App Publish Workflow</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#full-stack-app-with-stateful-db" class="nav-link">Full-Stack App with Stateful DB</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="published-application-diagrams">Published Application Diagrams</h1>
+<h2 id="single-site-traffic-flow">Single-Site Traffic Flow</h2>
+<p>Inbound internet request reaching a published app at one site, traversing the full DMZ stack.</p>
+<pre><code class="language-mermaid">graph TD
+
+  INET[&quot;Internet Client&lt;br/&gt;External user or bot&quot;]
+  DNS[&quot;Public DNS&lt;br/&gt;app.example.com → site edge IP&quot;]
+
+  subgraph SITE[Site - Single Publishing Site]
+    EDGE[&quot;Edge Router&lt;br/&gt;Internet interface&lt;br/&gt;Public IP&quot;]
+
+    subgraph FW[Firewall Pair - FW-A and FW-B]
+      FWDMZ[&quot;DMZ Rule&lt;br/&gt;Outside → DMZ - TCP 443 only&quot;]
+    end
+
+    subgraph DMZ[DMZ Zone]
+      WAF[&quot;WAF&lt;br/&gt;OWASP Top 10 + app rules&lt;br/&gt;Blocking mode&quot;]
+      LB[&quot;nginx LB&lt;br/&gt;TLS termination&lt;br/&gt;Upstream pool + health checks&quot;]
+    end
+
+    subgraph SRV[Servers and VMs Zone]
+      APP1[&quot;App Backend 1&lt;br/&gt;Stateless&quot;]
+      APP2[&quot;App Backend 2&lt;br/&gt;Stateless&quot;]
+      DB[(&quot;Database&lt;br/&gt;Stateful - if required&quot;)]
+    end
+  end
+
+  INET --&gt;|1 DNS lookup| DNS
+  DNS --&gt;|2 Resolves to edge IP| INET
+  INET --&gt;|3 HTTPS TCP 443| EDGE
+  EDGE --&gt;|4 Forwarded to FW outside| FWDMZ
+  FWDMZ --&gt;|5 DMZ rule permits 443| WAF
+  WAF --&gt;|6 Inspected - OWASP passed| LB
+  LB --&gt;|7 TLS terminated - proxied to backend| APP1
+  LB --&gt;|7 or load balanced to| APP2
+  APP1 --&gt;|8 DB read/write if needed| DB
+  APP2 --&gt;|8 DB read/write if needed| DB
+  linkStyle default color:#CC5500
+</code></pre>
+<h2 id="multi-site-anycast-flow">Multi-Site Anycast Flow</h2>
+<p>Stateless app published at multiple sites behind a shared anycast ingress VIP. BGP selects the nearest site.</p>
+<pre><code class="language-mermaid">graph LR
+
+  INET[&quot;Internet Client&quot;]
+  ANYDNS[&quot;Public DNS&lt;br/&gt;app.example.com → anycast VIP /128&quot;]
+  ANYING[&quot;Anycast VIP /128&lt;br/&gt;BGP-advertised from all active sites&quot;]
+
+  subgraph SA[Site A]
+    EA[&quot;Edge-A or Edge-B&lt;br/&gt;Advertises anycast VIP&quot;]
+    subgraph DMZA[DMZ - Site A]
+      WAFA[&quot;WAF A&quot;]
+      LBA[&quot;nginx LB A&lt;br/&gt;upstream-app pool&quot;]
+    end
+    APPA[&quot;App Backend A&lt;br/&gt;Stateless&quot;]
+  end
+
+  subgraph SB[Site B]
+    EB[&quot;Edge-A or Edge-B&lt;br/&gt;Advertises anycast VIP&quot;]
+    subgraph DMZB[DMZ - Site B]
+      WAFB[&quot;WAF B&quot;]
+      LBB[&quot;nginx LB B&lt;br/&gt;upstream-app pool&quot;]
+    end
+    APPB[&quot;App Backend B&lt;br/&gt;Stateless&quot;]
+  end
+
+  HEALTHA[&quot;Health daemon - Site A&lt;br/&gt;Withdraws VIP if backends down&quot;]
+  HEALTHB[&quot;Health daemon - Site B&lt;br/&gt;Withdraws VIP if backends down&quot;]
+
+  INET --&gt;|DNS lookup| ANYDNS
+  ANYDNS --&gt;|Returns anycast VIP| INET
+  INET --&gt;|HTTPS to anycast VIP| ANYING
+  ANYING --&gt;|BGP nearest path| EA
+  ANYING --&gt;|BGP nearest path| EB
+
+  EA --&gt; WAFA --&gt; LBA --&gt; APPA
+  EB --&gt; WAFB --&gt; LBB --&gt; APPB
+
+  HEALTHA --&gt;|Health gate| EA
+  HEALTHB --&gt;|Health gate| EB
+
+  style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style DMZA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style DMZB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
+</code></pre>
+<h2 id="multi-site-geodns-flow">Multi-Site GeoDNS Flow</h2>
+<p>Alternative to anycast. DNS provider returns the nearest site's IP based on client geography.</p>
+<pre><code class="language-mermaid">graph LR
+
+  INET[&quot;Internet Client&quot;]
+  GEODNS[&quot;GeoDNS Provider&lt;br/&gt;app.example.com&lt;br/&gt;Returns nearest site IP&lt;br/&gt;Health-gated per site&quot;]
+
+  subgraph SA[Site A - Region 1]
+    IPA[&quot;Edge public IP - Site A&quot;]
+    subgraph DMZGA[DMZ - Site A]
+      WAFGA[&quot;WAF A&quot;]
+      LBGA[&quot;nginx LB A&quot;]
+    end
+    APPGA[&quot;App Backend A&quot;]
+  end
+
+  subgraph SB[Site B - Region 2]
+    IPB[&quot;Edge public IP - Site B&quot;]
+    subgraph DMZGB[DMZ - Site B]
+      WAFGB[&quot;WAF B&quot;]
+      LBGB[&quot;nginx LB B&quot;]
+    end
+    APPGB[&quot;App Backend B&quot;]
+  end
+
+  INET --&gt;|DNS lookup| GEODNS
+  GEODNS --&gt;|Returns site A IP if nearest and healthy| INET
+  INET --&gt;|HTTPS| IPA
+  IPA --&gt; WAFGA --&gt; LBGA --&gt; APPGA
+
+  GEODNS --&gt;|Returns site B IP for region 2 clients| INET
+  INET --&gt;|HTTPS| IPB
+  IPB --&gt; WAFGB --&gt; LBGB --&gt; APPGB
+
+  style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style DMZGA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style DMZGB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
+</code></pre>
+<h2 id="app-publish-workflow">App Publish Workflow</h2>
+<p>Steps from request to live service. All configuration changes flow through GitOps — no manual changes on production systems.</p>
+<pre><code class="language-mermaid">flowchart TD
+
+  REQ[&quot;App Publish Request&lt;br/&gt;FQDN - backend IPs - port&lt;br/&gt;TLS cert source - WAF exceptions&quot;]
+  REVIEW[&quot;Architecture Review&lt;br/&gt;Confirm tier - spanning model&lt;br/&gt;DNS strategy - site assignment&quot;]
+
+  subgraph GITOPS[GitOps PRs - all in parallel]
+    PR1[&quot;nginx upstream + server block&lt;br/&gt;TLS cert reference&quot;]
+    PR2[&quot;WAF profile&lt;br/&gt;Base OWASP + app rules&quot;]
+    PR3[&quot;Firewall DMZ rule&lt;br/&gt;Outside to DMZ TCP 443&lt;br/&gt;DMZ to backend app port&quot;]
+    PR4[&quot;TLS certificate&lt;br/&gt;Provisioned via certbot or CA&lt;br/&gt;Stored in secrets manager&quot;]
+  end
+
+  MERGE[&quot;All PRs reviewed and merged&lt;br/&gt;Automation applies to staging&quot;]
+  STAGING[&quot;Staging Validation&lt;br/&gt;HTTPS reachable + correct cert&lt;br/&gt;HSTS header present&lt;br/&gt;WAF blocks test injection payload&lt;br/&gt;nginx upstream health green&lt;br/&gt;FW denies non-443 ports&quot;]
+
+  STAGING_PASS{Pass?}
+
+  DNS[&quot;Public DNS Cutover&lt;br/&gt;Low TTL during cutover&lt;br/&gt;Point FQDN to edge IP or anycast VIP&quot;]
+  SMOKE[&quot;Production Smoke Test&lt;br/&gt;External HTTPS check&lt;br/&gt;Cert valid - app responds&lt;br/&gt;WAF event log active&quot;]
+  MONITOR[&quot;Monitoring Active&lt;br/&gt;nginx access log flowing&lt;br/&gt;WAF event log flowing&lt;br/&gt;Error rate and latency alerts set&quot;]
+
+  FAIL[&quot;Fix and re-validate&lt;br/&gt;Update GitOps PR&lt;br/&gt;Re-run staging&quot;]
+
+  REQ --&gt; REVIEW
+  REVIEW --&gt; GITOPS
+  PR1 &amp; PR2 &amp; PR3 &amp; PR4 --&gt; MERGE
+  MERGE --&gt; STAGING
+  STAGING --&gt; STAGING_PASS
+  STAGING_PASS --&gt;|Yes| DNS
+  STAGING_PASS --&gt;|No| FAIL
+  FAIL --&gt; GITOPS
+  DNS --&gt; SMOKE
+  SMOKE --&gt; MONITOR
+  linkStyle default color:#CC5500
+</code></pre>
+<h2 id="full-stack-app-with-stateful-db">Full-Stack App with Stateful DB</h2>
+<p>Stateless frontend published externally, write DB single-site, read replicas at secondary sites.</p>
+<pre><code class="language-mermaid">graph LR
+
+  INET2[&quot;Internet Client&quot;]
+
+  subgraph SA2[Site A - Primary]
+    subgraph DMZSA2[DMZ]
+      WAFP[&quot;WAF&quot;]
+      LBP[&quot;nginx LB&quot;]
+    end
+    APPP[&quot;App Frontend&lt;br/&gt;Stateless&quot;]
+    DBP[(&quot;DB Primary&lt;br/&gt;Accepts writes&quot;)]
+  end
+
+  subgraph SB2[Site B - Secondary]
+    subgraph DMZSB2[DMZ]
+      WAFR[&quot;WAF&quot;]
+      LBR[&quot;nginx LB&quot;]
+    end
+    APPR[&quot;App Frontend&lt;br/&gt;Stateless&quot;]
+    DBR[(&quot;DB Replica&lt;br/&gt;Read only&quot;)]
+  end
+
+  INET2 --&gt;|HTTPS - nearest site| WAFP
+  WAFP --&gt; LBP --&gt; APPP
+  APPP --&gt;|Writes| DBP
+
+  INET2 --&gt;|HTTPS - nearest site| WAFR
+  WAFR --&gt; LBR --&gt; APPR
+  APPR --&gt;|Reads from replica| DBR
+
+  DBP &lt;--&gt;|&quot;Replication - IPsec encrypted WAN tunnel&quot;| DBR
+
+  style SA2 fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style DMZSA2 fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style DMZSB2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
+</code></pre></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

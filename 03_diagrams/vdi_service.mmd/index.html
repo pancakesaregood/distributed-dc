@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>VDI Service Architecture - Spanned Datacenter Architecture</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../assets/styles/site.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Spanned Datacenter Architecture</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">01 Scope</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../01_scope/scope_of_work/" class="dropdown-item">Scope of Work</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/assumptions/" class="dropdown-item">Assumptions</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/out_of_scope/" class="dropdown-item">Out of Scope</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/acceptance_criteria/" class="dropdown-item">Acceptance Criteria</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">02 Architecture</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../02_architecture/overview/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/physical_layout/" class="dropdown-item">Physical Layout</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/logical_network/" class="dropdown-item">Logical Network</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/ipv6_addressing/" class="dropdown-item">IPv6 Addressing</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/segmentation/" class="dropdown-item">Segmentation</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/routing_wan_abstraction/" class="dropdown-item">Routing and WAN Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/wan_transport_abstraction/" class="dropdown-item">WAN Transport Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/sdn_options/" class="dropdown-item">SDN Options</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/compute_platform/" class="dropdown-item">Compute Platform</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/services_spanning_model/" class="dropdown-item">Services Spanning Model</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/vdi_service/" class="dropdown-item">VDI as a Service</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/published_apps/" class="dropdown-item">Published Applications</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">03 Diagrams</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../diagram_index/" class="dropdown-item">Diagram Index</a>
+</li>
+                                    
+<li>
+    <a href="../topology_global.mmd/" class="dropdown-item">Global Topology</a>
+</li>
+                                    
+<li>
+    <a href="../topology_per_site.mmd/" class="dropdown-item">Per-Site Topology</a>
+</li>
+                                    
+<li>
+    <a href="../physical_rack_topology_2rack.mmd/" class="dropdown-item">Physical Rack Topology (Two-Rack Site)</a>
+</li>
+                                    
+<li>
+    <a href="../site_full_stack_upstream_abstracted.mmd/" class="dropdown-item">One-Site Full Stack (Upstream Abstracted)</a>
+</li>
+                                    
+<li>
+    <a href="../segmentation.mmd/" class="dropdown-item">Segmentation Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../routing_bgp.mmd/" class="dropdown-item">Routing BGP Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../services_anycast.mmd/" class="dropdown-item">Services Anycast Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../backup_dr.mmd/" class="dropdown-item">Backup and DR Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../failover_matrix.mmd/" class="dropdown-item">Failover Matrix Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../dhcp_ad_services.mmd/" class="dropdown-item">DHCP and AD Services</a>
+</li>
+                                    
+<li>
+    <a href="../vpn_access.mmd/" class="dropdown-item">Remote Access VPN Flow</a>
+</li>
+                                    
+<li>
+    <a href="../wan_transport.mmd/" class="dropdown-item">WAN Transport Modes</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">VDI Service Architecture</a>
+</li>
+                                    
+<li>
+    <a href="../published_apps_flow.mmd/" class="dropdown-item">Published App Flows</a>
+</li>
+                                    
+<li>
+    <a href="../client_service_interactions.mmd/" class="dropdown-item">Client and Service Interactions</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">04 Failover and DR</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../04_failover_dr/failover_scenarios/" class="dropdown-item">Failover Scenarios</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/rto_rpo_targets/" class="dropdown-item">RTO and RPO Targets</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/dr_runbooks/" class="dropdown-item">DR Runbooks</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/test_plan/" class="dropdown-item">Test Plan</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">05 Backup</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../05_backup/backup_strategy/" class="dropdown-item">Backup Strategy</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/backup_retention/" class="dropdown-item">Backup Retention</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/restore_procedures/" class="dropdown-item">Restore Procedures</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">06 Security</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../06_security/security_baseline/" class="dropdown-item">Security Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/identity_access/" class="dropdown-item">Identity and Access</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/logging_monitoring/" class="dropdown-item">Logging and Monitoring</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">07 Operations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../07_operations/gitops_operating_model/" class="dropdown-item">GitOps Operating Model</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/naming_standards/" class="dropdown-item">Naming Standards</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/lifecycle_patch_mgmt/" class="dropdown-item">Lifecycle and Patch Management</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">08 Vendor WAN</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../08_vendor_wan/wan_service_requirements/" class="dropdown-item">WAN Service Requirements</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/handoff_expectations/" class="dropdown-item">Handoff Expectations</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/bgp_requirements/" class="dropdown-item">BGP Requirements</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">09 Appendix</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../09_appendix/glossary/" class="dropdown-item">Glossary</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/references/" class="dropdown-item">References</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/abstractions_clarifications_needed/" class="dropdown-item">Abstractions and Clarifications Needed</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">10 Implementation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../10_implementation/readme/" class="dropdown-item">Implementation Proposal</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">11 FAQ</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../11_FAQ/readme/" class="dropdown-item">FAQ Home</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/team_faq/" class="dropdown-item">Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/server_team_faq/" class="dropdown-item">Server Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/executive_faq/" class="dropdown-item">Executive FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/vp_faq/" class="dropdown-item">VP FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/user_faq/" class="dropdown-item">User FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/admin_faq/" class="dropdown-item">Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/service_desk_faq/" class="dropdown-item">Service Desk FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/network_admin_faq/" class="dropdown-item">Network Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/security_team_faq/" class="dropdown-item">Security Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/backup_admin_faq/" class="dropdown-item">Backup Admin FAQ</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">12 Business Cases</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../12_business_cases/readme/" class="dropdown-item">Business Cases Home</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_01_multi_site_resilience/" class="dropdown-item">Multi-Site Resilience Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_02_security_control_uplift/" class="dropdown-item">Security Control Uplift</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_03_gitops_automation/" class="dropdown-item">GitOps and Operations Automation</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_04_vdi_enablement/" class="dropdown-item">VDI Service Enablement</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_05_backup_dr_assurance/" class="dropdown-item">Backup and DR Assurance</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">13 Operations Foundations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../13_operations_foundations/readme/" class="dropdown-item">Foundations Home</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/monitoring/" class="dropdown-item">Monitoring</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/identity/" class="dropdown-item">Identity</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/authentication/" class="dropdown-item">Authentication</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/storage/" class="dropdown-item">Storage</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/capacity_planning/" class="dropdown-item">Capacity Planning</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../wan_transport.mmd/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../published_apps_flow.mmd/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#vdi-service-architecture" class="nav-link">VDI Service Architecture</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#full-access-path" class="nav-link">Full Access Path</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#multi-site-spanning" class="nav-link">Multi-Site Spanning</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#protocol-stack" class="nav-link">Protocol Stack</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#firewall-zone-policy-summary" class="nav-link">Firewall Zone Policy Summary</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="vdi-service-architecture">VDI Service Architecture</h1>
+<h2 id="full-access-path">Full Access Path</h2>
+<p>Shows how a user browser session reaches a desktop VM through the open-source Guacamole stack, and how desktop VMs interact with backend services and identity.</p>
+<pre><code class="language-mermaid">graph LR
+
+  subgraph CLIENTS[Client Access]
+    BRW[&quot;Browser&lt;br/&gt;Internal User or VPN User&lt;br/&gt;HTTPS - no client needed&quot;]
+  end
+
+  subgraph DMZ[DMZ Zone]
+    WAF[&quot;WAF&lt;br/&gt;OWASP inspection&quot;]
+    LB[&quot;nginx LB&lt;br/&gt;TLS termination&lt;br/&gt;Load balances Guacamole&quot;]
+  end
+
+  subgraph CTR[Containers Zone]
+    GC[&quot;guacamole-client&lt;br/&gt;HTML5 session broker&lt;br/&gt;AD + MFA auth&quot;]
+    GUACD[&quot;guacd&lt;br/&gt;RDP / VNC / SSH proxy&quot;]
+  end
+
+  subgraph SRV[Servers and VMs Zone]
+    GDB[(&quot;guacamole-db&lt;br/&gt;PostgreSQL&lt;br/&gt;Sessions + connections&quot;)]
+    DC[&quot;AD Domain Controller&lt;br/&gt;LDAPS auth + group policy&quot;]
+    APP[&quot;Application Services&lt;br/&gt;Permitted by AD group&quot;]
+  end
+
+  subgraph VDI[VDI Segment - 0070]
+    DVM1[&quot;Desktop VM&lt;br/&gt;Linux + XRDP or Windows RDP&lt;br/&gt;Persistent or Pooled&quot;]
+    DVM2[&quot;Desktop VM&lt;br/&gt;Linux + XRDP or Windows RDP&lt;br/&gt;Persistent or Pooled&quot;]
+    DVM3[&quot;Desktop VM&lt;br/&gt;Linux + XRDP or Windows RDP&lt;br/&gt;Persistent or Pooled&quot;]
+  end
+
+  BRW --&gt;|HTTPS| WAF
+  WAF --&gt;|Filtered| LB
+  LB --&gt;|Proxy to Guacamole| GC
+  GC --&gt;|AD LDAPS - MFA| DC
+  GC --&gt;|Session config| GDB
+  GC --&gt;|Guacamole protocol| GUACD
+  GUACD --&gt;|RDP 3389 or VNC 5900| DVM1
+  GUACD --&gt;|RDP 3389 or VNC 5900| DVM2
+  GUACD --&gt;|RDP 3389 or VNC 5900| DVM3
+  DVM1 --&gt;|AD domain join + GPO| DC
+  DVM2 --&gt;|AD domain join + GPO| DC
+  DVM1 --&gt;|App access per AD group| APP
+  DVM2 --&gt;|App access per AD group| APP
+  linkStyle default color:#CC5500
+</code></pre>
+<h2 id="multi-site-spanning">Multi-Site Spanning</h2>
+<p>Each site runs its own Guacamole stack and local desktop VM pool. Session database replicates cross-site for failover.</p>
+<pre><code class="language-mermaid">graph TD
+
+  subgraph SA[Site A]
+    GCA[&quot;guacamole-client A&lt;br/&gt;guacd A&quot;]
+    GDBA[(&quot;guacamole-db A&lt;br/&gt;Primary&quot;)]
+    VDIA[&quot;Desktop VM Pool A&lt;br/&gt;fdca:fcaf:e000:0070::/64&quot;]
+  end
+
+  subgraph SB[Site B]
+    GCB[&quot;guacamole-client B&lt;br/&gt;guacd B&quot;]
+    GDBB[(&quot;guacamole-db B&lt;br/&gt;Replica&quot;)]
+    VDIB[&quot;Desktop VM Pool B&lt;br/&gt;fdca:fcaf:e100:0070::/64&quot;]
+  end
+
+  subgraph SC[Site C]
+    GCC[&quot;guacamole-client C&lt;br/&gt;guacd C&quot;]
+    GDBC[(&quot;guacamole-db C&lt;br/&gt;Replica&quot;)]
+    VDIC[&quot;Desktop VM Pool C&lt;br/&gt;fdca:fcaf:e200:0070::/64&quot;]
+  end
+
+  subgraph SD[Site D]
+    GCD[&quot;guacamole-client D&lt;br/&gt;guacd D&quot;]
+    GDBD[(&quot;guacamole-db D&lt;br/&gt;Replica&quot;)]
+    VDID[&quot;Desktop VM Pool D&lt;br/&gt;fdca:fcaf:e300:0070::/64&quot;]
+  end
+
+  GDBA &lt;--&gt;|&quot;DB replication - IPsec encrypted WAN tunnel&quot;| GDBB
+  GDBA &lt;--&gt;|&quot;DB replication - IPsec encrypted WAN tunnel&quot;| GDBC
+  GDBA &lt;--&gt;|&quot;DB replication - IPsec encrypted WAN tunnel&quot;| GDBD
+
+  GCA --&gt; VDIA
+  GCB --&gt; VDIB
+  GCC --&gt; VDIC
+  GCD --&gt; VDID
+
+  style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style SC fill:#EAF8EF,stroke:#2F855A,stroke-width:2px,color:#111111
+  style SD fill:#F2EDFF,stroke:#6B46C1,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
+</code></pre>
+<h2 id="protocol-stack">Protocol Stack</h2>
+<pre><code class="language-mermaid">graph TD
+  subgraph USER[User Side]
+    BR[&quot;Web Browser&lt;br/&gt;Any OS - no agent&quot;]
+  end
+
+  subgraph GUA[Guacamole Stack - Containers Zone]
+    direction TB
+    CL[&quot;guacamole-client&lt;br/&gt;HTML5 over WebSocket - HTTPS&quot;]
+    GD[&quot;guacd&lt;br/&gt;Guacamole protocol to RDP/VNC/SSH&quot;]
+  end
+
+  subgraph DESK[VDI Zone]
+    direction TB
+    XRDP[&quot;XRDP or Windows RDP&lt;br/&gt;Desktop VM&quot;]
+  end
+
+  BR --&gt;|&quot;HTTPS WebSocket - TLS 1.3&quot;| CL
+  CL --&gt;|&quot;Guacamole protocol - internal&quot;| GD
+  GD --&gt;|&quot;RDP 3389 or VNC 5900 - VDI segment only&quot;| XRDP
+  linkStyle default color:#CC5500
+</code></pre>
+<h2 id="firewall-zone-policy-summary">Firewall Zone Policy Summary</h2>
+<pre><code class="language-mermaid">graph LR
+
+  LB2[&quot;nginx LB&lt;br/&gt;DMZ&quot;]
+  GC2[&quot;guacamole-client&lt;br/&gt;Containers&quot;]
+  GD2[&quot;guacd&lt;br/&gt;Containers&quot;]
+  VDI2[&quot;Desktop VMs&lt;br/&gt;VDI Zone - 0070&quot;]
+  SRV2[&quot;App Services&lt;br/&gt;Servers and VMs&quot;]
+  MGMT2[&quot;Management&lt;br/&gt;Denied&quot;]
+  DC2[&quot;AD DC&lt;br/&gt;Servers and VMs&quot;]
+
+  LB2 --&gt;|443 to Guacamole| GC2
+  GC2 --&gt;|Internal| GD2
+  GD2 --&gt;|RDP 3389 - VNC 5900| VDI2
+  VDI2 --&gt;|App ports per AD group| SRV2
+  VDI2 --&gt;|LDAPS 636| DC2
+  VDI2 -.Denied.-&gt; MGMT2
+  linkStyle default color:#CC5500
+</code></pre></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

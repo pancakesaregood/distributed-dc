@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Routing and WAN Abstraction - Spanned Datacenter Architecture</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../assets/styles/site.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Spanned Datacenter Architecture</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">01 Scope</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../01_scope/scope_of_work/" class="dropdown-item">Scope of Work</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/assumptions/" class="dropdown-item">Assumptions</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/out_of_scope/" class="dropdown-item">Out of Scope</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/acceptance_criteria/" class="dropdown-item">Acceptance Criteria</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">02 Architecture</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../overview/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../physical_layout/" class="dropdown-item">Physical Layout</a>
+</li>
+                                    
+<li>
+    <a href="../logical_network/" class="dropdown-item">Logical Network</a>
+</li>
+                                    
+<li>
+    <a href="../ipv6_addressing/" class="dropdown-item">IPv6 Addressing</a>
+</li>
+                                    
+<li>
+    <a href="../segmentation/" class="dropdown-item">Segmentation</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Routing and WAN Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="../wan_transport_abstraction/" class="dropdown-item">WAN Transport Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="../sdn_options/" class="dropdown-item">SDN Options</a>
+</li>
+                                    
+<li>
+    <a href="../compute_platform/" class="dropdown-item">Compute Platform</a>
+</li>
+                                    
+<li>
+    <a href="../services_spanning_model/" class="dropdown-item">Services Spanning Model</a>
+</li>
+                                    
+<li>
+    <a href="../vdi_service/" class="dropdown-item">VDI as a Service</a>
+</li>
+                                    
+<li>
+    <a href="../published_apps/" class="dropdown-item">Published Applications</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">03 Diagrams</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../03_diagrams/diagram_index/" class="dropdown-item">Diagram Index</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/topology_global.mmd/" class="dropdown-item">Global Topology</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/topology_per_site.mmd/" class="dropdown-item">Per-Site Topology</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/physical_rack_topology_2rack.mmd/" class="dropdown-item">Physical Rack Topology (Two-Rack Site)</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/site_full_stack_upstream_abstracted.mmd/" class="dropdown-item">One-Site Full Stack (Upstream Abstracted)</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/segmentation.mmd/" class="dropdown-item">Segmentation Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/routing_bgp.mmd/" class="dropdown-item">Routing BGP Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/services_anycast.mmd/" class="dropdown-item">Services Anycast Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/backup_dr.mmd/" class="dropdown-item">Backup and DR Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/failover_matrix.mmd/" class="dropdown-item">Failover Matrix Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/dhcp_ad_services.mmd/" class="dropdown-item">DHCP and AD Services</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/vpn_access.mmd/" class="dropdown-item">Remote Access VPN Flow</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/wan_transport.mmd/" class="dropdown-item">WAN Transport Modes</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/vdi_service.mmd/" class="dropdown-item">VDI Service Architecture</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/published_apps_flow.mmd/" class="dropdown-item">Published App Flows</a>
+</li>
+                                    
+<li>
+    <a href="../../03_diagrams/client_service_interactions.mmd/" class="dropdown-item">Client and Service Interactions</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">04 Failover and DR</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../04_failover_dr/failover_scenarios/" class="dropdown-item">Failover Scenarios</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/rto_rpo_targets/" class="dropdown-item">RTO and RPO Targets</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/dr_runbooks/" class="dropdown-item">DR Runbooks</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/test_plan/" class="dropdown-item">Test Plan</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">05 Backup</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../05_backup/backup_strategy/" class="dropdown-item">Backup Strategy</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/backup_retention/" class="dropdown-item">Backup Retention</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/restore_procedures/" class="dropdown-item">Restore Procedures</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">06 Security</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../06_security/security_baseline/" class="dropdown-item">Security Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/identity_access/" class="dropdown-item">Identity and Access</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/logging_monitoring/" class="dropdown-item">Logging and Monitoring</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">07 Operations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../07_operations/gitops_operating_model/" class="dropdown-item">GitOps Operating Model</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/naming_standards/" class="dropdown-item">Naming Standards</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/lifecycle_patch_mgmt/" class="dropdown-item">Lifecycle and Patch Management</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">08 Vendor WAN</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../08_vendor_wan/wan_service_requirements/" class="dropdown-item">WAN Service Requirements</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/handoff_expectations/" class="dropdown-item">Handoff Expectations</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/bgp_requirements/" class="dropdown-item">BGP Requirements</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">09 Appendix</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../09_appendix/glossary/" class="dropdown-item">Glossary</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/references/" class="dropdown-item">References</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/abstractions_clarifications_needed/" class="dropdown-item">Abstractions and Clarifications Needed</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">10 Implementation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../10_implementation/readme/" class="dropdown-item">Implementation Proposal</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">11 FAQ</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../11_FAQ/readme/" class="dropdown-item">FAQ Home</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/team_faq/" class="dropdown-item">Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/server_team_faq/" class="dropdown-item">Server Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/executive_faq/" class="dropdown-item">Executive FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/vp_faq/" class="dropdown-item">VP FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/user_faq/" class="dropdown-item">User FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/admin_faq/" class="dropdown-item">Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/service_desk_faq/" class="dropdown-item">Service Desk FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/network_admin_faq/" class="dropdown-item">Network Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/security_team_faq/" class="dropdown-item">Security Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/backup_admin_faq/" class="dropdown-item">Backup Admin FAQ</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">12 Business Cases</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../12_business_cases/readme/" class="dropdown-item">Business Cases Home</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_01_multi_site_resilience/" class="dropdown-item">Multi-Site Resilience Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_02_security_control_uplift/" class="dropdown-item">Security Control Uplift</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_03_gitops_automation/" class="dropdown-item">GitOps and Operations Automation</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_04_vdi_enablement/" class="dropdown-item">VDI Service Enablement</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_05_backup_dr_assurance/" class="dropdown-item">Backup and DR Assurance</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">13 Operations Foundations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../13_operations_foundations/readme/" class="dropdown-item">Foundations Home</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/monitoring/" class="dropdown-item">Monitoring</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/identity/" class="dropdown-item">Identity</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/authentication/" class="dropdown-item">Authentication</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/storage/" class="dropdown-item">Storage</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/capacity_planning/" class="dropdown-item">Capacity Planning</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../segmentation/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../wan_transport_abstraction/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#routing-and-wan-abstraction" class="nav-link">Routing and WAN Abstraction</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#wan-abstraction-boundary" class="nav-link">WAN Abstraction Boundary</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#encryption-model" class="nav-link">Encryption Model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#multi-tunnel-redundancy-model" class="nav-link">Multi-Tunnel Redundancy Model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#required-wan-capabilities" class="nav-link">Required WAN Capabilities</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#routing-model" class="nav-link">Routing Model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#route-advertisement-policy" class="nav-link">Route Advertisement Policy</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#optional-anycast-for-shared-services" class="nav-link">Optional Anycast for Shared Services</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#failure-behavior-expectations" class="nav-link">Failure Behavior Expectations</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ipsec-operational-requirements" class="nav-link">IPsec Operational Requirements</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#internet-breakout-model" class="nav-link">Internet Breakout Model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="routing-and-wan-abstraction">Routing and WAN Abstraction</h1>
+<h2 id="wan-abstraction-boundary">WAN Abstraction Boundary</h2>
+<p>The WAN is treated as a vendor-managed L3 handoff. This design specifies required capabilities and expected behavior, not carrier-specific transport implementation. The WAN is assumed to be a private circuit service (such as an MPLS VPN or equivalent dedicated L3 service) that isolates inter-site traffic at the network layer. In addition, the customer edge terminates IPsec tunnels between all site pairs to provide encryption that is fully under customer control, independent of WAN provider trust assumptions.</p>
+<h2 id="encryption-model">Encryption Model</h2>
+<ul>
+<li>All inter-site traffic traverses IPsec tunnels terminated on the site edge pair.</li>
+<li>IPsec mode: tunnel mode with IKEv2 key exchange.</li>
+<li>Cipher suite: AES-256-GCM for encryption, SHA-256 or stronger for integrity, Perfect Forward Secrecy enabled.</li>
+<li>IPsec tunnels are established between every pair of sites, forming a full-mesh encrypted overlay.</li>
+<li>BGP sessions run inside the IPsec tunnels; BGP TCP-AO session authentication is applied as an additional control-plane hardening measure.</li>
+<li>IPsec session keys are rotated on a defined schedule and on any security incident involving edge credentials.</li>
+</ul>
+<h2 id="multi-tunnel-redundancy-model">Multi-Tunnel Redundancy Model</h2>
+<p>Each site operates an edge pair (Edge-A and Edge-B). Each edge node establishes independent IPsec tunnels to <strong>each</strong> edge node at every remote site. This produces four tunnels per site pair rather than one:</p>
+<table>
+<thead>
+<tr>
+<th>Tunnel</th>
+<th>Local</th>
+<th>Remote</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A–A</td>
+<td>Edge-A</td>
+<td>Remote Edge-A</td>
+<td>Primary — matched pair, preferred path</td>
+</tr>
+<tr>
+<td>B–B</td>
+<td>Edge-B</td>
+<td>Remote Edge-B</td>
+<td>Secondary — matched pair, failover path</td>
+</tr>
+<tr>
+<td>A–B</td>
+<td>Edge-A</td>
+<td>Remote Edge-B</td>
+<td>Cross-connect — available if remote Edge-A fails</td>
+</tr>
+<tr>
+<td>B–A</td>
+<td>Edge-B</td>
+<td>Remote Edge-A</td>
+<td>Cross-connect — available if local Edge-A fails</td>
+</tr>
+</tbody>
+</table>
+<p>With 4 sites and 6 site pairs, the fabric carries 24 IPsec tunnels in total.</p>
+<p><strong>Redundancy properties:</strong>
+- Loss of one local edge node: 2 of 4 tunnels to each remote site remain active. Traffic reroutes automatically over the surviving edge.
+- Loss of one remote edge node: same — 2 tunnels per affected site pair remain.
+- Loss of one WAN path for a single edge: that edge's tunnels reroute or re-establish over its surviving path. The other edge's tunnels are unaffected.
+- Simultaneous loss of a local edge AND the primary path on the remaining edge: the B–A or A–B cross-connect tunnel carries traffic on the surviving path until the failed components recover.</p>
+<p><strong>BGP session assignment:</strong>
+- Primary BGP sessions run on A–A tunnels (Edge-A to remote Edge-A for each site pair).
+- Secondary BGP sessions run on B–B tunnels (Edge-B to remote Edge-B for each site pair).
+- Cross-connect tunnels (A–B, B–A) carry forwarded traffic under routing policy but do not carry additional BGP sessions by default. Add cross-connect BGP sessions if stricter convergence guarantees are required.
+- Each edge node therefore maintains <code>(n-1) × 2</code> BGP sessions where n is the number of sites (6 sessions per edge, 12 per site across both edges).</p>
+<h2 id="required-wan-capabilities">Required WAN Capabilities</h2>
+<ul>
+<li>Private circuit or VPN service providing logically isolated inter-site L3 connectivity.</li>
+<li>IPv6 routing support for site edge peers.</li>
+<li>BGP session support per site for dynamic route exchange.</li>
+<li>Ability to carry each site <code>/56</code> summary route and IPsec-encapsulated inter-site traffic.</li>
+<li>SLA visibility for latency, packet loss, and availability.</li>
+<li>Fault notification and maintenance coordination process.</li>
+</ul>
+<h2 id="routing-model">Routing Model</h2>
+<ul>
+<li>Primary: eBGP between each site edge pair and WAN handoff, carried over IPsec-encrypted inter-site tunnels.</li>
+<li>Fallback: static routes with documented activation procedures. Static fallback traffic also routes through the IPsec overlay.</li>
+<li>Local preference and AS-path policy to prefer healthy primary paths.</li>
+<li>Prefix filtering to accept and advertise only approved route sets.</li>
+</ul>
+<h2 id="route-advertisement-policy">Route Advertisement Policy</h2>
+<p>Each site advertises only its site summary:
+- Site A advertises <code>fdca:fcaf:e000::/56</code>
+- Site B advertises <code>fdca:fcaf:e100::/56</code>
+- Site C advertises <code>fdca:fcaf:e200::/56</code>
+- Site D advertises <code>fdca:fcaf:e300::/56</code></p>
+<p>This limits control-plane churn and avoids leaking internal <code>/64</code> detail externally.</p>
+<h2 id="optional-anycast-for-shared-services">Optional Anycast for Shared Services</h2>
+<p>Anycast is optional for:
+- Internal DNS resolver VIP
+- Internal ingress VIP</p>
+<p>Approach:
+- Advertise identical <code>/128</code> loopback anycast addresses from multiple sites.
+- Use health checks to withdraw advertisements when local service is unhealthy.
+- Keep stateful backends non-anycast unless replication semantics are proven safe.</p>
+<h2 id="failure-behavior-expectations">Failure Behavior Expectations</h2>
+<ul>
+<li>Loss of one edge node: the surviving local edge retains 2 of 4 tunnels to each remote site (B–B and B–A if Edge-B survives, or A–A and A–B if Edge-A survives). BGP withdraws routes learned via the failed edge. No manual intervention required.</li>
+<li>Loss of one WAN path on a single edge: IPsec tunnels from that edge re-establish over its surviving internet path (for Mode B) or fail if the only WAN path is gone. The paired edge and its tunnels are unaffected.</li>
+<li>Loss of both tunnels to a remote site from one local edge: cross-connect tunnels from the other local edge carry traffic to that remote site. BGP routes are still available via the secondary BGP session.</li>
+<li>Loss of BGP control plane: static fallback procedure restores minimal inter-site reachability. IPsec tunnels must remain operational for any static fallback traffic to be encrypted.</li>
+<li>Full site failure: all 8 tunnels from the failed site tear down on IKEv2 dead-peer detection timeout. Failed site routes withdraw from all remaining sites via BGP. Traffic shifts to available sites hosting replicated services.</li>
+<li>IPsec tunnel failure without WAN failure: BGP withdraws routes using that tunnel. Remaining tunnels carry the load. Investigate and re-establish the failed tunnel without traffic impact.</li>
+</ul>
+<h2 id="ipsec-operational-requirements">IPsec Operational Requirements</h2>
+<ul>
+<li>Each site edge pair shares an IPsec configuration sourced from version control. Tunnel definitions are templated per edge role (Edge-A or Edge-B) and applied consistently across all sites.</li>
+<li>IKEv2 pre-shared keys or certificate-based authentication; certificate-based preferred for rotation and audit.</li>
+<li>All 24 tunnel states are monitored individually. Any single tunnel failure generates a high-priority alert. Loss of both tunnels in a matched pair (A–A and A–B, or B–B and B–A) generates a critical alert.</li>
+<li>IPsec SA lifetime and rekeying parameters are documented and consistent across all sites and all tunnel roles.</li>
+<li>Cross-connect tunnels (A–B, B–A) are held in a ready-established state at all times, not brought up on demand. This ensures they are immediately available for traffic without an IKEv2 negotiation delay at the moment they are needed.</li>
+</ul>
+<h2 id="internet-breakout-model">Internet Breakout Model</h2>
+<p>Each site has an independent local internet connection terminating on the site edge pair. Internet traffic exits directly at the local site and is never backhauled over the inter-site WAN.</p>
+<h3 id="standard-sites">Standard Sites</h3>
+<ul>
+<li>A single ISP circuit connects to both Edge-A and Edge-B at the site.</li>
+<li>Edge nodes share the ISP circuit via active-standby or ECMP depending on ISP handoff capability.</li>
+<li>Loss of one edge node: internet traffic fails over to the surviving edge node automatically.</li>
+<li>Loss of the ISP circuit: site loses internet egress; inter-site WAN and private services remain unaffected.</li>
+</ul>
+<h3 id="designated-redundant-internet-site">Designated Redundant Internet Site</h3>
+<p>One site is designated to have full internet edge redundancy:
+- Edge-A connects to ISP-1 (primary internet circuit).
+- Edge-B connects to ISP-2 (secondary internet circuit from a different provider).
+- BGP or policy-based routing selects the preferred internet path; failover is automatic on path loss.
+- This site can optionally provide internet fallback egress for other sites during a local ISP outage, via the inter-site WAN, if explicitly enabled in policy. This path must be approved in design governance before activation.</p>
+<h3 id="guest-internet-routing">Guest Internet Routing</h3>
+<ul>
+<li>Guest zone traffic is policy-routed to the local site internet L3 interface. All guest internet egress exits at the closest site L3OUT — no WAN backhaul.</li>
+<li>Guest traffic is explicitly blocked from entering the IPsec inter-site WAN tunnels.</li>
+<li>Guest traffic must not reach any internal segment; the only permitted destination is the internet via the local edge.</li>
+<li>If the local internet circuit is unavailable, guest service is suspended at that site. Guest traffic is not rerouted over the WAN to another site's internet path by default.</li>
+</ul>
+<h4 id="nat64-and-dns64-for-guest-internet">NAT64 and DNS64 for Guest Internet</h4>
+<p>The internal network is IPv6-only (ULA). Guest devices need to reach both IPv6-native and IPv4-only internet destinations. Two translation functions are deployed at each site for the guest path:</p>
+<p><strong>NAT64 (RFC 6146)</strong>
+- Translates outbound IPv6 packets from guest devices into IPv4 packets at the local internet L3 interface.
+- Uses the Well-Known Prefix <code>64:ff9b::/96</code> as the NAT64 destination range. Packets from guests addressed to <code>64:ff9b::&lt;ipv4&gt;</code> are translated to the corresponding IPv4 destination.
+- NAT64 is implemented on the site firewall pair where the platform supports it (e.g., VyOS, OPNsense with Jool). If the firewall does not support NAT64 natively, a dedicated NAT64 gateway VM (<code>site-&lt;x&gt;-nat64-01</code>) is deployed in the Guest zone and traffic is steered to it via firewall policy.
+- All NAT64 state is local to the site. Cross-site NAT64 failover is not provided; guest internet access is site-local.</p>
+<p><strong>DNS64 (RFC 6147)</strong>
+- A DNS64 resolver is provided to the guest segment as the authoritative DNS for guest clients. DHCP for guests delivers the DNS64 resolver address.
+- The DNS64 resolver synthesizes AAAA records for IPv4-only internet hosts by prepending the NAT64 Well-Known Prefix to the host's A record address. Guest devices then connect to the synthesized IPv6 address, which NAT64 translates to IPv4.
+- For hosts with native AAAA records, DNS64 returns the real AAAA record unchanged. NAT64 is not involved for IPv6-native destinations.
+- DNS64 runs as a lightweight VM or container (<code>site-&lt;x&gt;-dns64-01</code>) in the Guest zone, or as a separate resolver view on the site DNS resolver with guest-facing DNSSEC validation adjusted for synthesis.</p>
+<p><strong>IPv4 PAT (Masquerade)</strong>
+- NAT64-translated IPv4 packets exit the site through the edge internet interface with IPv4 PAT (NAPT/masquerade). The edge masquerades all outbound IPv4 behind the ISP-assigned public IPv4 address(es).
+- This is standard IPv4 NAT at the edge internet interface, applied to all IPv4 traffic destined for the internet regardless of origin (NAT64-translated guest traffic or any other IPv4 egress path).
+- On the designated redundant internet site with dual ISP circuits, PAT is applied per-edge to the respective ISP address.</p>
+<p><strong>NPTv6 (Optional)</strong>
+- If the ISP provides a public IPv6 prefix (GUA), NPTv6 (Network Prefix Translation, RFC 6296) at the edge translates the ULA guest source address to a GUA address for IPv6-native internet destinations. This eliminates the NAT64/DNS64 path for IPv6-capable sites and provides a direct IPv6 path.
+- NPTv6 is stateless and has no session table overhead. Enable it if the ISP provides a stable IPv6 prefix.</p>
+<p><strong>Guest translation path summary:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Destination type</th>
+<th>Guest source</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IPv4-only internet</td>
+<td>ULA guest</td>
+<td>DNS64 synthesis → NAT64 → IPv4 PAT → ISP IPv4</td>
+</tr>
+<tr>
+<td>IPv6-native internet</td>
+<td>ULA guest</td>
+<td>NPTv6 (ULA→GUA) → ISP IPv6 (if available) or NAT64 fallback</td>
+</tr>
+<tr>
+<td>Any internal segment</td>
+<td>ULA guest</td>
+<td>Denied by firewall — guest zone isolation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="vpn-inbound-routing">VPN Inbound Routing</h3>
+<ul>
+<li>Remote access VPN connections arrive from the internet at the edge router's internet-facing interface.</li>
+<li>The edge router forwards VPN traffic to the firewall outside interface. The firewall handles VPN termination.</li>
+<li>VPN can terminate on the firewall appliance itself (preferred for simplicity) or via DNAT to a dedicated VPN VM in the DMZ zone.</li>
+<li>Authenticated VPN sessions are placed in the VPN zone on the firewall. Zone policy then permits traffic to inside zones based on group membership.</li>
+<li>The public FQDN <code>vpn.example.com</code> resolves to the VPN endpoint IP at each site. DNS can be managed as per-site records or via GeoDNS for automatic client routing to the nearest site.</li>
+</ul></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

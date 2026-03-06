@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Physical Rack Topology (Two-Rack Site) - Spanned Datacenter Architecture</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../assets/styles/site.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Spanned Datacenter Architecture</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">01 Scope</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../01_scope/scope_of_work/" class="dropdown-item">Scope of Work</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/assumptions/" class="dropdown-item">Assumptions</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/out_of_scope/" class="dropdown-item">Out of Scope</a>
+</li>
+                                    
+<li>
+    <a href="../../01_scope/acceptance_criteria/" class="dropdown-item">Acceptance Criteria</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">02 Architecture</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../02_architecture/overview/" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/physical_layout/" class="dropdown-item">Physical Layout</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/logical_network/" class="dropdown-item">Logical Network</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/ipv6_addressing/" class="dropdown-item">IPv6 Addressing</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/segmentation/" class="dropdown-item">Segmentation</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/routing_wan_abstraction/" class="dropdown-item">Routing and WAN Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/wan_transport_abstraction/" class="dropdown-item">WAN Transport Abstraction</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/sdn_options/" class="dropdown-item">SDN Options</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/compute_platform/" class="dropdown-item">Compute Platform</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/services_spanning_model/" class="dropdown-item">Services Spanning Model</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/vdi_service/" class="dropdown-item">VDI as a Service</a>
+</li>
+                                    
+<li>
+    <a href="../../02_architecture/published_apps/" class="dropdown-item">Published Applications</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">03 Diagrams</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../diagram_index/" class="dropdown-item">Diagram Index</a>
+</li>
+                                    
+<li>
+    <a href="../topology_global.mmd/" class="dropdown-item">Global Topology</a>
+</li>
+                                    
+<li>
+    <a href="../topology_per_site.mmd/" class="dropdown-item">Per-Site Topology</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Physical Rack Topology (Two-Rack Site)</a>
+</li>
+                                    
+<li>
+    <a href="../site_full_stack_upstream_abstracted.mmd/" class="dropdown-item">One-Site Full Stack (Upstream Abstracted)</a>
+</li>
+                                    
+<li>
+    <a href="../segmentation.mmd/" class="dropdown-item">Segmentation Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../routing_bgp.mmd/" class="dropdown-item">Routing BGP Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../services_anycast.mmd/" class="dropdown-item">Services Anycast Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../backup_dr.mmd/" class="dropdown-item">Backup and DR Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../failover_matrix.mmd/" class="dropdown-item">Failover Matrix Diagram</a>
+</li>
+                                    
+<li>
+    <a href="../dhcp_ad_services.mmd/" class="dropdown-item">DHCP and AD Services</a>
+</li>
+                                    
+<li>
+    <a href="../vpn_access.mmd/" class="dropdown-item">Remote Access VPN Flow</a>
+</li>
+                                    
+<li>
+    <a href="../wan_transport.mmd/" class="dropdown-item">WAN Transport Modes</a>
+</li>
+                                    
+<li>
+    <a href="../vdi_service.mmd/" class="dropdown-item">VDI Service Architecture</a>
+</li>
+                                    
+<li>
+    <a href="../published_apps_flow.mmd/" class="dropdown-item">Published App Flows</a>
+</li>
+                                    
+<li>
+    <a href="../client_service_interactions.mmd/" class="dropdown-item">Client and Service Interactions</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">04 Failover and DR</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../04_failover_dr/failover_scenarios/" class="dropdown-item">Failover Scenarios</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/rto_rpo_targets/" class="dropdown-item">RTO and RPO Targets</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/dr_runbooks/" class="dropdown-item">DR Runbooks</a>
+</li>
+                                    
+<li>
+    <a href="../../04_failover_dr/test_plan/" class="dropdown-item">Test Plan</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">05 Backup</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../05_backup/backup_strategy/" class="dropdown-item">Backup Strategy</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/backup_retention/" class="dropdown-item">Backup Retention</a>
+</li>
+                                    
+<li>
+    <a href="../../05_backup/restore_procedures/" class="dropdown-item">Restore Procedures</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">06 Security</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../06_security/security_baseline/" class="dropdown-item">Security Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/identity_access/" class="dropdown-item">Identity and Access</a>
+</li>
+                                    
+<li>
+    <a href="../../06_security/logging_monitoring/" class="dropdown-item">Logging and Monitoring</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">07 Operations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../07_operations/gitops_operating_model/" class="dropdown-item">GitOps Operating Model</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/naming_standards/" class="dropdown-item">Naming Standards</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/lifecycle_patch_mgmt/" class="dropdown-item">Lifecycle and Patch Management</a>
+</li>
+                                    
+<li>
+    <a href="../../07_operations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">08 Vendor WAN</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../08_vendor_wan/wan_service_requirements/" class="dropdown-item">WAN Service Requirements</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/handoff_expectations/" class="dropdown-item">Handoff Expectations</a>
+</li>
+                                    
+<li>
+    <a href="../../08_vendor_wan/bgp_requirements/" class="dropdown-item">BGP Requirements</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">09 Appendix</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../09_appendix/glossary/" class="dropdown-item">Glossary</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/references/" class="dropdown-item">References</a>
+</li>
+                                    
+<li>
+    <a href="../../09_appendix/abstractions_clarifications_needed/" class="dropdown-item">Abstractions and Clarifications Needed</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">10 Implementation</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../10_implementation/readme/" class="dropdown-item">Implementation Proposal</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">11 FAQ</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../11_FAQ/readme/" class="dropdown-item">FAQ Home</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/team_faq/" class="dropdown-item">Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/server_team_faq/" class="dropdown-item">Server Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/executive_faq/" class="dropdown-item">Executive FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/vp_faq/" class="dropdown-item">VP FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/user_faq/" class="dropdown-item">User FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/admin_faq/" class="dropdown-item">Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/service_desk_faq/" class="dropdown-item">Service Desk FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/network_admin_faq/" class="dropdown-item">Network Admin FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/security_team_faq/" class="dropdown-item">Security Team FAQ</a>
+</li>
+                                    
+<li>
+    <a href="../../11_FAQ/backup_admin_faq/" class="dropdown-item">Backup Admin FAQ</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">12 Business Cases</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../12_business_cases/readme/" class="dropdown-item">Business Cases Home</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_01_multi_site_resilience/" class="dropdown-item">Multi-Site Resilience Baseline</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_02_security_control_uplift/" class="dropdown-item">Security Control Uplift</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_03_gitops_automation/" class="dropdown-item">GitOps and Operations Automation</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_04_vdi_enablement/" class="dropdown-item">VDI Service Enablement</a>
+</li>
+                                    
+<li>
+    <a href="../../12_business_cases/business_case_05_backup_dr_assurance/" class="dropdown-item">Backup and DR Assurance</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">13 Operations Foundations</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../13_operations_foundations/readme/" class="dropdown-item">Foundations Home</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/monitoring/" class="dropdown-item">Monitoring</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/observability/" class="dropdown-item">Observability</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/identity/" class="dropdown-item">Identity</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/authentication/" class="dropdown-item">Authentication</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/storage/" class="dropdown-item">Storage</a>
+</li>
+                                    
+<li>
+    <a href="../../13_operations_foundations/capacity_planning/" class="dropdown-item">Capacity Planning</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../topology_per_site.mmd/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../site_full_stack_upstream_abstracted.mmd/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#physical-rack-topology-two-rack-site" class="nav-link">Physical Rack Topology (Two-Rack Site)</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#rack-elevation-and-upstream-connectivity-abstracted" class="nav-link">Rack Elevation and Upstream Connectivity (Abstracted)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#cold-aisle-hot-aisle-airflow-and-cable-lanes" class="nav-link">Cold Aisle / Hot Aisle Airflow and Cable Lanes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#detailed-42u-layout-guidance" class="nav-link">Detailed 42U Layout Guidance</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#physical-rules-mandatory" class="nav-link">Physical Rules (Mandatory)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#airflow-quality-targets" class="nav-link">Airflow Quality Targets</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="physical-rack-topology-two-rack-site">Physical Rack Topology (Two-Rack Site)</h1>
+<p>This diagram set defines a practical two-rack physical layout for one site.
+It keeps upstream connectivity abstracted while making device placement, cable paths, and airflow controls explicit.</p>
+<h2 id="rack-elevation-and-upstream-connectivity-abstracted">Rack Elevation and Upstream Connectivity (Abstracted)</h2>
+<pre><code class="language-mermaid">flowchart LR
+
+  subgraph UP[Upstream Connectivity - Abstracted]
+    WAN[(Vendor WAN Handoff)]
+    ISP[(Internet Demarc)]
+    OOB[(Out-of-Band Management Uplink)]
+  end
+
+  subgraph R1[Rack 1 - Network, Security, Control Plane, Core Compute - 42U]
+    direction TB
+    R1T[&quot;U42-U40: Overhead Entry, Brush Panel, Horizontal Cable Manager&quot;]
+    R1P[&quot;U39-U37: WAN/ISP/OOB Patch Panels, Fiber Shelf&quot;]
+    R1N1[&quot;U36-U33: ToR-A and ToR-B (1U each) with 1U cable managers&quot;]
+    R1N2[&quot;U32-U27: Edge-A, Edge-B, FW-A, FW-B with 1U managers between appliances&quot;]
+    R1M[&quot;U26-U23: OOB Switch and KVM Drawer&quot;]
+    R1C[&quot;U22-U11: Mgmt Host, HV-01, HV-02 (2U servers)&quot;]
+    R1S[&quot;U10-U07: Reserved for growth and airflow buffer (blanking panels)&quot;]
+    R1B[&quot;U06-U01: UPS/Battery Shelf or Ballast (heaviest zone)&quot;]
+  end
+
+  subgraph R2[Rack 2 - Compute and Storage Expansion - 42U]
+    direction TB
+    R2T[&quot;U42-U40: Overhead Entry, Brush Panel, Horizontal Cable Manager&quot;]
+    R2P[&quot;U39-U37: Inter-Rack Patch and Fiber Shelf&quot;]
+    R2C[&quot;U36-U25: HV-03, HV-04, Optional VDI Host (2U servers)&quot;]
+    R2ST[&quot;U24-U11: Storage-01, Storage-02, Backup Repository (heavy 2U-4U chassis)&quot;]
+    R2S[&quot;U10-U07: Reserved for airflow buffer and maintenance&quot;]
+    R2B[&quot;U06-U01: UPS/Battery Shelf or Ballast (heaviest zone)&quot;]
+  end
+
+  WAN --&gt;|Abstract L3 handoff| R1P
+  ISP --&gt;|Abstract internet handoff| R1P
+  OOB --&gt;|Abstract OOB handoff| R1P
+
+  R1N1 &lt;--&gt;|Dual inter-rack fiber trunks A and B| R2P
+  R1N1 --&gt;|Dual-homed access uplinks| R2C
+  R1N1 --&gt;|Dual-homed storage uplinks| R2ST
+  linkStyle default color:#CC5500
+</code></pre>
+<h2 id="cold-aisle-hot-aisle-airflow-and-cable-lanes">Cold Aisle / Hot Aisle Airflow and Cable Lanes</h2>
+<pre><code class="language-mermaid">flowchart LR
+  CA[Cold Aisle Fronts&lt;br/&gt;Target 20C to 24C] --&gt; R1F[Rack 1 Front Intake]
+  CA --&gt; R2F[Rack 2 Front Intake]
+  R1F --&gt; R1R[Rack 1 Rear Exhaust]
+  R2F --&gt; R2R[Rack 2 Rear Exhaust]
+  R1R --&gt; HA[Hot Aisle Rears&lt;br/&gt;Target 32C to 40C]
+  R2R --&gt; HA
+
+  OHT[Overhead Tray&lt;br/&gt;Fiber and uplink copper only] --&gt; R1T2[Rack 1 Top Entry]
+  OHT --&gt; R2T2[Rack 2 Top Entry]
+
+  PWR[Dual PDU Feeds A and B] --&gt; R1B2[Rack 1 Bottom PDU ingress]
+  PWR --&gt; R2B2[Rack 2 Bottom PDU ingress]
+  linkStyle default color:#CC5500
+</code></pre>
+<h2 id="detailed-42u-layout-guidance">Detailed 42U Layout Guidance</h2>
+<h3 id="rack-1-network-security-core-compute">Rack 1 (Network + Security + Core Compute)</h3>
+<table>
+<thead>
+<tr>
+<th>RU range</th>
+<th>Equipment block</th>
+<th>Weight profile</th>
+<th>Mounting and orientation</th>
+<th>Airflow direction</th>
+<th>Cable management</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U42-U40</td>
+<td>Brush panel + cable manager</td>
+<td>Light</td>
+<td>Top entry for overhead tray handoff</td>
+<td>Passive</td>
+<td>Keep fiber/copper entry strain-relieved</td>
+</tr>
+<tr>
+<td>U39-U37</td>
+<td>Patch panels + fiber shelf</td>
+<td>Light</td>
+<td>Front serviceable, labeled left-to-right</td>
+<td>Passive</td>
+<td>Keep WAN/ISP/OOB patching short and labeled</td>
+</tr>
+<tr>
+<td>U36-U33</td>
+<td>ToR-A, ToR-B + 1U managers</td>
+<td>Medium</td>
+<td>Rails square and level, ports facing service side</td>
+<td>Front-to-back</td>
+<td>1U manager between switches, short DAC/AOC runs</td>
+</tr>
+<tr>
+<td>U32-U27</td>
+<td>Edge-A, Edge-B, FW-A, FW-B + managers</td>
+<td>Medium</td>
+<td>Alternate appliance and manager for service access</td>
+<td>Front-to-back</td>
+<td>Keep uplinks in right-side data lane, no cross-face drape</td>
+</tr>
+<tr>
+<td>U26-U23</td>
+<td>OOB switch + KVM drawer</td>
+<td>Light</td>
+<td>Front-access controls</td>
+<td>Front-to-back</td>
+<td>OOB copper to dedicated patch block</td>
+</tr>
+<tr>
+<td>U22-U11</td>
+<td>Mgmt host, HV-01, HV-02</td>
+<td>Heavy-medium</td>
+<td>Use fixed rails and rear support brackets</td>
+<td>Front-to-back</td>
+<td>Separate server NIC bundles by ToR A/B path</td>
+</tr>
+<tr>
+<td>U10-U07</td>
+<td>Reserved blanking zone</td>
+<td>None</td>
+<td>Fill with blanking panels</td>
+<td>Maintains pressure</td>
+<td>No loose slack loops</td>
+</tr>
+<tr>
+<td>U06-U01</td>
+<td>UPS/battery shelf or ballast</td>
+<td>Heaviest</td>
+<td>Bottom-most to lower center of gravity</td>
+<td>Front-to-back if fan-assisted</td>
+<td>Power enters from rear vertical lanes only</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rack-2-compute-storage-expansion">Rack 2 (Compute + Storage Expansion)</h3>
+<table>
+<thead>
+<tr>
+<th>RU range</th>
+<th>Equipment block</th>
+<th>Weight profile</th>
+<th>Mounting and orientation</th>
+<th>Airflow direction</th>
+<th>Cable management</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U42-U40</td>
+<td>Brush panel + cable manager</td>
+<td>Light</td>
+<td>Top entry for inter-rack trunks</td>
+<td>Passive</td>
+<td>Keep trunks bundled by path A/B</td>
+</tr>
+<tr>
+<td>U39-U37</td>
+<td>Inter-rack patch + fiber shelf</td>
+<td>Light</td>
+<td>Front patching and clear labeling</td>
+<td>Passive</td>
+<td>Fiber on top tray, copper below in same manager</td>
+</tr>
+<tr>
+<td>U36-U25</td>
+<td>HV-03, HV-04, optional VDI host</td>
+<td>Medium-heavy</td>
+<td>Rails with rear brackets; even side loading</td>
+<td>Front-to-back</td>
+<td>Dual-home each host to both ToRs</td>
+</tr>
+<tr>
+<td>U24-U11</td>
+<td>Storage-01, Storage-02, backup repo</td>
+<td>Heavy</td>
+<td>Keep deepest/heaviest chassis lower in this block</td>
+<td>Front-to-back</td>
+<td>Use short, direct storage fabric runs</td>
+</tr>
+<tr>
+<td>U10-U07</td>
+<td>Reserved blanking zone</td>
+<td>None</td>
+<td>Fill with blanking panels</td>
+<td>Maintains pressure</td>
+<td>Hold only service slack, no large coils</td>
+</tr>
+<tr>
+<td>U06-U01</td>
+<td>UPS/battery shelf or ballast</td>
+<td>Heaviest</td>
+<td>Bottom-most to reduce tip risk</td>
+<td>Front-to-back if fan-assisted</td>
+<td>Separate power A/B feeds on opposite vertical PDUs</td>
+</tr>
+</tbody>
+</table>
+<h2 id="physical-rules-mandatory">Physical Rules (Mandatory)</h2>
+<ul>
+<li>Mount all active gear for front intake from cold aisle and rear exhaust to hot aisle.</li>
+<li>Do not mix side-to-side airflow appliances without baffles or airflow adapters.</li>
+<li>Keep heavy equipment in lower third of rack (roughly U14 and below), with the heaviest at U06-U01.</li>
+<li>Maintain front and rear service clearance of at least 1000 mm where possible.</li>
+<li>Install blanking panels in every unused RU inside active equipment zones.</li>
+<li>Reserve at least 15 percent free RU per rack for thermal stability and growth.</li>
+<li>Separate power and data pathways:
+  power on rear vertical managers and PDUs, data in overhead tray and horizontal managers.</li>
+<li>Keep fiber bend radius and copper bend radius within vendor limits; avoid hard 90-degree bends.</li>
+<li>Use two physically separated inter-rack trunks (Path A and Path B) to avoid single-cable failure domains.</li>
+</ul>
+<h2 id="airflow-quality-targets">Airflow Quality Targets</h2>
+<ul>
+<li>Cold aisle inlet: 20C to 24C target range.</li>
+<li>Relative humidity: 40 percent to 60 percent.</li>
+<li>Rack delta-T (front intake to rear exhaust): typically 10C to 15C.</li>
+<li>No persistent hotspot above 27C at any server intake sensor.</li>
+<li>Investigate immediately if top-of-rack exhaust exceeds 40C for sustained periods.</li>
+</ul></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
