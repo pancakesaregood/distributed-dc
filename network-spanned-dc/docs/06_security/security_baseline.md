@@ -1,54 +1,82 @@
-﻿# Security Baseline
+# Security Baseline
 
-## Baseline Controls
-- Least privilege access for infrastructure and platform roles.
-- MFA for privileged control-plane access.
-- Segmentation with default-deny inter-zone policy.
+## Purpose
+Define minimum mandatory controls for the spanned datacenter platform so security posture is consistent across all four sites.
+
+## Baseline Objectives
+- Enforce least privilege for all human and service identities.
+- Constrain blast radius with zone segmentation and default deny policy.
+- Encrypt sensitive traffic paths in transit and protect data at rest.
+- Maintain audit-quality telemetry for detection, response, and review.
+- Keep security controls reproducible through Git-backed change workflows.
+
+## Control Domains
+
+### Identity and Access
+- Centralized identity source for operators and service administrators.
+- MFA required for privileged access and remote access.
+- Unique named privileged accounts only; no shared admin accounts.
+- Time-bounded elevation for break-glass and high-risk tasks.
+
+### Network and Segmentation
+- Inter-site traffic traverses IPsec overlay tunnels (IKEv2, AES-256-GCM, PFS).
+- Layer 3 between sites only; no stretched Layer 2 trust boundary.
+- Guest zone is internet-only and blocked from internal zones and WAN tunnels.
+- Route filtering prevents unauthorized prefix advertisement.
+
+### Perimeter and Application Exposure
+- Dedicated firewall pair at each site with explicit zone policy.
+- Default deny between zones; allow rules must be explicit and justified.
+- Inbound HTTP/HTTPS paths must traverse WAF before load balancer or backend.
+- Internet ingress and VPN entry points treated as untrusted edges.
+
+### Platform and Host Hardening
+- Hardened base images for hypervisors and critical service VMs.
 - Encrypted management protocols only.
-- Encrypted backups and replication channels.
+- Signed package sources and controlled update channels.
+- Endpoint protection and vulnerability remediation cadence for critical hosts.
 
-## Platform Hardening
-- Standard hardened images for hypervisors and VM templates.
-- CIS-aligned configuration where practical.
-- Controlled package sources and signed update artifacts.
-- Endpoint protection for management and critical service VMs.
+### Data Protection
+- Backup and replication channels encrypted in transit.
+- Backup model aligned to 3-2-1 with immutable or off-domain copy.
+- Credential separation between production and backup control planes.
+- Restore workflows tested on a recurring schedule.
 
-## Network Security
-- All inter-site traffic traverses IPsec tunnels (IKEv2, AES-256-GCM, PFS) between site edge pairs. Private WAN circuits provide network-layer isolation in addition. See [Routing and WAN Abstraction](../02_architecture/routing_wan_abstraction.md) for cipher parameters, multi-tunnel redundancy model, and failure behavior.
-- Each site has a local internet circuit for direct internet breakout. Internet-facing edge interfaces are treated as untrusted with strict ingress and egress filtering.
-- Guest zone traffic exits only via NAT64 and IPv4 PAT at the local site internet interface. It is blocked from inter-site WAN tunnels and all internal zones.
-- One designated site has dual ISP circuits on separate edge nodes for redundant internet egress.
-- Control-plane route filters prevent unauthorized prefix advertisement.
+### Detection and Response
+- Centralized collection of firewall, WAF, auth, host, and backup signals.
+- Alert severity model with runbook mapping for Sev 1 and Sev 2 events.
+- Forensic logging retention aligned to incident response requirements.
+- Quarterly security baseline review and control exception review.
 
-## Firewall Baseline
-- A dedicated vendor-agnostic stateful firewall pair (FW-A / FW-B) is deployed at each site, between the edge routers and the internal ToR switching fabric.
-- Firewall operates in zone-based mode with explicit inside, outside, DMZ, VPN, and guest zones.
-- Default deny between all zones. All permitted traffic flows require explicit rules.
-- Firewall logs all permitted and denied sessions. Logs are shipped to the centralized logging stack.
-- HA pair with session synchronization. Loss of one firewall node must not drop active sessions.
-- Firewall configuration is version-controlled and deployed via GitOps. No manual changes outside the change process.
-- Optional IDS/IPS on the outside interface for threat detection on internet-facing traffic.
+## Firewall Baseline Requirements
+- FW-A/FW-B deployed per site between edge and internal fabric.
+- HA pair with state/session synchronization.
+- Firewall policy and object definitions managed through GitOps.
+- All permit and deny events logged to centralized telemetry.
+- Manual emergency changes require post-incident normalization through code.
 
-## WAF and Load Balancer Baseline
-- A WAF VM is deployed in the DMZ zone at each site. All inbound HTTP/HTTPS traffic from the internet or external zones passes through the WAF before reaching the nginx load balancer or any backend service.
-- WAF enforces OWASP Top 10 protections: SQL injection, XSS, command injection, path traversal, and protocol anomaly filtering as a minimum baseline.
-- WAF operates in blocking mode by default. Exceptions require GitOps change review.
-- WAF logs all blocked requests with source IP, request detail, and matched rule. Logs are shipped to the centralized logging stack.
-- An nginx load balancer VM is deployed in the DMZ zone at each site, downstream of the WAF. nginx terminates TLS for all published services and distributes requests across backend instances in the Servers/VMs zone.
-- nginx health checks remove unhealthy backends from rotation without manual intervention.
-- nginx and WAF configurations are version-controlled and deployed via GitOps. No manual changes outside the change process.
-- WAF and nginx VMs are classified as Tier 1 stateless. Instances are rebuilt from automation on replacement.
+## WAF and Load Balancer Baseline Requirements
+- WAF deployed in DMZ and operating in blocking mode by default.
+- OWASP-focused baseline ruleset required for all published apps.
+- Exception requests require review, approval, and expiry date.
+- Load balancer performs TLS termination and backend health checks.
+- WAF/LB configurations are version-controlled and reproducible.
 
-## VPN Baseline
-- Remote access VPN terminates on the site firewall appliance or a dedicated VPN VM in the DMZ zone.
-- VPN is reachable via the public FQDN `vpn.example.com`, which resolves to the VPN endpoint IP at each site.
-- MFA is required for all VPN connections. Authentication integrates with the site AD domain controller.
-- VPN clients are placed in a restricted VPN zone on the firewall. Access to inside zones is governed by AD group membership and explicit firewall policy.
-- All VPN sessions are logged with client identity, source IP, session duration, and accessed resources.
-- Split tunnelling is disabled by default. All client traffic routes through the VPN tunnel.
-- VPN session certificates or credentials are rotated on a defined schedule and immediately on compromise.
+## VPN and Remote Access Baseline Requirements
+- VPN terminates on firewall or dedicated VPN VM in DMZ.
+- VPN authentication requires directory-backed identity + MFA.
+- Post-auth zone access determined by role and explicit policy.
+- Split tunneling disabled by default unless formally approved.
+- VPN sessions logged with identity, source, duration, and target zone.
 
-## Security Operations
-- Centralized logging and alerting for auth, routing, and backup anomalies.
-- Documented incident response and forensic preservation steps.
-- Quarterly security review against this baseline.
+## Governance and Assurance
+- Security controls must be mapped to runbooks and monitored signals.
+- Exceptions must include owner, reason, risk statement, and expiry.
+- Baseline drift is reviewed monthly and corrected through change process.
+
+## Related Documents
+- [Identity and Access](identity_access.md)
+- [Logging and Monitoring](logging_monitoring.md)
+- [Monitoring Foundations](../13_operations_foundations/monitoring.md)
+- [Observability Foundations](../13_operations_foundations/observability.md)
+- [Authentication Foundations](../13_operations_foundations/authentication.md)

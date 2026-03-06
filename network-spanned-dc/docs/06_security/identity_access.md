@@ -1,23 +1,52 @@
-﻿# Identity and Access
+# Identity and Access
+
+## Purpose
+Define identity, access, and privilege governance for operators, administrators, and service identities.
 
 ## Identity Principles
-- Centralized identity provider for administrators and service operators.
-- Role-based access control mapped to operational responsibilities.
-- Unique named accounts for all privileged access.
+- One authoritative identity source for human administrators and operators.
+- Role-based authorization aligned to operational responsibility.
+- Unique named accounts for all privileged actions.
+- Full auditability for identity lifecycle and privilege changes.
 
-## MFA and Session Controls
-- MFA required for all privileged and remote access, including all VPN connections.
-- VPN authentication integrates with the site AD domain controller. AD group membership determines which firewall zones are accessible after tunnel establishment.
-- Session recording for high-risk administration paths.
-- Time-bound elevation for emergency or break-glass operations.
-- VPN sessions are logged with user identity, source IP, connection duration, and destination zones accessed. Logs are shipped to the centralized logging stack.
+## Authentication Baseline
+- MFA required for:
+  - Privileged platform access
+  - Remote access (VPN and equivalent flows)
+  - High-risk administrative actions
+- Directory-backed authentication for platform control paths.
+- Encrypted authentication protocols only (for example, LDAPS or TLS-backed services).
 
-## Service Account Governance
-- Separate service identities for production and backup systems.
-- No shared static credentials across environments.
-- Periodic credential rotation with auditable change records.
+## Authorization Model
+- Authorization is role-based and least-privilege by default.
+- Zone and service access is granted by group membership and policy mapping.
+- Deny-by-default policy for undefined or unapproved role paths.
+- Temporary privilege elevation requires ticketed approval and expiry.
 
-## Access Review
-- Monthly privileged access review.
+## Privileged Access Controls
+- Administrative access uses hardened jump paths and controlled endpoints.
+- Session activity for high-risk operations is logged and reviewable.
+- Break-glass access is time-bounded and requires retrospective review.
+- Privileged credential use is prohibited outside approved tooling paths.
+
+## Service Identity Governance
+- Separate service accounts by environment and function.
+- No shared static service credentials across production domains.
+- Credential rotation on a defined cadence with change traceability.
+- Immediate revocation workflow for compromised service identities.
+
+## Lifecycle and Review Controls
+- Joiner/mover/leaver flows must include immediate deprovisioning on role exit.
+- Monthly review of privileged identities and emergency access usage.
 - Quarterly entitlement recertification with service owners.
-- Immediate deprovisioning for role changes and terminations.
+- Control evidence retained for audit and incident investigations.
+
+## Operational Integration
+- Identity failures and abnormal auth patterns generate actionable alerts.
+- Access model changes are version-controlled and peer-reviewed.
+- Incident runbooks include identity containment and recovery procedures.
+
+## Related Documents
+- [Security Baseline](security_baseline.md)
+- [Authentication Foundations](../13_operations_foundations/authentication.md)
+- [Identity Foundations](../13_operations_foundations/identity.md)
