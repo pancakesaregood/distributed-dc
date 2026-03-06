@@ -37,6 +37,24 @@ This appendix lists the standards and primary technology references used across 
 - RFC 8446 - TLS 1.3: https://www.rfc-editor.org/rfc/rfc8446
 - RFC 6797 - HTTP Strict Transport Security (HSTS): https://www.rfc-editor.org/rfc/rfc6797
 
+### Voice and Telephony
+
+- RFC 3261 - Session Initiation Protocol (SIP): https://www.rfc-editor.org/rfc/rfc3261
+- RFC 3550 - Real-time Transport Protocol (RTP): https://www.rfc-editor.org/rfc/rfc3550
+- RFC 3711 - Secure Real-time Transport Protocol (SRTP): https://www.rfc-editor.org/rfc/rfc3711
+
+### Wireless and Access Control
+
+- IEEE 802.11 Wireless LAN Working Group: https://www.ieee802.org/11/
+- IEEE 802.1X Port-Based Network Access Control: https://www.ieee802.org/1/pages/802.1x.html
+- RFC 2865 - RADIUS Authentication: https://www.rfc-editor.org/rfc/rfc2865
+- RFC 2866 - RADIUS Accounting: https://www.rfc-editor.org/rfc/rfc2866
+
+### Printing
+
+- RFC 8010 - Internet Printing Protocol/1.1 Encoding and Transport: https://www.rfc-editor.org/rfc/rfc8010
+- RFC 8011 - Internet Printing Protocol/1.1 Model and Semantics: https://www.rfc-editor.org/rfc/rfc8011
+
 ## Open Source Project References
 
 ### Routing, Overlay, and Translation
@@ -66,6 +84,14 @@ This appendix lists the standards and primary technology references used across 
 
 - Apache Guacamole: https://guacamole.apache.org
 - XRDP: https://www.xrdp.org
+
+### Campus and Edge Service Components
+
+- Asterisk: https://www.asterisk.org
+- FreeSWITCH: https://freeswitch.com
+- Kamailio: https://www.kamailio.org
+- FreeRADIUS: https://freeradius.org
+- CUPS: https://openprinting.github.io/cups/
 
 ### Compute and Platform Services
 
