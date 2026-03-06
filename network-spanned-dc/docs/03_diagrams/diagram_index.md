@@ -2,6 +2,7 @@
 
 - [Global Topology](topology_global.mmd.md)
 - [Per-Site Logical Topology](topology_per_site.mmd.md)
+- [Physical Rack Topology (Two-Rack Site)](physical_rack_topology_2rack.mmd.md)
 - [One-Site Full Stack (Upstream Abstracted)](site_full_stack_upstream_abstracted.mmd.md)
 - [Segmentation and Flow Model](segmentation.mmd.md)
 - [BGP Routing and Prefix Advertisement](routing_bgp.mmd.md)

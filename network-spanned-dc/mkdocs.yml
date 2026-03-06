@@ -28,6 +28,7 @@ nav:
       - Diagram Index: 03_diagrams/diagram_index.md
       - Global Topology: 03_diagrams/topology_global.mmd.md
       - Per-Site Topology: 03_diagrams/topology_per_site.mmd.md
+      - Physical Rack Topology (Two-Rack Site): 03_diagrams/physical_rack_topology_2rack.mmd.md
       - One-Site Full Stack (Upstream Abstracted): 03_diagrams/site_full_stack_upstream_abstracted.mmd.md
       - Segmentation Diagram: 03_diagrams/segmentation.mmd.md
       - Routing BGP Diagram: 03_diagrams/routing_bgp.mmd.md

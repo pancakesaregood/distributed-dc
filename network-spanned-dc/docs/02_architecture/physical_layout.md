@@ -32,3 +32,6 @@ Each site uses a compact design suitable for 1 to 2 racks:
 - Minimum per site: 2 hypervisors, 2 ToRs, 2 edge nodes.
 - Recommended growth threshold: add Rack 2 when sustained compute utilization exceeds 65 percent.
 - Keep spare capacity for one host failure without violating Tier 1 service SLOs.
+
+## Detailed Two-Rack Reference
+- For a full RU-level two-rack placement, airflow model, and cable pathway layout, see [Physical Rack Topology (Two-Rack Site)](../03_diagrams/physical_rack_topology_2rack.mmd.md).
