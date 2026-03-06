@@ -32,6 +32,16 @@
 - Firewall configuration is version-controlled and deployed via GitOps. No manual changes outside the change process.
 - Optional IDS/IPS on the outside interface for threat detection on internet-facing traffic.
 
+## WAF and Load Balancer Baseline
+- A WAF VM is deployed in the DMZ zone at each site. All inbound HTTP/HTTPS traffic from the internet or external zones passes through the WAF before reaching the nginx load balancer or any backend service.
+- WAF enforces OWASP Top 10 protections: SQL injection, XSS, command injection, path traversal, and protocol anomaly filtering as a minimum baseline.
+- WAF operates in blocking mode by default. Exceptions require GitOps change review.
+- WAF logs all blocked requests with source IP, request detail, and matched rule. Logs are shipped to the centralized logging stack.
+- An nginx load balancer VM is deployed in the DMZ zone at each site, downstream of the WAF. nginx terminates TLS for all published services and distributes requests across backend instances in the Servers/VMs zone.
+- nginx health checks remove unhealthy backends from rotation without manual intervention.
+- nginx and WAF configurations are version-controlled and deployed via GitOps. No manual changes outside the change process.
+- WAF and nginx VMs are classified as Tier 1 stateless. Instances are rebuilt from automation on replacement.
+
 ## VPN Baseline
 - Remote access VPN terminates on the site firewall appliance or a dedicated VPN VM in the DMZ zone.
 - VPN is reachable via the public FQDN `vpn.example.com`, which resolves to the VPN endpoint IP at each site.

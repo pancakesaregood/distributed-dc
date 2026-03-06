@@ -14,6 +14,8 @@ Each site uses a compact design suitable for 1 to 2 racks:
 - `Storage-01..n`: local storage and replication endpoints.
 - `Mgmt-VMs`: DNS caching, monitoring collectors, and automation agents.
 - `VPN-VM` (optional): dedicated VPN server VM if VPN is not hosted on the firewall appliance. Placed in a VPN segment accessible from the firewall DMZ interface.
+- `WAF-VM`: Web Application Firewall VM deployed in the DMZ zone. Inspects all inbound HTTP/HTTPS traffic before it reaches the load balancer. Runs as a single VM per site; add a second instance for HA at sites where internet-facing service uptime is critical.
+- `LB-VM`: nginx load balancer VM deployed in the DMZ zone. Terminates TLS for published services and distributes traffic across backend instances in the Servers/VMs zone. Add a second instance for HA at internet-facing or high-traffic sites.
 
 ## Internet Circuit Model
 - Standard site: one ISP circuit presented to both Edge-A and Edge-B. Edge nodes share the circuit via active-standby or ECMP.

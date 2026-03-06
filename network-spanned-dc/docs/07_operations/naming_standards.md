@@ -11,6 +11,8 @@
 - Hypervisor: `site-a-r01-hv01`.
 - Storage: `site-a-r02-st01`.
 - VPN VM (if not on-box on firewall): `site-a-vpn-01`.
+- WAF VM: `site-a-waf-01`, `site-a-waf-02` (if HA pair).
+- nginx Load Balancer VM: `site-a-lb-01`, `site-a-lb-02` (if HA pair).
 
 ## Service Naming
 - Tier 1 stateless apps: `svc-<name>-aa`.
