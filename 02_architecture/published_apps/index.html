@@ -528,13 +528,17 @@
 <hr />
 <h2 id="component-stack">Component Stack</h2>
 <p>Every published app uses the following per-site component chain:</p>
-<pre><code>Public DNS (FQDN)
-  -&gt; Edge router internet interface (public IP or anycast VIP)
-    -&gt; Firewall Outside -&gt; DMZ rule (HTTPS 443 only)
-      -&gt; WAF (OWASP inspection + app-specific rules)
-        -&gt; nginx LB (TLS termination, upstream pool, health checks)
-          -&gt; Backend service (Servers/VMs zone, approved app port)
-            -&gt; Database if required (Servers/VMs zone, stateful, same or replicated site)
+<pre><code class="language-mermaid">flowchart TD
+  DNS[&quot;Public DNS (FQDN)&quot;]
+  EDGE[&quot;Edge Router Internet Interface&lt;br/&gt;(Public IP or Anycast VIP)&quot;]
+  FWRULE[&quot;Firewall Outside -&gt; DMZ Rule&lt;br/&gt;(HTTPS 443 only)&quot;]
+  WAF[&quot;WAF&lt;br/&gt;(OWASP inspection + app-specific rules)&quot;]
+  LB[&quot;nginx LB&lt;br/&gt;(TLS termination, upstream pool, health checks)&quot;]
+  APP[&quot;Backend Service&lt;br/&gt;(Servers/VMs zone, approved app port)&quot;]
+  DB[&quot;Database (optional)&lt;br/&gt;(Servers/VMs zone, same or replicated site)&quot;]
+
+  DNS --&gt; EDGE --&gt; FWRULE --&gt; WAF --&gt; LB --&gt; APP
+  APP -. If required .-&gt; DB
 </code></pre>
 <p>Each layer is required. There is no bypass path from the internet to a backend without traversing the WAF and LB.</p>
 <hr />
