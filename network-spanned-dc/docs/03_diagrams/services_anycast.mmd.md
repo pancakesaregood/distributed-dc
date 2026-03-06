@@ -47,4 +47,9 @@ graph LR
   LB2 --> APP2
 
   DB1 <-->|Replication - IPsec encrypted WAN tunnel| DB2
+
+  style S1 fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style DMZ1 fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style S2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style DMZ2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
 ```

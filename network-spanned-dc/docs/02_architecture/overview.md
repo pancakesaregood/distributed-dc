@@ -1,33 +1,39 @@
-﻿# Architecture Overview
+# Architecture Overview
 
 ## Executive Summary
-This design defines a low-cost, four-site spanned datacenter architecture that prioritizes fault isolation, operational simplicity, and open-source tooling. Each site is an independent failure domain with local compute and network control planes. Sites are interconnected over a vendor-managed Layer 3 WAN handoff, and service continuity across sites is achieved through routing and data replication rather than Layer 2 extension. Each site includes a dedicated vendor-agnostic stateful firewall pair that enforces zone policy and terminates remote access VPN, providing a clear inside/outside security boundary between the routed edge and internal segments.
+This design defines a low-cost, four-site spanned datacenter architecture focused on failure isolation, deterministic recovery, and operational practicality. Each site is an independent failure domain with its own edge, security boundary, compute footprint, and internet breakout path. Sites are connected through a vendor-managed Layer 3 handoff, while service continuity is achieved through routed reachability and replication rather than stretched Layer 2.
 
 ## Core Design Principles
 - Layer 3 between sites.
 - No stretched Layer 2 between sites.
-- All inter-site traffic is encrypted in transit. Site edge pairs terminate IPsec tunnels over the WAN; private WAN circuits provide network-layer isolation, and the IPsec overlay provides defense-in-depth encryption regardless of WAN provider trust assumptions.
-- Failure domains are bounded per site.
-- Spanning services use replication and deterministic failover.
-- Open-source platforms are preferred when they meet support and operational requirements.
-- Automation and Git-backed change control are default practices.
+- Inter-site traffic encrypted in transit with an IPsec overlay.
+- Per-site failure domains with local control and local internet breakout.
+- Service spanning via replication and policy-based routing, not shared broadcast domains.
+- Open-source-first tooling where operationally supportable.
+- Git-backed, reviewable, automation-driven change control.
 
 ## Constraints
 - Budget-sensitive architecture with low recurring licensing overhead.
-- WAN transport is abstracted as a vendor-managed L3 service.
-- Each site has an independent local internet connection. Internet traffic breaks out locally and is never backhauled over the inter-site WAN.
-- One designated site has a redundant internet edge: dual ISP circuits, each terminating on a separate edge node, providing full edge and ISP redundancy for internet egress. All other sites use a single ISP circuit presented across both edge nodes.
-- Site design assumes 1 to 2 racks per location.
-- Compute platform must support VMs and Podman containers.
+- WAN transport abstracted as vendor-managed Layer 3 connectivity.
+- Site footprint constrained to 1 to 2 racks per location.
+- Mixed workload support required: VMs plus Podman-managed containers.
+- Operations model must remain supportable by a small infrastructure team.
 
 ## High-Level Architecture
-- Per site: edge pair (L3 router), firewall pair (FW-A / FW-B), ToR pair, compute cluster, local backup target, and independent internet connection.
-- Traffic path inbound: edge pair → firewall outside interface → firewall inside interface → ToR → internal segments.
-- Inter-site: prefix-based routing with BGP as primary exchange method. BGP sessions and all data-plane traffic run over IPsec-encrypted tunnels between site edge pairs.
-- Remote access VPN: inbound VPN connections arrive at the edge, are forwarded to the firewall outside interface, and terminate on the firewall appliance or a dedicated VPN VM. Authenticated clients are granted access to internal zones per group policy. Reachable via `vpn.example.com`.
-- Internet egress: each site breaks out internet traffic locally through the site edge pair. Guest traffic is policy-routed to the local internet L3 interface and is blocked from entering the inter-site WAN.
-- Data resiliency: local fast restore plus cross-site replicated copies. All cross-site replication traffic is encrypted via the IPsec inter-site tunnels.
-- Optional global anycast for DNS and internal ingress endpoints.
+- Per site: edge pair, firewall pair, ToR pair, compute cluster, local backup services, and local internet handoff.
+- Inbound path: internet or WAN edge -> firewall policy boundary -> internal segments.
+- Inter-site routing: BGP over IPsec tunnel mesh with documented fallback behavior.
+- Remote access: VPN terminates on firewall or dedicated VPN VM with AD + MFA controls.
+- Guest internet: local site egress only, with NAT64/DNS64 and policy isolation from WAN.
+- Service publication: DMZ WAF + load balancer stack, with GeoDNS or anycast selection by service type.
+
+## Physical Form Factor
+- Baseline supports one-rack sites and two-rack expansion sites.
+- Two-rack RU placement, cable pathing, vent direction, and airflow quality controls are defined in [Physical Rack Topology (Two-Rack Site)](../03_diagrams/physical_rack_topology_2rack.mmd.md).
+
+## Design Governance
+- Architecture acceptance criteria are defined in [01 Scope - Acceptance Criteria](../01_scope/acceptance_criteria.md).
+- Open design decisions are tracked in [Abstractions and Clarifications Needed](../09_appendix/abstractions_clarifications_needed.md).
 
 ## Design Outcome
-The resulting architecture is scalable from four to additional sites with minimal redesign, because routing policies, addressing, and service classes are standardized and independent of specific WAN circuit implementations.
+The resulting architecture can scale to additional sites without redesigning core policy, because addressing, segmentation, routing intent, and service classes are standardized and transport-agnostic.

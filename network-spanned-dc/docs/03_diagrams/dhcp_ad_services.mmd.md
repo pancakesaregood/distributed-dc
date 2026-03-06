@@ -56,6 +56,11 @@ graph TD
   CLTB -->|Auth + Group Policy - Local-first| DCB1
   CLTC -->|Auth + Group Policy - Local-first| DCC1
   CLTD -->|Auth + Group Policy - Local-first| DCD1
+
+  style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style SC fill:#EAF8EF,stroke:#2F855A,stroke-width:2px,color:#111111
+  style SD fill:#F2EDFF,stroke:#6B46C1,stroke-width:2px,color:#111111
 ```
 
 ## Design Notes

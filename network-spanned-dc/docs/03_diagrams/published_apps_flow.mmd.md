@@ -84,6 +84,11 @@ graph LR
 
   HEALTHA -->|Health gate| EA
   HEALTHB -->|Health gate| EB
+
+  style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style DMZA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style DMZB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
 ```
 
 ## Multi-Site GeoDNS Flow
@@ -122,6 +127,11 @@ graph LR
   GEODNS -->|Returns site B IP for region 2 clients| INET
   INET -->|HTTPS| IPB
   IPB --> WAFGB --> LBGB --> APPGB
+
+  style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style DMZGA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style DMZGB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
 ```
 
 ## App Publish Workflow
@@ -200,4 +210,9 @@ graph LR
   APPR -->|Reads from replica| DBR
 
   DBP <-->|"Replication - IPsec encrypted WAN tunnel"| DBR
+
+  style SA2 fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style DMZSA2 fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style DMZSB2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
 ```

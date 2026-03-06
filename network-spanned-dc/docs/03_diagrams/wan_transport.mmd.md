@@ -32,6 +32,11 @@ graph TD
 
   MODEA -->|"Underlay carries<br/>IPsec ESP packets"| OVERLAY
   MODEB -->|"Underlay carries<br/>IPsec ESP over IPv4<br/>NAT-T UDP 4500 if behind NAT"| OVERLAY
+
+  classDef siteA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111;
+  classDef siteB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111;
+  class EA,PA,CA siteA
+  class EB,PB,CB siteB
 ```
 
 ## Protocol Stack per Mode
@@ -79,6 +84,9 @@ graph LR
   SAB <-->|"B-B tunnel - secondary<br/>BGP secondary session"| SBB
   SAA <-->|"A-B cross-connect<br/>traffic only"| SBB
   SAB <-->|"B-A cross-connect<br/>traffic only"| SBA
+
+  style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
 ```
 
 With 4 sites (6 site pairs) × 4 tunnels each = **24 tunnels total** in the full fabric.
@@ -139,6 +147,11 @@ graph LR
   SCED_A <--> SDED_B
   SCED_B <--> SDED_A
   SCED_B <--> SDED_B
+
+  style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style SC fill:#EAF8EF,stroke:#2F855A,stroke-width:2px,color:#111111
+  style SD fill:#F2EDFF,stroke:#6B46C1,stroke-width:2px,color:#111111
 ```
 
 ## Mixed-Mode Full-Mesh Example
@@ -197,6 +210,11 @@ graph LR
   MC_A <-->|"Mode B"| MD_B
   MC_B <-->|"Mode B"| MD_A
   MC_B <-->|"Mode B"| MD_B
+
+  style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  style SC fill:#EAF8EF,stroke:#2F855A,stroke-width:2px,color:#111111
+  style SD fill:#F2EDFF,stroke:#6B46C1,stroke-width:2px,color:#111111
 ```
 
 All tunnels carry IPsec AES-256-GCM with IKEv2 regardless of the underlay. IPv6 ULA routes are reachable from every site through any tunnel mode.

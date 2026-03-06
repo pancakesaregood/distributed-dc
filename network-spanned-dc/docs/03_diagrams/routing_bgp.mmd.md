@@ -29,4 +29,14 @@ graph TD
   FALLBACK -.-> B
   FALLBACK -.-> C
   FALLBACK -.-> D
+
+  classDef siteA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111;
+  classDef siteB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111;
+  classDef siteC fill:#EAF8EF,stroke:#2F855A,stroke-width:2px,color:#111111;
+  classDef siteD fill:#F2EDFF,stroke:#6B46C1,stroke-width:2px,color:#111111;
+
+  class A,ANYA siteA
+  class B,ANYB siteB
+  class C,ANYC siteC
+  class D,ANYD siteD
 ```
