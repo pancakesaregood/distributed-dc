@@ -1,4 +1,4 @@
-﻿# BGP Routing and Prefix Advertisement
+# BGP Routing and Prefix Advertisement
 
 ```mermaid
 graph TD
@@ -39,4 +39,5 @@ graph TD
   class B,ANYB siteB
   class C,ANYC siteC
   class D,ANYD siteD
+  linkStyle default color:#CC5500
 ```

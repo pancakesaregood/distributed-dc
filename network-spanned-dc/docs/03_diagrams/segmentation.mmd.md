@@ -1,4 +1,4 @@
-﻿# Segmentation and Allowed Flows
+# Segmentation and Allowed Flows
 
 All zone enforcement is performed by FW-A / FW-B. Default deny between all zones.
 
@@ -54,4 +54,5 @@ graph LR
   IOT -.Denied.-> MGMT
   USR -.Restricted.-> IOT
   VPN -.Denied without policy.-> MGMT
+  linkStyle default color:#CC5500
 ```

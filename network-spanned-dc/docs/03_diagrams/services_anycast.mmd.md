@@ -1,4 +1,4 @@
-﻿# Services and Optional Anycast
+# Services and Optional Anycast
 
 ```mermaid
 graph LR
@@ -52,4 +52,5 @@ graph LR
   style DMZ1 fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
   style S2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
   style DMZ2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```

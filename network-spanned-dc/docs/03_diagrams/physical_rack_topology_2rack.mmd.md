@@ -43,6 +43,7 @@ flowchart LR
   R1N1 <-->|Dual inter-rack fiber trunks A and B| R2P
   R1N1 -->|Dual-homed access uplinks| R2C
   R1N1 -->|Dual-homed storage uplinks| R2ST
+  linkStyle default color:#CC5500
 ```
 
 ## Cold Aisle / Hot Aisle Airflow and Cable Lanes
@@ -61,6 +62,7 @@ flowchart LR
 
   PWR[Dual PDU Feeds A and B] --> R1B2[Rack 1 Bottom PDU ingress]
   PWR --> R2B2[Rack 2 Bottom PDU ingress]
+  linkStyle default color:#CC5500
 ```
 
 ## Detailed 42U Layout Guidance

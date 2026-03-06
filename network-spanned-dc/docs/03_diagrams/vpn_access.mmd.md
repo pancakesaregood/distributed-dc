@@ -45,6 +45,7 @@ graph TD
   MGMT --> FWIN
   SRV --> FWIN
   USR --> FWIN
+  linkStyle default color:#CC5500
 ```
 
 ## Design Notes

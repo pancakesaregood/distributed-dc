@@ -37,6 +37,7 @@ graph TD
   classDef siteB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111;
   class EA,PA,CA siteA
   class EB,PB,CB siteB
+  linkStyle default color:#CC5500
 ```
 
 ## Protocol Stack per Mode
@@ -61,6 +62,7 @@ graph TD
     B1["Consumer IPv4 internet<br/>Best-effort - ESP or UDP 4500 passthrough"]
     B4 --> B3 --> B2 --> B1
   end
+  linkStyle default color:#CC5500
 ```
 
 ## Per-Site-Pair Tunnel Detail
@@ -87,6 +89,7 @@ graph LR
 
   style SA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
   style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```
 
 With 4 sites (6 site pairs) × 4 tunnels each = **24 tunnels total** in the full fabric.
@@ -152,6 +155,7 @@ graph LR
   style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
   style SC fill:#EAF8EF,stroke:#2F855A,stroke-width:2px,color:#111111
   style SD fill:#F2EDFF,stroke:#6B46C1,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```
 
 ## Mixed-Mode Full-Mesh Example
@@ -215,6 +219,7 @@ graph LR
   style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
   style SC fill:#EAF8EF,stroke:#2F855A,stroke-width:2px,color:#111111
   style SD fill:#F2EDFF,stroke:#6B46C1,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```
 
 All tunnels carry IPsec AES-256-GCM with IKEv2 regardless of the underlay. IPv6 ULA routes are reachable from every site through any tunnel mode.

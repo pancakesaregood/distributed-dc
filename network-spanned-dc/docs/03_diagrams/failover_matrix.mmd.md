@@ -1,4 +1,4 @@
-﻿# Failover Matrix
+# Failover Matrix
 
 ```mermaid
 graph TD
@@ -22,4 +22,5 @@ graph TD
   F4 --> R4
   F5 --> R5
   F6 --> R6
+  linkStyle default color:#CC5500
 ```

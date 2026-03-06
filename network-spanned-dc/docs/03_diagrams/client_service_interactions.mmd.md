@@ -76,6 +76,7 @@ graph LR
   WEB --> DB
   API --> DB
   API --> CTR
+  linkStyle default color:#CC5500
 ```
 
 ## Client Access Summary

@@ -1,4 +1,4 @@
-﻿# Per-Site Logical Rack Topology
+# Per-Site Logical Rack Topology
 
 Standard site template. The designated redundant internet site uses two separate ISP circuits (ISP-1 on Edge-A, ISP-2 on Edge-B) instead of a single shared circuit. VPN can terminate on FW-A/FW-B directly or via DNAT to a VPN VM in a DMZ segment.
 
@@ -58,4 +58,5 @@ graph TD
 
   H1 --> MGMT
   H2 --> MGMT
+  linkStyle default color:#CC5500
 ```

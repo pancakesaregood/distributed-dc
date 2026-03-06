@@ -39,6 +39,7 @@ graph TD
   LB -->|7 or load balanced to| APP2
   APP1 -->|8 DB read/write if needed| DB
   APP2 -->|8 DB read/write if needed| DB
+  linkStyle default color:#CC5500
 ```
 
 ## Multi-Site Anycast Flow
@@ -89,6 +90,7 @@ graph LR
   style DMZA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
   style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
   style DMZB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```
 
 ## Multi-Site GeoDNS Flow
@@ -132,6 +134,7 @@ graph LR
   style DMZGA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
   style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
   style DMZGB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```
 
 ## App Publish Workflow
@@ -172,6 +175,7 @@ flowchart TD
   FAIL --> GITOPS
   DNS --> SMOKE
   SMOKE --> MONITOR
+  linkStyle default color:#CC5500
 ```
 
 ## Full-Stack App with Stateful DB
@@ -215,4 +219,5 @@ graph LR
   style DMZSA2 fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
   style SB2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
   style DMZSB2 fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```

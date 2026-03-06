@@ -46,6 +46,7 @@ graph LR
   DVM2 -->|AD domain join + GPO| DC
   DVM1 -->|App access per AD group| APP
   DVM2 -->|App access per AD group| APP
+  linkStyle default color:#CC5500
 ```
 
 ## Multi-Site Spanning
@@ -92,6 +93,7 @@ graph TD
   style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
   style SC fill:#EAF8EF,stroke:#2F855A,stroke-width:2px,color:#111111
   style SD fill:#F2EDFF,stroke:#6B46C1,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```
 
 ## Protocol Stack
@@ -116,6 +118,7 @@ graph TD
   BR -->|"HTTPS WebSocket - TLS 1.3"| CL
   CL -->|"Guacamole protocol - internal"| GD
   GD -->|"RDP 3389 or VNC 5900 - VDI segment only"| XRDP
+  linkStyle default color:#CC5500
 ```
 
 ## Firewall Zone Policy Summary
@@ -137,4 +140,5 @@ graph LR
   VDI2 -->|App ports per AD group| SRV2
   VDI2 -->|LDAPS 636| DC2
   VDI2 -.Denied.-> MGMT2
+  linkStyle default color:#CC5500
 ```

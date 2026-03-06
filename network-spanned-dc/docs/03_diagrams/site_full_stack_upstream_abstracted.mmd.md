@@ -148,6 +148,7 @@ flowchart LR
   IOT -.Denied.-> BAST
 
   style SITEA fill:#EAF4FF,stroke:#2E6DA4,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```
 
 ## Notes

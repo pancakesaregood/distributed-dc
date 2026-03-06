@@ -1,4 +1,4 @@
-﻿# Global Topology
+# Global Topology
 
 ```mermaid
 graph LR
@@ -42,4 +42,5 @@ graph LR
   style SB fill:#FFF4DB,stroke:#A56A00,stroke-width:2px,color:#111111
   style SC fill:#EAF8EF,stroke:#2F855A,stroke-width:2px,color:#111111
   style SD fill:#F2EDFF,stroke:#6B46C1,stroke-width:2px,color:#111111
+  linkStyle default color:#CC5500
 ```
