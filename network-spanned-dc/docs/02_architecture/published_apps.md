@@ -10,23 +10,7 @@ A published application is any service intentionally exposed to internet clients
 
 Every published app uses the following per-site component chain:
 
-```mermaid
-flowchart TD
-  DNS["Public DNS (FQDN)"]
-  EDGE["Edge Router Internet Interface"]
-  FWRULE["Firewall DMZ Rule: HTTPS 443"]
-  WAF["WAF Inspection"]
-  LB["nginx Load Balancer"]
-  APP["Backend Service"]
-  DB["Database (optional)"]
-
-  DNS --> EDGE
-  EDGE --> FWRULE
-  FWRULE --> WAF
-  WAF --> LB
-  LB --> APP
-  APP -->|if required| DB
-```
+![Published app component stack](../assets/diagrams/published_apps_component_stack.svg)
 
 Each layer is required. There is no bypass path from the internet to a backend without traversing the WAF and LB.
 
