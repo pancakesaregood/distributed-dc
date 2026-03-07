@@ -34,3 +34,8 @@ mkdocs serve
 ```
 
 The site runs locally and reflects the navigation defined in `mkdocs.yml`.
+
+## Cloud Deployment Notes (2026-03-07)
+- Terraform cloud deployment phases are implemented through Phase 3 in `iac/terraform`.
+- Phase 2 inter-cloud VPN/BGP and Phase 3 EKS/GKE control planes are deployed and converged.
+- Detailed operational notes are tracked in `iac/terraform/SESSION_NOTES.md`.

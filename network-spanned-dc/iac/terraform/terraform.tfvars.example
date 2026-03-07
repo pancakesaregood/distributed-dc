@@ -24,3 +24,38 @@ site_c_ipv6_ula = "fdca:fcaf:e200::/56"
 site_d_ipv6_ula = "fdca:fcaf:e300::/56"
 
 gcp_enable_ipv6 = true
+
+aws_site_a_vpn_asn = 64512
+aws_site_b_vpn_asn = 64513
+
+phase2_primary_bgp_priority  = 100
+phase2_failover_bgp_priority = 200
+
+phase2_gcp_router_asns = {
+  ac = 65010
+  ad = 65011
+  bc = 65020
+  bd = 65021
+}
+
+# Set a unique secret seed before production use.
+phase2_secret_seed = "replace-this-phase2-seed"
+
+# Set true to deploy EKS/GKE control planes in all four sites.
+phase3_enable_platform = false
+
+# Optional EKS version (example: "1.31"). Null lets AWS choose.
+phase3_aws_eks_cluster_version = null
+phase3_aws_enabled_cluster_log_types = ["api", "audit", "authenticator"]
+phase3_aws_endpoint_public_access    = true
+phase3_aws_endpoint_private_access   = false
+phase3_aws_public_access_cidrs       = ["0.0.0.0/0"]
+
+phase3_gcp_release_channel     = "REGULAR"
+phase3_gcp_deletion_protection = false
+
+# Optional per-site Pod/Service CIDR overrides for GKE.
+phase3_site_c_cluster_ipv4_cidr_block  = null
+phase3_site_c_services_ipv4_cidr_block = null
+phase3_site_d_cluster_ipv4_cidr_block  = null
+phase3_site_d_services_ipv4_cidr_block = null

@@ -111,3 +111,135 @@ variable "gcp_enable_ipv6" {
   type        = bool
   default     = true
 }
+
+variable "aws_site_a_vpn_asn" {
+  description = "AWS Site A VPN gateway ASN for BGP."
+  type        = number
+  default     = 64512
+}
+
+variable "aws_site_b_vpn_asn" {
+  description = "AWS Site B VPN gateway ASN for BGP."
+  type        = number
+  default     = 64513
+}
+
+variable "phase2_primary_bgp_priority" {
+  description = "BGP advertised route priority for primary links (lower is preferred)."
+  type        = number
+  default     = 100
+}
+
+variable "phase2_failover_bgp_priority" {
+  description = "BGP advertised route priority for cross/failover links."
+  type        = number
+  default     = 200
+}
+
+variable "phase2_gcp_router_asns" {
+  description = "Cloud Router ASNs per inter-cloud pair key (ac, ad, bc, bd)."
+  type        = map(number)
+  default = {
+    ac = 65010
+    ad = 65011
+    bc = 65020
+    bd = 65021
+  }
+
+  validation {
+    condition = alltrue([
+      contains(keys(var.phase2_gcp_router_asns), "ac"),
+      contains(keys(var.phase2_gcp_router_asns), "ad"),
+      contains(keys(var.phase2_gcp_router_asns), "bc"),
+      contains(keys(var.phase2_gcp_router_asns), "bd")
+    ])
+    error_message = "phase2_gcp_router_asns must contain keys ac, ad, bc, bd."
+  }
+}
+
+variable "phase2_secret_seed" {
+  description = "Seed used to derive deterministic Phase 2 tunnel pre-shared keys."
+  type        = string
+  default     = "replace-this-phase2-seed"
+  sensitive   = true
+}
+
+variable "phase3_enable_platform" {
+  description = "Enable Phase 3 platform resources (EKS/GKE control planes)."
+  type        = bool
+  default     = false
+}
+
+variable "phase3_aws_eks_cluster_version" {
+  description = "Optional EKS cluster version for Site A/B. Null lets AWS choose."
+  type        = string
+  default     = null
+}
+
+variable "phase3_aws_enabled_cluster_log_types" {
+  description = "EKS control plane log types to enable."
+  type        = list(string)
+  default     = ["api", "audit", "authenticator"]
+}
+
+variable "phase3_aws_endpoint_public_access" {
+  description = "Whether EKS API endpoints are publicly reachable."
+  type        = bool
+  default     = true
+}
+
+variable "phase3_aws_endpoint_private_access" {
+  description = "Whether EKS API endpoints are privately reachable."
+  type        = bool
+  default     = false
+}
+
+variable "phase3_aws_public_access_cidrs" {
+  description = "CIDRs allowed to access public EKS API endpoints."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "phase3_gcp_release_channel" {
+  description = "GKE release channel for Site C/D."
+  type        = string
+  default     = "REGULAR"
+
+  validation {
+    condition = contains(
+      ["RAPID", "REGULAR", "STABLE", "UNSPECIFIED"],
+      var.phase3_gcp_release_channel
+    )
+    error_message = "phase3_gcp_release_channel must be one of RAPID, REGULAR, STABLE, UNSPECIFIED."
+  }
+}
+
+variable "phase3_gcp_deletion_protection" {
+  description = "Enable deletion protection on GKE clusters."
+  type        = bool
+  default     = false
+}
+
+variable "phase3_site_c_cluster_ipv4_cidr_block" {
+  description = "Optional Site C GKE Pod CIDR range."
+  type        = string
+  default     = null
+}
+
+variable "phase3_site_c_services_ipv4_cidr_block" {
+  description = "Optional Site C GKE Services CIDR range."
+  type        = string
+  default     = null
+}
+
+variable "phase3_site_d_cluster_ipv4_cidr_block" {
+  description = "Optional Site D GKE Pod CIDR range."
+  type        = string
+  default     = null
+}
+
+variable "phase3_site_d_services_ipv4_cidr_block" {
+  description = "Optional Site D GKE Services CIDR range."
+  type        = string
+  default     = null
+}
