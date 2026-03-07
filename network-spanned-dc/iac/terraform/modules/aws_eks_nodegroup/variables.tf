@@ -13,6 +13,12 @@ variable "environment" {
   type        = string
 }
 
+variable "node_group_suffix" {
+  description = "Suffix used in the EKS node group name."
+  type        = string
+  default     = "general"
+}
+
 variable "cluster_name" {
   description = "EKS cluster name."
   type        = string
@@ -41,7 +47,7 @@ variable "max_size" {
 variable "instance_types" {
   description = "EC2 instance types used by the node group."
   type        = list(string)
-  default     = ["t3.large"]
+  default     = ["t3.small"]
 }
 
 variable "capacity_type" {
@@ -95,6 +101,12 @@ variable "max_unavailable" {
   description = "Maximum unavailable nodes during updates."
   type        = number
   default     = 1
+}
+
+variable "enable_ssm_managed_instance_core" {
+  description = "Attach AmazonSSMManagedInstanceCore to worker node role (optional)."
+  type        = bool
+  default     = false
 }
 
 variable "tags" {

@@ -57,3 +57,12 @@ variable "labels" {
   type        = map(string)
   default     = {}
 }
+
+variable "master_authorized_networks" {
+  description = "Optional authorized CIDR blocks for Kubernetes API server access."
+  type = list(object({
+    cidr_block   = string
+    display_name = string
+  }))
+  default = []
+}

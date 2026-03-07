@@ -17,6 +17,7 @@ output "aws_site_a_network" {
     ingress_subnets    = module.aws_site_a.ingress_subnet_ids
     app_subnets        = module.aws_site_a.app_subnet_ids
     data_subnets       = module.aws_site_a.data_subnet_ids
+    vdi_subnets        = module.aws_site_a.vdi_subnet_ids
     availability_zones = module.aws_site_a.availability_zones
   }
 }
@@ -30,6 +31,7 @@ output "aws_site_b_network" {
     ingress_subnets    = module.aws_site_b.ingress_subnet_ids
     app_subnets        = module.aws_site_b.app_subnet_ids
     data_subnets       = module.aws_site_b.data_subnet_ids
+    vdi_subnets        = module.aws_site_b.vdi_subnet_ids
     availability_zones = module.aws_site_b.availability_zones
   }
 }
@@ -41,6 +43,7 @@ output "gcp_site_c_network" {
     ingress_subnets   = module.gcp_site_c.ingress_subnet_names
     app_subnets       = module.gcp_site_c.app_subnet_names
     data_subnets      = module.gcp_site_c.data_subnet_names
+    vdi_subnets       = module.gcp_site_c.vdi_subnet_names
   }
 }
 
@@ -51,31 +54,37 @@ output "gcp_site_d_network" {
     ingress_subnets   = module.gcp_site_d.ingress_subnet_names
     app_subnets       = module.gcp_site_d.app_subnet_names
     data_subnets      = module.gcp_site_d.data_subnet_names
+    vdi_subnets       = module.gcp_site_d.vdi_subnet_names
   }
 }
 
 output "phase2_aws_vpn_gateways" {
   description = "AWS VPN gateways created for Phase 2 inter-cloud connectivity."
-  value = {
+  value = var.phase2_enable_intercloud ? {
     site_a = {
-      vpn_gateway_id = aws_vpn_gateway.site_a.id
-      asn            = aws_vpn_gateway.site_a.amazon_side_asn
+      vpn_gateway_id = aws_vpn_gateway.site_a[0].id
+      asn            = aws_vpn_gateway.site_a[0].amazon_side_asn
     }
     site_b = {
-      vpn_gateway_id = aws_vpn_gateway.site_b.id
-      asn            = aws_vpn_gateway.site_b.amazon_side_asn
+      vpn_gateway_id = aws_vpn_gateway.site_b[0].id
+      asn            = aws_vpn_gateway.site_b[0].amazon_side_asn
     }
-  }
+  } : {}
 }
 
 output "phase2_intercloud_links" {
   description = "Inter-cloud pair object summaries for A-C, A-D, B-C, B-D."
-  value = {
-    ac = module.intercloud_ac.summary
-    ad = module.intercloud_ad.summary
-    bc = module.intercloud_bc.summary
-    bd = module.intercloud_bd.summary
-  }
+  value = var.phase2_enable_intercloud ? {
+    ac = module.intercloud_ac[0].summary
+    ad = module.intercloud_ad[0].summary
+    bc = module.intercloud_bc[0].summary
+    bd = module.intercloud_bd[0].summary
+  } : {}
+}
+
+output "phase2_intercloud_enabled" {
+  description = "Whether Phase 2 inter-cloud VPN/BGP resources are enabled in this apply."
+  value       = var.phase2_enable_intercloud
 }
 
 output "phase3_platform_enabled" {
@@ -118,6 +127,40 @@ output "phase4_gcp_gke_node_pools" {
     site_c = module.gcp_gke_node_pool_site_c[0].summary
     site_d = module.gcp_gke_node_pool_site_d[0].summary
   } : {}
+}
+
+output "phase4_published_app_paths" {
+  description = "Phase 4 published app path summaries for Site A/B when enabled."
+  value = local.phase4_published_app_path_enabled ? {
+    site_a = module.aws_published_app_path_site_a[0].summary
+    site_b = module.aws_published_app_path_site_b[0].summary
+  } : {}
+}
+
+output "phase4_vdi_reference_stacks" {
+  description = "Phase 4 VDI reference stack summaries for Site A/B/C/D when enabled."
+  value = local.phase4_vdi_reference_stack_enabled ? {
+    aws = {
+      site_a = {
+        controls = module.aws_vdi_reference_stack_site_a[0].summary
+        worker   = module.aws_eks_nodegroup_site_a_vdi[0].summary
+      }
+      site_b = {
+        controls = module.aws_vdi_reference_stack_site_b[0].summary
+        worker   = module.aws_eks_nodegroup_site_b_vdi[0].summary
+      }
+    }
+    gcp = {
+      site_c = {
+        controls = module.gcp_vdi_reference_stack_site_c[0].summary
+        worker   = module.gcp_gke_node_pool_site_c_vdi[0].summary
+      }
+      site_d = {
+        controls = module.gcp_vdi_reference_stack_site_d[0].summary
+        worker   = module.gcp_gke_node_pool_site_d_vdi[0].summary
+      }
+    }
+  } : null
 }
 
 output "phase4_deliverable_flags" {

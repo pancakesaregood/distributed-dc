@@ -45,13 +45,14 @@ resource "aws_iam_role_policy_attachment" "ecr_read" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_core" {
+  count      = var.enable_ssm_managed_instance_core ? 1 : 0
   role       = aws_iam_role.node.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_eks_node_group" "this" {
   cluster_name    = var.cluster_name
-  node_group_name = "${local.base_name}-ng-general"
+  node_group_name = "${local.base_name}-ng-${var.node_group_suffix}"
   node_role_arn   = aws_iam_role.node.arn
   subnet_ids      = var.subnet_ids
 
@@ -90,7 +91,7 @@ resource "aws_eks_node_group" "this" {
   tags = merge(
     var.tags,
     {
-      Name      = "${local.base_name}-ng-general"
+      Name      = "${local.base_name}-ng-${var.node_group_suffix}"
       site      = var.site_name
       component = "k8s-worker"
     }

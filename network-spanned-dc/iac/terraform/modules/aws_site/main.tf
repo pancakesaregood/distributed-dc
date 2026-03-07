@@ -17,6 +17,9 @@ locals {
     data = {
       subnet_offsets = [4, 5]
     }
+    vdi = {
+      subnet_offsets = [6, 7]
+    }
   }
 
   subnet_plan = merge(

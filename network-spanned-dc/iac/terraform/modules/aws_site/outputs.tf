@@ -41,3 +41,11 @@ output "data_subnet_ids" {
     aws_subnet.tier["data-b"].id
   ]
 }
+
+output "vdi_subnet_ids" {
+  description = "VDI subnet IDs."
+  value = [
+    aws_subnet.tier["vdi-a"].id,
+    aws_subnet.tier["vdi-b"].id
+  ]
+}

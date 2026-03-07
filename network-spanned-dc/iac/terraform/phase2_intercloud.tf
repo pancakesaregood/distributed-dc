@@ -1,4 +1,5 @@
 resource "aws_vpn_gateway" "site_a" {
+  count           = var.phase2_enable_intercloud ? 1 : 0
   provider        = aws.site_a
   vpc_id          = module.aws_site_a.vpc_id
   amazon_side_asn = var.aws_site_a_vpn_asn
@@ -14,6 +15,7 @@ resource "aws_vpn_gateway" "site_a" {
 }
 
 resource "aws_vpn_gateway" "site_b" {
+  count           = var.phase2_enable_intercloud ? 1 : 0
   provider        = aws.site_b
   vpc_id          = module.aws_site_b.vpc_id
   amazon_side_asn = var.aws_site_b_vpn_asn
@@ -29,6 +31,7 @@ resource "aws_vpn_gateway" "site_b" {
 }
 
 data "aws_route_table" "site_a_main" {
+  count    = var.phase2_enable_intercloud ? 1 : 0
   provider = aws.site_a
   vpc_id   = module.aws_site_a.vpc_id
 
@@ -39,6 +42,7 @@ data "aws_route_table" "site_a_main" {
 }
 
 data "aws_route_table" "site_b_main" {
+  count    = var.phase2_enable_intercloud ? 1 : 0
   provider = aws.site_b
   vpc_id   = module.aws_site_b.vpc_id
 
@@ -49,18 +53,21 @@ data "aws_route_table" "site_b_main" {
 }
 
 resource "aws_vpn_gateway_route_propagation" "site_a_main" {
+  count          = var.phase2_enable_intercloud ? 1 : 0
   provider       = aws.site_a
-  route_table_id = data.aws_route_table.site_a_main.id
-  vpn_gateway_id = aws_vpn_gateway.site_a.id
+  route_table_id = data.aws_route_table.site_a_main[0].id
+  vpn_gateway_id = aws_vpn_gateway.site_a[0].id
 }
 
 resource "aws_vpn_gateway_route_propagation" "site_b_main" {
+  count          = var.phase2_enable_intercloud ? 1 : 0
   provider       = aws.site_b
-  route_table_id = data.aws_route_table.site_b_main.id
-  vpn_gateway_id = aws_vpn_gateway.site_b.id
+  route_table_id = data.aws_route_table.site_b_main[0].id
+  vpn_gateway_id = aws_vpn_gateway.site_b[0].id
 }
 
 module "intercloud_ac" {
+  count  = var.phase2_enable_intercloud ? 1 : 0
   source = "./modules/intercloud_pair"
 
   providers = {
@@ -74,7 +81,7 @@ module "intercloud_ac" {
   environment              = var.environment
   aws_site_name            = "site-a"
   gcp_site_name            = "site-c"
-  aws_vpn_gateway_id       = aws_vpn_gateway.site_a.id
+  aws_vpn_gateway_id       = aws_vpn_gateway.site_a[0].id
   aws_vpn_gateway_asn      = var.aws_site_a_vpn_asn
   aws_local_ipv4_cidr      = var.site_a_ipv4_cidr
   gcp_remote_ipv4_cidr     = var.site_c_ipv4_cidr
@@ -90,6 +97,7 @@ module "intercloud_ac" {
 }
 
 module "intercloud_ad" {
+  count  = var.phase2_enable_intercloud ? 1 : 0
   source = "./modules/intercloud_pair"
 
   providers = {
@@ -103,7 +111,7 @@ module "intercloud_ad" {
   environment              = var.environment
   aws_site_name            = "site-a"
   gcp_site_name            = "site-d"
-  aws_vpn_gateway_id       = aws_vpn_gateway.site_a.id
+  aws_vpn_gateway_id       = aws_vpn_gateway.site_a[0].id
   aws_vpn_gateway_asn      = var.aws_site_a_vpn_asn
   aws_local_ipv4_cidr      = var.site_a_ipv4_cidr
   gcp_remote_ipv4_cidr     = var.site_d_ipv4_cidr
@@ -119,6 +127,7 @@ module "intercloud_ad" {
 }
 
 module "intercloud_bc" {
+  count  = var.phase2_enable_intercloud ? 1 : 0
   source = "./modules/intercloud_pair"
 
   providers = {
@@ -132,7 +141,7 @@ module "intercloud_bc" {
   environment              = var.environment
   aws_site_name            = "site-b"
   gcp_site_name            = "site-c"
-  aws_vpn_gateway_id       = aws_vpn_gateway.site_b.id
+  aws_vpn_gateway_id       = aws_vpn_gateway.site_b[0].id
   aws_vpn_gateway_asn      = var.aws_site_b_vpn_asn
   aws_local_ipv4_cidr      = var.site_b_ipv4_cidr
   gcp_remote_ipv4_cidr     = var.site_c_ipv4_cidr
@@ -148,6 +157,7 @@ module "intercloud_bc" {
 }
 
 module "intercloud_bd" {
+  count  = var.phase2_enable_intercloud ? 1 : 0
   source = "./modules/intercloud_pair"
 
   providers = {
@@ -161,7 +171,7 @@ module "intercloud_bd" {
   environment              = var.environment
   aws_site_name            = "site-b"
   gcp_site_name            = "site-d"
-  aws_vpn_gateway_id       = aws_vpn_gateway.site_b.id
+  aws_vpn_gateway_id       = aws_vpn_gateway.site_b[0].id
   aws_vpn_gateway_asn      = var.aws_site_b_vpn_asn
   aws_local_ipv4_cidr      = var.site_b_ipv4_cidr
   gcp_remote_ipv4_cidr     = var.site_d_ipv4_cidr

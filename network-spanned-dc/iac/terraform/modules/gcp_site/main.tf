@@ -5,6 +5,7 @@ locals {
     ingress = cidrsubnet(var.ipv4_cidr, 4, 0)
     app     = cidrsubnet(var.ipv4_cidr, 4, 1)
     data    = cidrsubnet(var.ipv4_cidr, 4, 2)
+    vdi     = cidrsubnet(var.ipv4_cidr, 4, 3)
   }
 }
 

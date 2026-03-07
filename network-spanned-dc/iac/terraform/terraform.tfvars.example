@@ -40,6 +40,7 @@ phase2_gcp_router_asns = {
 
 # Set a unique secret seed before production use.
 phase2_secret_seed = "replace-this-phase2-seed"
+phase2_enable_intercloud = true
 
 # Set true to deploy EKS/GKE control planes in all four sites.
 phase3_enable_platform = false
@@ -48,11 +49,17 @@ phase3_enable_platform = false
 phase3_aws_eks_cluster_version = null
 phase3_aws_enabled_cluster_log_types = ["api", "audit", "authenticator"]
 phase3_aws_endpoint_public_access    = true
-phase3_aws_endpoint_private_access   = false
-phase3_aws_public_access_cidrs       = ["0.0.0.0/0"]
+phase3_aws_endpoint_private_access   = true
+phase3_aws_public_access_cidrs       = ["203.0.113.10/32"]
 
 phase3_gcp_release_channel     = "REGULAR"
 phase3_gcp_deletion_protection = false
+phase3_gcp_master_authorized_networks = [
+  {
+    cidr_block   = "203.0.113.10/32"
+    display_name = "operator-workstation"
+  }
+]
 
 # Optional per-site Pod/Service CIDR overrides for GKE.
 phase3_site_c_cluster_ipv4_cidr_block  = null
@@ -63,16 +70,18 @@ phase3_site_d_services_ipv4_cidr_block = null
 # Phase 4 service onboarding (worker capacity).
 phase4_enable_service_onboarding = false
 
-phase4_aws_node_desired_size      = 2
+phase4_aws_node_desired_size      = 1
 phase4_aws_node_min_size          = 1
-phase4_aws_node_max_size          = 4
-phase4_aws_node_instance_types    = ["t3.large"]
+phase4_aws_node_max_size          = 2
+phase4_aws_node_instance_types    = ["t3.small"]
 phase4_aws_node_capacity_type     = "ON_DEMAND"
 phase4_aws_node_disk_size         = 80
 phase4_aws_node_ami_type          = null
 phase4_aws_node_labels            = {}
 phase4_aws_node_taints            = []
 phase4_aws_node_max_unavailable   = 1
+phase4_aws_enable_ssm_managed_instance_core = false
+phase4_aws_enable_private_service_endpoints = true
 
 phase4_gcp_node_machine_type       = "e2-standard-4"
 phase4_gcp_node_disk_size_gb       = 100
@@ -81,15 +90,69 @@ phase4_gcp_node_image_type         = "COS_CONTAINERD"
 phase4_gcp_node_spot               = false
 phase4_gcp_node_enable_autoscaling = true
 phase4_gcp_node_min_count          = 1
-phase4_gcp_node_max_count          = 3
+phase4_gcp_node_max_count          = 2
 phase4_gcp_node_initial_count      = 1
 phase4_gcp_node_service_account    = null
 phase4_gcp_node_labels             = {}
 phase4_gcp_node_tags               = []
+phase4_gcp_node_oauth_scopes = [
+  "https://www.googleapis.com/auth/logging.write",
+  "https://www.googleapis.com/auth/monitoring",
+  "https://www.googleapis.com/auth/devstorage.read_only"
+]
+phase4_gcp_node_disable_legacy_metadata_endpoints = true
+phase4_gcp_node_enable_secure_boot                = true
+phase4_gcp_node_enable_integrity_monitoring       = true
+phase4_gcp_node_workload_metadata_mode            = "GCE_METADATA"
 
 # Source-material Phase 4 deliverable tracking flags.
 phase4_enable_published_app_path  = false
 phase4_enable_vdi_reference_stack = false
+
+# Optional published app path baseline (AWS Site A/B).
+phase4_published_app_listener_port = 80
+phase4_published_app_allowed_ingress_ipv4_cidrs = ["0.0.0.0/0"]
+phase4_published_app_allowed_ingress_ipv6_cidrs = ["::/0"]
+phase4_published_app_health_check_path           = "/healthz"
+phase4_published_app_backend_port                = 80
+phase4_published_app_waf_rate_limit              = 2000
+
+# Register backend targets only when workloads are reachable from ingress subnets.
+phase4_site_a_published_app_backend_ipv4_targets = []
+phase4_site_b_published_app_backend_ipv4_targets = []
+
+# Optional VDI reference stack baseline (AWS + GCP Site A/B/C/D).
+phase4_vdi_aws_desktop_controlled_egress_ipv4_cidrs = ["0.0.0.0/0"]
+phase4_vdi_aws_desktop_controlled_egress_ipv6_cidrs = ["::/0"]
+phase4_vdi_identity_ssm_parameter_arn_patterns      = ["arn:aws:ssm:*:*:parameter/ddc/vdi/*"]
+phase4_vdi_identity_secret_arn_patterns             = ["arn:aws:secretsmanager:*:*:secret:ddc-vdi-*"]
+phase4_vdi_aws_node_desired_size                    = 1
+phase4_vdi_aws_node_min_size                        = 1
+phase4_vdi_aws_node_max_size                        = 2
+phase4_vdi_aws_node_instance_types                  = ["t3.large"]
+phase4_vdi_aws_node_labels                          = {}
+phase4_vdi_aws_node_taints = [
+  {
+    key    = "workload"
+    value  = "vdi"
+    effect = "NO_SCHEDULE"
+  }
+]
+phase4_vdi_aws_node_max_unavailable = 1
+
+phase4_vdi_gcp_desktop_controlled_egress_ipv4_cidrs = ["0.0.0.0/0"]
+phase4_vdi_gcp_node_machine_type                     = "e2-standard-8"
+phase4_vdi_gcp_node_disk_size_gb                     = 120
+phase4_vdi_gcp_node_disk_type                        = "pd-balanced"
+phase4_vdi_gcp_node_image_type                       = "COS_CONTAINERD"
+phase4_vdi_gcp_node_spot                             = false
+phase4_vdi_gcp_node_enable_autoscaling               = true
+phase4_vdi_gcp_node_min_count                        = 1
+phase4_vdi_gcp_node_max_count                        = 2
+phase4_vdi_gcp_node_initial_count                    = 1
+phase4_vdi_gcp_node_service_account                  = null
+phase4_vdi_gcp_node_labels                           = {}
+phase4_vdi_gcp_node_tags                             = []
 
 # Source-material Phase 5 deliverable tracking flags.
 phase5_enable_resilience_validation = false

@@ -17,3 +17,8 @@ output "data_subnet_names" {
   description = "Data subnet name."
   value       = [google_compute_subnetwork.tier["data"].name]
 }
+
+output "vdi_subnet_names" {
+  description = "VDI subnet name."
+  value       = [google_compute_subnetwork.tier["vdi"].name]
+}

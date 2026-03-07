@@ -306,13 +306,13 @@ $summaryMarkdown = @"
 # Phase 5 Evidence Summary
 
 - Generated (UTC): $($summary.generated_utc)
-- Output directory: `$runDir`
+- Output directory: $($summary.run_directory)
 
 ## Health Snapshot
 
 | Check | Healthy | Total |
 |---|---:|---:|
-| AWS VPN connections (`available`) | $($summary.metrics.aws_vpn_connections_up) | $($summary.metrics.aws_vpn_connections_total) |
+| AWS VPN connections (available) | $($summary.metrics.aws_vpn_connections_up) | $($summary.metrics.aws_vpn_connections_total) |
 | GCP VPN tunnels (`ESTABLISHED`) | $($summary.metrics.gcp_vpn_tunnels_established) | $($summary.metrics.gcp_vpn_tunnels_total) |
 | EKS clusters (`ACTIVE`) | $($summary.metrics.eks_clusters_active) | $($summary.metrics.eks_clusters_total) |
 | GKE clusters (`RUNNING`) | $($summary.metrics.gke_clusters_running) | $($summary.metrics.gke_clusters_total) |
@@ -363,6 +363,7 @@ $executionRecordTemplate = @"
 "@
 
 Set-Content -Path (Join-Path $runDir "execution_record.md") -Value $executionRecordTemplate
+Set-Content -Path (Join-Path $OutputRoot "phase5-latest.txt") -Value $runDir
 
 if ($summary.errors.Count -gt 0) {
   Write-Warning ("Evidence capture completed with {0} command error(s)." -f $summary.errors.Count)

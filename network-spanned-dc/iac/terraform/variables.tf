@@ -164,6 +164,12 @@ variable "phase2_secret_seed" {
   sensitive   = true
 }
 
+variable "phase2_enable_intercloud" {
+  description = "Enable Phase 2 inter-cloud VPN/BGP resources."
+  type        = bool
+  default     = true
+}
+
 variable "phase3_enable_platform" {
   description = "Enable Phase 3 platform resources (EKS/GKE control planes)."
   type        = bool
@@ -244,6 +250,15 @@ variable "phase3_site_d_services_ipv4_cidr_block" {
   default     = null
 }
 
+variable "phase3_gcp_master_authorized_networks" {
+  description = "Optional authorized CIDR blocks for GKE control plane access."
+  type = list(object({
+    cidr_block   = string
+    display_name = string
+  }))
+  default = []
+}
+
 variable "phase4_enable_service_onboarding" {
   description = "Enable Phase 4 worker-capacity resources for EKS/GKE."
   type        = bool
@@ -259,12 +274,232 @@ variable "phase4_enable_published_app_path" {
   description = "Track whether published app path (WAF/LB/health gating) is enabled."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.phase4_enable_published_app_path || var.phase4_enable_service_onboarding
+    error_message = "phase4_enable_published_app_path requires phase4_enable_service_onboarding=true."
+  }
 }
 
 variable "phase4_enable_vdi_reference_stack" {
   description = "Track whether VDI reference stack and identity controls are enabled."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.phase4_enable_vdi_reference_stack || var.phase4_enable_service_onboarding
+    error_message = "phase4_enable_vdi_reference_stack requires phase4_enable_service_onboarding=true."
+  }
+}
+
+variable "phase4_vdi_aws_desktop_controlled_egress_ipv4_cidrs" {
+  description = "IPv4 CIDRs VDI desktops may reach for controlled update egress in AWS."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "phase4_vdi_aws_desktop_controlled_egress_ipv6_cidrs" {
+  description = "IPv6 CIDRs VDI desktops may reach for controlled update egress in AWS."
+  type        = list(string)
+  default     = ["::/0"]
+}
+
+variable "phase4_vdi_identity_ssm_parameter_arn_patterns" {
+  description = "SSM parameter ARN patterns readable by the AWS VDI broker identity role."
+  type        = list(string)
+  default     = ["arn:aws:ssm:*:*:parameter/ddc/vdi/*"]
+}
+
+variable "phase4_vdi_identity_secret_arn_patterns" {
+  description = "Secrets Manager ARN patterns readable by the AWS VDI broker identity role."
+  type        = list(string)
+  default     = ["arn:aws:secretsmanager:*:*:secret:ddc-vdi-*"]
+}
+
+variable "phase4_vdi_aws_node_desired_size" {
+  description = "Desired EKS VDI node count per AWS site."
+  type        = number
+  default     = 1
+}
+
+variable "phase4_vdi_aws_node_min_size" {
+  description = "Minimum EKS VDI node count per AWS site."
+  type        = number
+  default     = 1
+}
+
+variable "phase4_vdi_aws_node_max_size" {
+  description = "Maximum EKS VDI node count per AWS site."
+  type        = number
+  default     = 2
+}
+
+variable "phase4_vdi_aws_node_instance_types" {
+  description = "EC2 instance types for EKS VDI node groups."
+  type        = list(string)
+  default     = ["t3.large"]
+}
+
+variable "phase4_vdi_aws_node_labels" {
+  description = "Additional labels for EKS VDI node groups."
+  type        = map(string)
+  default     = {}
+}
+
+variable "phase4_vdi_aws_node_taints" {
+  description = "Optional taints for EKS VDI node groups."
+  type = list(object({
+    key    = string
+    value  = string
+    effect = string
+  }))
+  default = [
+    {
+      key    = "workload"
+      value  = "vdi"
+      effect = "NO_SCHEDULE"
+    }
+  ]
+
+  validation {
+    condition = alltrue([
+      for taint in var.phase4_vdi_aws_node_taints :
+      contains(["NO_SCHEDULE", "PREFER_NO_SCHEDULE", "NO_EXECUTE"], taint.effect)
+    ])
+    error_message = "Each phase4_vdi_aws_node_taints effect must be NO_SCHEDULE, PREFER_NO_SCHEDULE, or NO_EXECUTE."
+  }
+}
+
+variable "phase4_vdi_aws_node_max_unavailable" {
+  description = "Maximum unavailable EKS VDI nodes during rolling update."
+  type        = number
+  default     = 1
+}
+
+variable "phase4_vdi_gcp_desktop_controlled_egress_ipv4_cidrs" {
+  description = "IPv4 CIDRs VDI desktops may reach for controlled update egress in GCP."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "phase4_vdi_gcp_node_machine_type" {
+  description = "Machine type for GKE VDI node pools."
+  type        = string
+  default     = "e2-standard-8"
+}
+
+variable "phase4_vdi_gcp_node_disk_size_gb" {
+  description = "Disk size in GiB for GKE VDI node pools."
+  type        = number
+  default     = 120
+}
+
+variable "phase4_vdi_gcp_node_disk_type" {
+  description = "Disk type for GKE VDI node pools."
+  type        = string
+  default     = "pd-balanced"
+}
+
+variable "phase4_vdi_gcp_node_image_type" {
+  description = "Image type for GKE VDI node pools."
+  type        = string
+  default     = "COS_CONTAINERD"
+}
+
+variable "phase4_vdi_gcp_node_spot" {
+  description = "Use spot nodes for GKE VDI node pools."
+  type        = bool
+  default     = false
+}
+
+variable "phase4_vdi_gcp_node_enable_autoscaling" {
+  description = "Enable autoscaling for GKE VDI node pools."
+  type        = bool
+  default     = true
+}
+
+variable "phase4_vdi_gcp_node_min_count" {
+  description = "Minimum node count for GKE VDI autoscaling."
+  type        = number
+  default     = 1
+}
+
+variable "phase4_vdi_gcp_node_max_count" {
+  description = "Maximum node count for GKE VDI autoscaling."
+  type        = number
+  default     = 2
+}
+
+variable "phase4_vdi_gcp_node_initial_count" {
+  description = "Initial node count for GKE VDI node pools."
+  type        = number
+  default     = 1
+}
+
+variable "phase4_vdi_gcp_node_service_account" {
+  description = "Optional explicit service account for GKE VDI node pools."
+  type        = string
+  default     = null
+}
+
+variable "phase4_vdi_gcp_node_labels" {
+  description = "Additional labels for GKE VDI node pools."
+  type        = map(string)
+  default     = {}
+}
+
+variable "phase4_vdi_gcp_node_tags" {
+  description = "Additional network tags for GKE VDI node pools."
+  type        = list(string)
+  default     = []
+}
+
+variable "phase4_published_app_listener_port" {
+  description = "Inbound listener port for published app load balancers."
+  type        = number
+  default     = 80
+}
+
+variable "phase4_published_app_allowed_ingress_ipv4_cidrs" {
+  description = "Allowed IPv4 client CIDRs for the published app path."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "phase4_published_app_allowed_ingress_ipv6_cidrs" {
+  description = "Allowed IPv6 client CIDRs for the published app path."
+  type        = list(string)
+  default     = ["::/0"]
+}
+
+variable "phase4_published_app_health_check_path" {
+  description = "HTTP health check path used for published app backend gating."
+  type        = string
+  default     = "/healthz"
+}
+
+variable "phase4_published_app_backend_port" {
+  description = "Backend application port for published app target groups."
+  type        = number
+  default     = 80
+}
+
+variable "phase4_published_app_waf_rate_limit" {
+  description = "Per-5-minute IP threshold for published app WAF rate-limiting."
+  type        = number
+  default     = 2000
+}
+
+variable "phase4_site_a_published_app_backend_ipv4_targets" {
+  description = "Site A backend IPv4 targets for the published app path."
+  type        = list(string)
+  default     = []
+}
+
+variable "phase4_site_b_published_app_backend_ipv4_targets" {
+  description = "Site B backend IPv4 targets for the published app path."
+  type        = list(string)
+  default     = []
 }
 
 variable "phase4_aws_node_desired_size" {
@@ -288,7 +523,7 @@ variable "phase4_aws_node_max_size" {
 variable "phase4_aws_node_instance_types" {
   description = "EC2 instance types for EKS node groups."
   type        = list(string)
-  default     = ["t3.large"]
+  default     = ["t3.small"]
 }
 
 variable "phase4_aws_node_capacity_type" {
@@ -334,6 +569,18 @@ variable "phase4_aws_node_max_unavailable" {
   description = "Maximum unavailable EKS nodes during rolling update."
   type        = number
   default     = 1
+}
+
+variable "phase4_aws_enable_ssm_managed_instance_core" {
+  description = "Attach AmazonSSMManagedInstanceCore to Phase 4 EKS worker roles."
+  type        = bool
+  default     = false
+}
+
+variable "phase4_aws_enable_private_service_endpoints" {
+  description = "Create private VPC endpoints required for EKS worker bootstrap/runtime."
+  type        = bool
+  default     = true
 }
 
 variable "phase4_gcp_node_machine_type" {
@@ -406,6 +653,48 @@ variable "phase4_gcp_node_tags" {
   description = "Network tags for GKE nodes."
   type        = list(string)
   default     = []
+}
+
+variable "phase4_gcp_node_oauth_scopes" {
+  description = "OAuth scopes assigned to GKE node tokens."
+  type        = list(string)
+  default = [
+    "https://www.googleapis.com/auth/logging.write",
+    "https://www.googleapis.com/auth/monitoring",
+    "https://www.googleapis.com/auth/devstorage.read_only"
+  ]
+}
+
+variable "phase4_gcp_node_disable_legacy_metadata_endpoints" {
+  description = "Disable legacy metadata endpoints on GKE nodes."
+  type        = bool
+  default     = true
+}
+
+variable "phase4_gcp_node_enable_secure_boot" {
+  description = "Enable Shielded VM Secure Boot on GKE nodes."
+  type        = bool
+  default     = true
+}
+
+variable "phase4_gcp_node_enable_integrity_monitoring" {
+  description = "Enable Shielded VM integrity monitoring on GKE nodes."
+  type        = bool
+  default     = true
+}
+
+variable "phase4_gcp_node_workload_metadata_mode" {
+  description = "Workload metadata mode for GKE nodes."
+  type        = string
+  default     = "GCE_METADATA"
+
+  validation {
+    condition = contains(
+      ["GCE_METADATA", "GKE_METADATA"],
+      var.phase4_gcp_node_workload_metadata_mode
+    )
+    error_message = "phase4_gcp_node_workload_metadata_mode must be GCE_METADATA or GKE_METADATA."
+  }
 }
 
 variable "phase5_enable_resilience_validation" {

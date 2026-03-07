@@ -13,6 +13,12 @@ variable "environment" {
   type        = string
 }
 
+variable "node_pool_suffix" {
+  description = "Suffix used in the GKE node pool name."
+  type        = string
+  default     = "general"
+}
+
 variable "location" {
   description = "Cluster location (region or zone)."
   type        = string
@@ -93,4 +99,46 @@ variable "node_tags" {
   description = "Network tags for nodes."
   type        = list(string)
   default     = []
+}
+
+variable "node_oauth_scopes" {
+  description = "OAuth scopes assigned to node service account tokens."
+  type        = list(string)
+  default = [
+    "https://www.googleapis.com/auth/logging.write",
+    "https://www.googleapis.com/auth/monitoring",
+    "https://www.googleapis.com/auth/devstorage.read_only"
+  ]
+}
+
+variable "disable_legacy_metadata_endpoints" {
+  description = "Disable legacy metadata endpoints on GKE nodes."
+  type        = bool
+  default     = true
+}
+
+variable "enable_secure_boot" {
+  description = "Enable Secure Boot on shielded GKE nodes."
+  type        = bool
+  default     = true
+}
+
+variable "enable_integrity_monitoring" {
+  description = "Enable integrity monitoring on shielded GKE nodes."
+  type        = bool
+  default     = true
+}
+
+variable "workload_metadata_mode" {
+  description = "Workload metadata mode for node pools."
+  type        = string
+  default     = "GCE_METADATA"
+
+  validation {
+    condition = contains(
+      ["GCE_METADATA", "GKE_METADATA"],
+      var.workload_metadata_mode
+    )
+    error_message = "workload_metadata_mode must be GCE_METADATA or GKE_METADATA."
+  }
 }
