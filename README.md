@@ -18,3 +18,6 @@ Quick use examples:
 4. Onboard ops/support teams: use `docs/11_FAQ` + `docs/13_operations_foundations`.
 
 If you want the full narrative, start with the docs home in [`network-spanned-dc/docs/index.md`](./network-spanned-dc/docs/index.md).
+
+
+python -m mkdocs build -f network-spanned-dc\mkdocs.yml
