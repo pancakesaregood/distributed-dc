@@ -140,6 +140,10 @@
                   
                 
                   
+                    <option value="../../03_diagrams/dual_cloud_4site_topology.mmd/">Dual-Cloud 4-Site Topology</option>
+                  
+                
+                  
                     <option value="../../03_diagrams/physical_rack_topology_2rack.mmd/">Physical Rack Topology (Two-Rack Site)</option>
                   
                 
@@ -337,6 +341,10 @@
                     <option value="../../10_implementation/readme/">Implementation Proposal</option>
                   
                 
+                  
+                    <option value="../../10_implementation/proposal_dual_cloud_4site/">Dual-Cloud 4-Site Proposal (AWS + GCP)</option>
+                  
+                
               </optgroup>
             
           
@@ -415,6 +423,10 @@
                 
                   
                     <option value="../../12_business_cases/business_case_05_backup_dr_assurance/">Backup and DR Assurance</option>
+                  
+                
+                  
+                    <option value="../../12_business_cases/business_case_06_dual_cloud_public_cloud_extension/">Dual-Cloud Public Cloud Extension</option>
                   
                 
               </optgroup>
@@ -548,7 +560,7 @@
 <h2 id="session-model">Session Model</h2>
 <ul>
 <li>eBGP between each site edge node and WAN handoff, hardened with TCP-AO authentication.</li>
-<li>All inter-site BGP sessions run inside IPsec tunnels. The full tunnel redundancy model is defined in <a href="routing_wan_abstraction.md">Routing and WAN Abstraction — Multi-Tunnel Redundancy Model</a>.</li>
+<li>All inter-site BGP sessions run inside IPsec tunnels. The full tunnel redundancy model is defined in <a href="../../02_architecture/routing_wan_abstraction/">Routing and WAN Abstraction — Multi-Tunnel Redundancy Model</a>.</li>
 </ul>
 <h2 id="bgp-session-assignment-per-tunnel">BGP Session Assignment per Tunnel</h2>
 <p>Each site pair maintains four IPsec tunnels. BGP sessions are assigned as follows:</p>

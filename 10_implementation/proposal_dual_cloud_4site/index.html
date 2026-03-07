@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>DR Runbooks - Spanned Datacenter Architecture</title>
+        <title>Dual-Cloud 4-Site Proposal (AWS + GCP) - Spanned Datacenter Architecture</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -36,7 +36,7 @@
   
   <div class="site-nav-stack">
     <div class="page-jump-bar" aria-label="Page navigation">
-      <a rel="prev" href="../rto_rpo_targets/" class="page-jump-arrow" aria-label="Previous page">
+      <a rel="prev" href="../readme/" class="page-jump-arrow" aria-label="Previous page">
         <i class="fa fa-arrow-left"></i>
       </a>
 
@@ -222,19 +222,19 @@
               <optgroup label="04 Failover and DR">
                 
                   
-                    <option value="../failover_scenarios/">Failover Scenarios</option>
+                    <option value="../../04_failover_dr/failover_scenarios/">Failover Scenarios</option>
                   
                 
                   
-                    <option value="../rto_rpo_targets/">RTO and RPO Targets</option>
+                    <option value="../../04_failover_dr/rto_rpo_targets/">RTO and RPO Targets</option>
                   
                 
                   
-                    <option value="./" selected>DR Runbooks</option>
+                    <option value="../../04_failover_dr/dr_runbooks/">DR Runbooks</option>
                   
                 
                   
-                    <option value="../test_plan/">Test Plan</option>
+                    <option value="../../04_failover_dr/test_plan/">Test Plan</option>
                   
                 
               </optgroup>
@@ -338,11 +338,11 @@
               <optgroup label="10 Implementation">
                 
                   
-                    <option value="../../10_implementation/readme/">Implementation Proposal</option>
+                    <option value="../readme/">Implementation Proposal</option>
                   
                 
                   
-                    <option value="../../10_implementation/proposal_dual_cloud_4site/">Dual-Cloud 4-Site Proposal (AWS + GCP)</option>
+                    <option value="./" selected>Dual-Cloud 4-Site Proposal (AWS + GCP)</option>
                   
                 
               </optgroup>
@@ -495,7 +495,7 @@
         </select>
       </div>
 
-      <a rel="next" href="../test_plan/" class="page-jump-arrow" aria-label="Next page">
+      <a rel="next" href="../../11_FAQ/readme/" class="page-jump-arrow" aria-label="Next page">
         <i class="fa fa-arrow-right"></i>
       </a>
     </div>
@@ -527,21 +527,65 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#dr-runbooks" class="nav-link">DR Runbooks</a>
+            <li class="nav-item" data-bs-level="1"><a href="#dual-cloud-four-site-proposal-aws-gcp" class="nav-link">Dual-Cloud Four-Site Proposal (AWS + GCP)</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#runbook-framework" class="nav-link">Runbook Framework</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#runbook-set" class="nav-link">Runbook Set</a>
+            <li class="nav-item" data-bs-level="2"><a href="#proposal-status" class="nav-link">Proposal Status</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#standard-manual-validation-checks" class="nav-link">Standard Manual Validation Checks</a>
+            <li class="nav-item" data-bs-level="2"><a href="#decision-statement" class="nav-link">Decision Statement</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#documentation-discipline" class="nav-link">Documentation Discipline</a>
+            <li class="nav-item" data-bs-level="2"><a href="#reference-site-map-concrete-draft" class="nav-link">Reference Site Map (Concrete Draft)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#per-site-baseline" class="nav-link">Per-Site Baseline</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#connectivity-and-routing-model" class="nav-link">Connectivity and Routing Model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ipv6-strategy" class="nav-link">IPv6 Strategy</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#service-placement-model" class="nav-link">Service Placement Model</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ingress-and-traffic-steering" class="nav-link">Ingress and Traffic Steering</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#failure-behavior-target" class="nav-link">Failure Behavior (Target)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#security-and-operations-baseline" class="nav-link">Security and Operations Baseline</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#delivery-plan-draft" class="nav-link">Delivery Plan (Draft)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#implementation-artifacts-in-this-repository" class="nav-link">Implementation Artifacts in This Repository</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#acceptance-criteria-for-this-use-case" class="nav-link">Acceptance Criteria for This Use Case</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#open-decisions" class="nav-link">Open Decisions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#related-diagram" class="nav-link">Related Diagram</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -552,34 +596,265 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="dr-runbooks">DR Runbooks</h1>
-<h2 id="runbook-framework">Runbook Framework</h2>
-<p>Each runbook follows a consistent structure:
-1. Preconditions and declaration criteria.
-2. Roles and communication channels.
-3. Step-by-step execution.
-4. Validation checkpoints.
-5. Exit criteria and post-incident review actions.</p>
-<h2 id="runbook-set">Runbook Set</h2>
+<h1 id="dual-cloud-four-site-proposal-aws-gcp">Dual-Cloud Four-Site Proposal (AWS + GCP)</h1>
+<h2 id="proposal-status">Proposal Status</h2>
 <ul>
-<li>Compute host failure recovery.</li>
-<li>Network path and ToR recovery.</li>
-<li>Edge routing failover and BGP recovery.</li>
-<li>Site outage service promotion.</li>
-<li>Data corruption containment and clean restore.</li>
+<li>Draft version: <code>0.1</code></li>
+<li>Draft date: <code>2026-03-06</code></li>
+<li>Scope: Public cloud extension of the four-site spanned architecture model</li>
 </ul>
-<h2 id="standard-manual-validation-checks">Standard Manual Validation Checks</h2>
+<h2 id="decision-statement">Decision Statement</h2>
+<p>Implement a four-site, dual-cloud deployment with two AWS regions and two GCP regions, preserving core architecture principles:
+- Layer 3 between sites.
+- No stretched Layer 2 between sites.
+- Explicit failover via routing and service health policy.
+- Service spanning through replication and controlled promotion.</p>
+<h2 id="reference-site-map-concrete-draft">Reference Site Map (Concrete Draft)</h2>
+<table>
+<thead>
+<tr>
+<th>Site</th>
+<th>Cloud</th>
+<th>Region</th>
+<th>Regional Fault Domains</th>
+<th>Primary Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Site A</td>
+<td>AWS</td>
+<td><code>us-east-1</code></td>
+<td>Multi-AZ</td>
+<td>East primary application site</td>
+</tr>
+<tr>
+<td>Site B</td>
+<td>AWS</td>
+<td><code>us-west-2</code></td>
+<td>Multi-AZ</td>
+<td>West AWS peer and DR target</td>
+</tr>
+<tr>
+<td>Site C</td>
+<td>GCP</td>
+<td><code>us-east4</code></td>
+<td>Multi-zone</td>
+<td>East secondary cloud and failover site</td>
+</tr>
+<tr>
+<td>Site D</td>
+<td>GCP</td>
+<td><code>us-west1</code></td>
+<td>Multi-zone</td>
+<td>West GCP peer and DR target</td>
+</tr>
+</tbody>
+</table>
+<p>Notes:
+- This region set is a US-focused starting point for latency and operations.
+- Final region selection must be validated against data residency, compliance, and user latency.</p>
+<h2 id="per-site-baseline">Per-Site Baseline</h2>
 <ul>
-<li>Confirm control-plane health (routing, DNS, identity).</li>
-<li>Confirm data-plane reachability from user and service networks.</li>
-<li>Confirm backup integrity and replication status.</li>
-<li>Confirm alert noise returns to baseline.</li>
+<li>One workload network boundary per site (<code>VPC</code> in AWS, dedicated <code>VPC network</code> in GCP).</li>
+<li>Three-tier subnet model per site: ingress, application, data/management.</li>
+<li>Kubernetes plus VM support:</li>
+<li>AWS sites: <code>EKS</code> + VM workloads on <code>EC2</code>.</li>
+<li>GCP sites: <code>GKE</code> + VM workloads on <code>Compute Engine</code>.</li>
+<li>Local internet breakout and local egress controls at each site.</li>
 </ul>
-<h2 id="documentation-discipline">Documentation Discipline</h2>
+<h2 id="connectivity-and-routing-model">Connectivity and Routing Model</h2>
+<h3 id="intra-cloud-site-connectivity">Intra-Cloud Site Connectivity</h3>
 <ul>
-<li>Keep runbooks in Git with change history.</li>
-<li>Require peer review for any runbook change.</li>
-<li>Record timestamps during execution to prove measured RTO/RPO.</li>
+<li>AWS Site A to Site B:</li>
+<li><code>Transit Gateway</code> in each AWS region.</li>
+<li>Inter-region <code>Transit Gateway peering</code>.</li>
+<li>Route tables advertise only approved site summary prefixes.</li>
+<li>GCP Site C to Site D:</li>
+<li>Dedicated VPC per site.</li>
+<li><code>HA VPN</code> + <code>Cloud Router</code> (BGP) between C and D.</li>
+<li>Four tunnels (<code>2x2</code>) for resilient east-west cloud pathing.</li>
+</ul>
+<h3 id="inter-cloud-connectivity-aws-gcp">Inter-Cloud Connectivity (AWS &lt;-&gt; GCP)</h3>
+<ul>
+<li>Connect each AWS site to each GCP site (A-C, A-D, B-C, B-D).</li>
+<li>For each AWS-GCP site pair:</li>
+<li>One BGP VPN set for IPv4 payload routing (2 tunnels).</li>
+<li>One BGP VPN set for IPv6 payload routing (2 tunnels), where feature parity is available in both ends.</li>
+<li>Target total inter-cloud tunnel count for this draft: <code>16</code> tunnels.</li>
+<li>Routing policy:</li>
+<li>Preferred east path: A-C.</li>
+<li>Preferred west path: B-D.</li>
+<li>Cross paths A-D and B-C as policy failover paths with lower preference.</li>
+</ul>
+<h3 id="prefix-advertisement-policy">Prefix Advertisement Policy</h3>
+<ul>
+<li>Keep per-site route advertisements summarized.</li>
+<li>IPv6 site summaries:</li>
+<li>Site A: <code>fdca:fcaf:e000::/56</code></li>
+<li>Site B: <code>fdca:fcaf:e100::/56</code></li>
+<li>Site C: <code>fdca:fcaf:e200::/56</code></li>
+<li>Site D: <code>fdca:fcaf:e300::/56</code></li>
+<li>IPv4 fallback summaries (draft):</li>
+<li>Site A: <code>10.10.0.0/20</code></li>
+<li>Site B: <code>10.20.0.0/20</code></li>
+<li>Site C: <code>10.30.0.0/20</code></li>
+<li>Site D: <code>10.40.0.0/20</code></li>
+</ul>
+<h2 id="ipv6-strategy">IPv6 Strategy</h2>
+<ul>
+<li>Run dual-stack workloads where service support is mature.</li>
+<li>Prefer native IPv6 east-west and north-south traffic paths.</li>
+<li>Keep IPv4 for compatibility paths where managed services are not yet IPv6-complete.</li>
+<li>For internet egress:</li>
+<li>IPv6-native services egress directly with policy filtering.</li>
+<li>IPv4-only destinations use NAT policy paths (<code>NAT Gateway</code>/<code>Cloud NAT</code> and application-level translation as needed).</li>
+</ul>
+<h2 id="service-placement-model">Service Placement Model</h2>
+<table>
+<thead>
+<tr>
+<th>Service Class</th>
+<th>Placement Pattern</th>
+<th>Failover Pattern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tier 1 Stateless</td>
+<td>Active-active on all four sites</td>
+<td>DNS and health-based traffic steering</td>
+</tr>
+<tr>
+<td>Tier 1 Stateful</td>
+<td>Domain-based write primary per geography with cross-cloud replicas</td>
+<td>Controlled promotion to designated standby site</td>
+</tr>
+<tr>
+<td>Tier 2 Platform</td>
+<td>Active-standby by cloud pair (A&lt;-&gt;C, B&lt;-&gt;D)</td>
+<td>Manual or runbook-driven promotion</td>
+</tr>
+<tr>
+<td>Local-Only</td>
+<td>Single site only</td>
+<td>No cross-site failover requirement</td>
+</tr>
+</tbody>
+</table>
+<p>Stateful guidance:
+- Avoid global synchronous writes across all four sites.
+- Use asynchronous cross-region and cross-cloud replication unless measured latency justifies synchronous pairing for a specific service.</p>
+<h2 id="ingress-and-traffic-steering">Ingress and Traffic Steering</h2>
+<ul>
+<li>Public ingress:</li>
+<li>Global DNS with health checks and policy routing (<code>latency</code> + <code>failover</code>).</li>
+<li>Regional L7 load balancers per site (AWS ALB/NLB, GCP Global/Regional LB as needed).</li>
+<li>Internal ingress:</li>
+<li>Per-cloud internal load balancing.</li>
+<li>Service discovery synchronized via GitOps-managed records and health policies.</li>
+</ul>
+<h2 id="failure-behavior-target">Failure Behavior (Target)</h2>
+<table>
+<thead>
+<tr>
+<th>Failure Event</th>
+<th>Expected Behavior</th>
+<th>Manual Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single AZ/zone failure in a site</td>
+<td>Workloads reschedule within region</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Full site failure (A, B, C, or D)</td>
+<td>Route withdrawal plus DNS weight shift to surviving sites</td>
+<td>Optional capacity tuning</td>
+</tr>
+<tr>
+<td>East inter-cloud link failure (A-C)</td>
+<td>Cross-path A-D/B-C takes traffic</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Full AWS control-plane outage in one region</td>
+<td>Workloads continue on other AWS region and GCP pair</td>
+<td>Data-service promotion if needed</td>
+</tr>
+<tr>
+<td>Full cloud-provider regional outage</td>
+<td>Surviving provider and remaining regions continue service based on tier policy</td>
+<td>Runbook-based stateful promotion</td>
+</tr>
+</tbody>
+</table>
+<h2 id="security-and-operations-baseline">Security and Operations Baseline</h2>
+<ul>
+<li>End-to-end encryption in transit (<code>IPsec</code> for inter-cloud links, <code>TLS</code> for service traffic).</li>
+<li>Cloud-native KMS in each provider with key ownership policy and rotation.</li>
+<li>Identity federation for admin and CI/CD access with MFA.</li>
+<li>Centralized logs/metrics/traces with provider-local buffering and cross-cloud export.</li>
+<li>GitOps-managed infrastructure and application manifests with peer review.</li>
+</ul>
+<h2 id="delivery-plan-draft">Delivery Plan (Draft)</h2>
+<h3 id="phase-0-architecture-decisions-2-weeks">Phase 0 - Architecture Decisions (2 weeks)</h3>
+<ul>
+<li>Confirm region list, compliance boundaries, and service tier mapping.</li>
+<li>Confirm DNS authority and certificate management model.</li>
+</ul>
+<h3 id="phase-1-per-cloud-foundations-4-6-weeks">Phase 1 - Per-Cloud Foundations (4-6 weeks)</h3>
+<ul>
+<li>Build Site A/B on AWS and Site C/D on GCP.</li>
+<li>Deploy baseline EKS/GKE clusters and VM landing zones.</li>
+</ul>
+<h3 id="phase-2-cross-site-networking-3-4-weeks">Phase 2 - Cross-Site Networking (3-4 weeks)</h3>
+<ul>
+<li>Bring up AWS TGW peering and GCP HA VPN pair.</li>
+<li>Bring up AWS-GCP VPN/BGP connections with route filters.</li>
+<li>Validate IPv6 and IPv4 route propagation and failover.</li>
+</ul>
+<h3 id="phase-3-service-onboarding-4-8-weeks">Phase 3 - Service Onboarding (4-8 weeks)</h3>
+<ul>
+<li>Onboard tiered reference workloads.</li>
+<li>Implement runbook-driven stateful failover and restoration.</li>
+</ul>
+<h3 id="phase-4-resilience-certification-3-4-weeks">Phase 4 - Resilience Certification (3-4 weeks)</h3>
+<ul>
+<li>Execute game-day tests for site, path, and provider failure scenarios.</li>
+<li>Record evidence against RTO/RPO targets and close gaps.</li>
+</ul>
+<h2 id="implementation-artifacts-in-this-repository">Implementation Artifacts in This Repository</h2>
+<ul>
+<li>Terraform root: <code>network-spanned-dc/iac/terraform</code></li>
+<li>AWS site module: <code>network-spanned-dc/iac/terraform/modules/aws_site</code></li>
+<li>GCP site module: <code>network-spanned-dc/iac/terraform/modules/gcp_site</code></li>
+<li>Example variable file: <code>network-spanned-dc/iac/terraform/terraform.tfvars.example</code></li>
+</ul>
+<p>Current build scope:
+- Phase 1 baseline network resources for all four sites.
+- Dual-stack network intent (IPv6 where provider features permit).
+- Inter-cloud path policy matrix captured as Terraform outputs for next-phase VPN/BGP implementation.</p>
+<h2 id="acceptance-criteria-for-this-use-case">Acceptance Criteria for This Use Case</h2>
+<ul>
+<li>All four sites are active with tested connectivity and policy controls.</li>
+<li>Tier 1 stateless services pass active-active failover tests across both clouds.</li>
+<li>Tier 1 stateful services pass controlled promotion tests across cloud boundaries.</li>
+<li>IPv6 data paths are validated for selected services; IPv4 fallback paths are validated where IPv6 is not yet available.</li>
+<li>DR test evidence is attached to the implementation record.</li>
+</ul>
+<h2 id="open-decisions">Open Decisions</h2>
+<ul>
+<li>Authoritative DNS operating model (single-provider vs dual-provider).</li>
+<li>Cross-cloud data replication tooling per stateful service.</li>
+<li>Cost guardrails for inter-cloud egress and replication traffic.</li>
+<li>Final selection of services that must be IPv6-first at go-live.</li>
+</ul>
+<h2 id="related-diagram">Related Diagram</h2>
+<ul>
+<li><a href="../../03_diagrams/dual_cloud_4site_topology.mmd/">Dual-Cloud 4-Site Topology</a></li>
 </ul></div>
             </div>
         </div>

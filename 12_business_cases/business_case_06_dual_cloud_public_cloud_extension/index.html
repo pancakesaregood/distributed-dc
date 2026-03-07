@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>DR Runbooks - Spanned Datacenter Architecture</title>
+        <title>Dual-Cloud Public Cloud Extension - Spanned Datacenter Architecture</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/fontawesome.min.css" rel="stylesheet">
         <link href="../../css/brands.min.css" rel="stylesheet">
@@ -36,7 +36,7 @@
   
   <div class="site-nav-stack">
     <div class="page-jump-bar" aria-label="Page navigation">
-      <a rel="prev" href="../rto_rpo_targets/" class="page-jump-arrow" aria-label="Previous page">
+      <a rel="prev" href="../business_case_05_backup_dr_assurance/" class="page-jump-arrow" aria-label="Previous page">
         <i class="fa fa-arrow-left"></i>
       </a>
 
@@ -222,19 +222,19 @@
               <optgroup label="04 Failover and DR">
                 
                   
-                    <option value="../failover_scenarios/">Failover Scenarios</option>
+                    <option value="../../04_failover_dr/failover_scenarios/">Failover Scenarios</option>
                   
                 
                   
-                    <option value="../rto_rpo_targets/">RTO and RPO Targets</option>
+                    <option value="../../04_failover_dr/rto_rpo_targets/">RTO and RPO Targets</option>
                   
                 
                   
-                    <option value="./" selected>DR Runbooks</option>
+                    <option value="../../04_failover_dr/dr_runbooks/">DR Runbooks</option>
                   
                 
                   
-                    <option value="../test_plan/">Test Plan</option>
+                    <option value="../../04_failover_dr/test_plan/">Test Plan</option>
                   
                 
               </optgroup>
@@ -402,31 +402,31 @@
               <optgroup label="12 Business Cases">
                 
                   
-                    <option value="../../12_business_cases/readme/">Business Cases Home</option>
+                    <option value="../readme/">Business Cases Home</option>
                   
                 
                   
-                    <option value="../../12_business_cases/business_case_01_multi_site_resilience/">Multi-Site Resilience Baseline</option>
+                    <option value="../business_case_01_multi_site_resilience/">Multi-Site Resilience Baseline</option>
                   
                 
                   
-                    <option value="../../12_business_cases/business_case_02_security_control_uplift/">Security Control Uplift</option>
+                    <option value="../business_case_02_security_control_uplift/">Security Control Uplift</option>
                   
                 
                   
-                    <option value="../../12_business_cases/business_case_03_gitops_automation/">GitOps and Operations Automation</option>
+                    <option value="../business_case_03_gitops_automation/">GitOps and Operations Automation</option>
                   
                 
                   
-                    <option value="../../12_business_cases/business_case_04_vdi_enablement/">VDI Service Enablement</option>
+                    <option value="../business_case_04_vdi_enablement/">VDI Service Enablement</option>
                   
                 
                   
-                    <option value="../../12_business_cases/business_case_05_backup_dr_assurance/">Backup and DR Assurance</option>
+                    <option value="../business_case_05_backup_dr_assurance/">Backup and DR Assurance</option>
                   
                 
                   
-                    <option value="../../12_business_cases/business_case_06_dual_cloud_public_cloud_extension/">Dual-Cloud Public Cloud Extension</option>
+                    <option value="./" selected>Dual-Cloud Public Cloud Extension</option>
                   
                 
               </optgroup>
@@ -495,7 +495,7 @@
         </select>
       </div>
 
-      <a rel="next" href="../test_plan/" class="page-jump-arrow" aria-label="Next page">
+      <a rel="next" href="../../13_operations_foundations/readme/" class="page-jump-arrow" aria-label="Next page">
         <i class="fa fa-arrow-right"></i>
       </a>
     </div>
@@ -527,21 +527,37 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-bs-level="1"><a href="#dr-runbooks" class="nav-link">DR Runbooks</a>
+            <li class="nav-item" data-bs-level="1"><a href="#business-case-06-dual-cloud-public-cloud-extension" class="nav-link">Business Case 06 - Dual-Cloud Public Cloud Extension</a>
               <ul class="nav flex-column">
-            <li class="nav-item" data-bs-level="2"><a href="#runbook-framework" class="nav-link">Runbook Framework</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            <li class="nav-item" data-bs-level="2"><a href="#runbook-set" class="nav-link">Runbook Set</a>
+            <li class="nav-item" data-bs-level="2"><a href="#decision-statement" class="nav-link">Decision Statement</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#standard-manual-validation-checks" class="nav-link">Standard Manual Validation Checks</a>
+            <li class="nav-item" data-bs-level="2"><a href="#current-problem" class="nav-link">Current Problem</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-bs-level="2"><a href="#documentation-discipline" class="nav-link">Documentation Discipline</a>
+            <li class="nav-item" data-bs-level="2"><a href="#proposed-investment" class="nav-link">Proposed Investment</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#cost-drivers" class="nav-link">Cost Drivers</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#expected-business-outcomes" class="nav-link">Expected Business Outcomes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#kpis" class="nav-link">KPIs</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#recommendation" class="nav-link">Recommendation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#related-proposal" class="nav-link">Related Proposal</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -552,34 +568,48 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="dr-runbooks">DR Runbooks</h1>
-<h2 id="runbook-framework">Runbook Framework</h2>
-<p>Each runbook follows a consistent structure:
-1. Preconditions and declaration criteria.
-2. Roles and communication channels.
-3. Step-by-step execution.
-4. Validation checkpoints.
-5. Exit criteria and post-incident review actions.</p>
-<h2 id="runbook-set">Runbook Set</h2>
+<h1 id="business-case-06-dual-cloud-public-cloud-extension">Business Case 06 - Dual-Cloud Public Cloud Extension</h1>
+<h2 id="decision-statement">Decision Statement</h2>
+<p>Approve a staged four-site public cloud implementation using two AWS regions and two GCP regions to extend the existing resilience architecture into a dual-provider operating model.</p>
+<h2 id="current-problem">Current Problem</h2>
 <ul>
-<li>Compute host failure recovery.</li>
-<li>Network path and ToR recovery.</li>
-<li>Edge routing failover and BGP recovery.</li>
-<li>Site outage service promotion.</li>
-<li>Data corruption containment and clean restore.</li>
+<li>The architecture is documented for four sites, but cloud execution detail is not yet defined.</li>
+<li>Provider-concentrated deployment increases outage and platform dependency risk.</li>
+<li>IPv6 adoption is inconsistent without a cross-cloud target design.</li>
 </ul>
-<h2 id="standard-manual-validation-checks">Standard Manual Validation Checks</h2>
+<h2 id="proposed-investment">Proposed Investment</h2>
 <ul>
-<li>Confirm control-plane health (routing, DNS, identity).</li>
-<li>Confirm data-plane reachability from user and service networks.</li>
-<li>Confirm backup integrity and replication status.</li>
-<li>Confirm alert noise returns to baseline.</li>
+<li>Build four cloud sites:</li>
+<li>AWS: <code>us-east-1</code> and <code>us-west-2</code></li>
+<li>GCP: <code>us-east4</code> and <code>us-west1</code></li>
+<li>Implement policy-controlled cross-cloud routing with encrypted links.</li>
+<li>Onboard tiered services with explicit failover and promotion runbooks.</li>
+<li>Validate dual-stack behavior (IPv6 primary where available, IPv4 compatibility path where needed).</li>
 </ul>
-<h2 id="documentation-discipline">Documentation Discipline</h2>
+<h2 id="cost-drivers">Cost Drivers</h2>
 <ul>
-<li>Keep runbooks in Git with change history.</li>
-<li>Require peer review for any runbook change.</li>
-<li>Record timestamps during execution to prove measured RTO/RPO.</li>
+<li>Inter-cloud egress and replication traffic.</li>
+<li>Managed network components (Transit Gateway, HA VPN, Cloud Router, load balancing).</li>
+<li>Platform engineering effort for multi-cloud GitOps, testing, and operations.</li>
+</ul>
+<h2 id="expected-business-outcomes">Expected Business Outcomes</h2>
+<ul>
+<li>Reduced single-provider dependency for critical services.</li>
+<li>Better continuity posture for regional or provider-specific incidents.</li>
+<li>Clear migration runway for IPv6-ready service delivery.</li>
+</ul>
+<h2 id="kpis">KPIs</h2>
+<ul>
+<li>Tier 1 stateless recovery success across provider boundaries.</li>
+<li>Stateful promotion time during cloud or region failure drills.</li>
+<li>Percent of production services validated on IPv6 paths.</li>
+<li>Inter-cloud egress spend versus approved budget guardrails.</li>
+</ul>
+<h2 id="recommendation">Recommendation</h2>
+<p>Approve as a phased proposal with a pilot wave first. Use pilot evidence to finalize full production rollout scope and cost controls.</p>
+<h2 id="related-proposal">Related Proposal</h2>
+<ul>
+<li><a href="../../10_implementation/proposal_dual_cloud_4site/">Dual-Cloud Four-Site Proposal (AWS + GCP)</a></li>
 </ul></div>
             </div>
         </div>
