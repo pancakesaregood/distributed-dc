@@ -2,7 +2,7 @@
 
 ## Session Model
 - eBGP between each site edge node and WAN handoff, hardened with TCP-AO authentication.
-- All inter-site BGP sessions run inside IPsec tunnels. The full tunnel redundancy model is defined in [Routing and WAN Abstraction — Multi-Tunnel Redundancy Model](routing_wan_abstraction.md).
+- All inter-site BGP sessions run inside IPsec tunnels. The full tunnel redundancy model is defined in [Routing and WAN Abstraction — Multi-Tunnel Redundancy Model](../02_architecture/routing_wan_abstraction.md).
 
 ## BGP Session Assignment per Tunnel
 
