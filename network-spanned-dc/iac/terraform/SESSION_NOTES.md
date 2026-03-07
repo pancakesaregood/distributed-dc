@@ -3,6 +3,8 @@
 ## Current State (2026-03-07)
 - Docs are building and published to GitHub Pages.
 - Terraform Phase 1, Phase 2, and Phase 3 are applied and converged.
+- Terraform Phase 4 worker-capacity scaffolding is now in code (gated, not applied).
+- Terraform Phase 5 resilience-validation pack is now in code (scripts/templates/flags).
 - Drift check with Phase 3 enabled:
   - `terraform plan -var "phase3_enable_platform=true"` returns `No changes`.
 - Local service account key is valid:
@@ -84,8 +86,40 @@ terraform plan -var "phase3_enable_platform=true"
 
 Expected now: no pending changes.
 
-## Next Build Step (Phase 4)
-- Begin workload onboarding:
-  - add worker node groups/node pools
-  - establish baseline ingress/services and placement policy
-  - run failover validation across all four sites
+## Phase 4 Scaffold (Current)
+- New gated flags:
+  - `phase4_enable_service_onboarding`
+  - `phase4_enable_published_app_path`
+  - `phase4_enable_vdi_reference_stack`
+- New modules added:
+  - `modules/aws_eks_nodegroup`
+  - `modules/gcp_gke_node_pool`
+- Root wiring added in:
+  - `phase4_service_onboarding.tf`
+
+## Phase 5 Scaffold (Current)
+- Evidence capture script:
+  - `scripts/invoke_phase5_evidence_capture.ps1`
+- Documentation and template:
+  - `docs/10_implementation/phase5_resilience_handover.md`
+  - `docs/04_failover_dr/phase5_execution_record_template.md`
+- Terraform deliverable flags:
+  - `phase5_enable_resilience_validation`
+  - `phase5_enable_backup_restore_drills`
+  - `phase5_enable_handover_signoff`
+
+## Next Build Step (Phase 4 Execution)
+- Enable and apply worker capacity:
+  - `terraform plan -var "phase3_enable_platform=true" -var "phase4_enable_service_onboarding=true"`
+- Then implement remaining source-material deliverables:
+  - published app path (`WAF + LB + health gating`)
+  - VDI reference stack and identity policy controls
+- After service onboarding, execute failover and DR runbook evidence capture.
+
+## Phase 5 Execution Starter
+```powershell
+cd e:\distributed-dc\network-spanned-dc\iac\terraform
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\Users\john\.gcp\ddc-sa.json"
+$env:AWS_PROFILE="ddc"
+.\scripts\invoke_phase5_evidence_capture.ps1 -ProjectId "worldbuilder-413006"
+```

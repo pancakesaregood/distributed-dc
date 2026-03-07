@@ -58,6 +58,7 @@ nav:
       - RTO and RPO Targets: 04_failover_dr/rto_rpo_targets.md
       - DR Runbooks: 04_failover_dr/dr_runbooks.md
       - Test Plan: 04_failover_dr/test_plan.md
+      - Phase 5 Execution Record Template: 04_failover_dr/phase5_execution_record_template.md
   - 05 Backup:
       - Backup Strategy: 05_backup/backup_strategy.md
       - Backup Retention: 05_backup/backup_retention.md
@@ -82,6 +83,7 @@ nav:
   - 10 Implementation:
       - Implementation Proposal: 10_implementation/readme.md
       - Dual-Cloud 4-Site Proposal (AWS + GCP): 10_implementation/proposal_dual_cloud_4site.md
+      - Phase 5 Resilience and Handover: 10_implementation/phase5_resilience_handover.md
   - 11 FAQ:
       - FAQ Home: 11_FAQ/readme.md
       - Team FAQ: 11_FAQ/team_faq.md

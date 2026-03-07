@@ -243,3 +243,185 @@ variable "phase3_site_d_services_ipv4_cidr_block" {
   type        = string
   default     = null
 }
+
+variable "phase4_enable_service_onboarding" {
+  description = "Enable Phase 4 worker-capacity resources for EKS/GKE."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.phase4_enable_service_onboarding || var.phase3_enable_platform
+    error_message = "phase4_enable_service_onboarding requires phase3_enable_platform=true."
+  }
+}
+
+variable "phase4_enable_published_app_path" {
+  description = "Track whether published app path (WAF/LB/health gating) is enabled."
+  type        = bool
+  default     = false
+}
+
+variable "phase4_enable_vdi_reference_stack" {
+  description = "Track whether VDI reference stack and identity controls are enabled."
+  type        = bool
+  default     = false
+}
+
+variable "phase4_aws_node_desired_size" {
+  description = "Desired EKS node count per AWS site."
+  type        = number
+  default     = 2
+}
+
+variable "phase4_aws_node_min_size" {
+  description = "Minimum EKS node count per AWS site."
+  type        = number
+  default     = 1
+}
+
+variable "phase4_aws_node_max_size" {
+  description = "Maximum EKS node count per AWS site."
+  type        = number
+  default     = 4
+}
+
+variable "phase4_aws_node_instance_types" {
+  description = "EC2 instance types for EKS node groups."
+  type        = list(string)
+  default     = ["t3.large"]
+}
+
+variable "phase4_aws_node_capacity_type" {
+  description = "Capacity type for EKS node groups."
+  type        = string
+  default     = "ON_DEMAND"
+
+  validation {
+    condition     = contains(["ON_DEMAND", "SPOT"], var.phase4_aws_node_capacity_type)
+    error_message = "phase4_aws_node_capacity_type must be ON_DEMAND or SPOT."
+  }
+}
+
+variable "phase4_aws_node_disk_size" {
+  description = "Disk size in GiB for EKS nodes."
+  type        = number
+  default     = 80
+}
+
+variable "phase4_aws_node_ami_type" {
+  description = "Optional AMI type override for EKS node groups."
+  type        = string
+  default     = null
+}
+
+variable "phase4_aws_node_labels" {
+  description = "Additional node labels for EKS node groups."
+  type        = map(string)
+  default     = {}
+}
+
+variable "phase4_aws_node_taints" {
+  description = "Optional taints for EKS node groups."
+  type = list(object({
+    key    = string
+    value  = string
+    effect = string
+  }))
+  default = []
+}
+
+variable "phase4_aws_node_max_unavailable" {
+  description = "Maximum unavailable EKS nodes during rolling update."
+  type        = number
+  default     = 1
+}
+
+variable "phase4_gcp_node_machine_type" {
+  description = "Machine type for GKE node pools."
+  type        = string
+  default     = "e2-standard-4"
+}
+
+variable "phase4_gcp_node_disk_size_gb" {
+  description = "Disk size in GiB for GKE node pools."
+  type        = number
+  default     = 100
+}
+
+variable "phase4_gcp_node_disk_type" {
+  description = "Disk type for GKE node pools."
+  type        = string
+  default     = "pd-standard"
+}
+
+variable "phase4_gcp_node_image_type" {
+  description = "Image type for GKE node pools."
+  type        = string
+  default     = "COS_CONTAINERD"
+}
+
+variable "phase4_gcp_node_spot" {
+  description = "Use spot VMs for GKE node pools."
+  type        = bool
+  default     = false
+}
+
+variable "phase4_gcp_node_enable_autoscaling" {
+  description = "Enable autoscaling for GKE node pools."
+  type        = bool
+  default     = true
+}
+
+variable "phase4_gcp_node_min_count" {
+  description = "Minimum node count for GKE autoscaling."
+  type        = number
+  default     = 1
+}
+
+variable "phase4_gcp_node_max_count" {
+  description = "Maximum node count for GKE autoscaling."
+  type        = number
+  default     = 3
+}
+
+variable "phase4_gcp_node_initial_count" {
+  description = "Initial node count for GKE node pools."
+  type        = number
+  default     = 1
+}
+
+variable "phase4_gcp_node_service_account" {
+  description = "Optional service account for GKE node pools."
+  type        = string
+  default     = null
+}
+
+variable "phase4_gcp_node_labels" {
+  description = "Additional labels for GKE nodes."
+  type        = map(string)
+  default     = {}
+}
+
+variable "phase4_gcp_node_tags" {
+  description = "Network tags for GKE nodes."
+  type        = list(string)
+  default     = []
+}
+
+variable "phase5_enable_resilience_validation" {
+  description = "Track readiness to execute Phase 5 failover scenarios and DR runbooks."
+  type        = bool
+  default     = false
+}
+
+variable "phase5_enable_backup_restore_drills" {
+  description = "Track readiness to execute backup and restore drills for Phase 5."
+  type        = bool
+  default     = false
+}
+
+variable "phase5_enable_handover_signoff" {
+  description = "Track readiness to complete operations handover sign-off."
+  type        = bool
+  default     = false
+}

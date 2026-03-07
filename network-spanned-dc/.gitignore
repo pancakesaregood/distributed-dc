@@ -26,3 +26,6 @@ override.tf.json
 
 # Local tool artifacts
 iac/terraform/terraform.exe
+
+# Generated validation evidence
+iac/terraform/evidence/

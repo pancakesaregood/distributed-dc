@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.4.0] - 2026-03-07
+### Added
+- Phase 5 resilience-validation pack:
+  - `iac/terraform/scripts/invoke_phase5_evidence_capture.ps1`
+  - `docs/10_implementation/phase5_resilience_handover.md`
+  - `docs/04_failover_dr/phase5_execution_record_template.md`
+- Terraform Phase 5 deliverable tracking flags and outputs for resilience validation, backup/restore drills, and handover sign-off.
+
+### Changed
+- MkDocs navigation updated to include Phase 5 implementation and DR template pages.
+- Terraform and repository notes updated to reflect Phase 5 readiness workflow.
+
+## [0.3.0] - 2026-03-07
+### Added
+- Terraform Phase 4 scaffold for service onboarding capacity in `iac/terraform/phase4_service_onboarding.tf`.
+- Reusable modules for worker capacity:
+  - `modules/aws_eks_nodegroup`
+  - `modules/gcp_gke_node_pool`
+- Phase 4 deliverable tracking flags:
+  - `phase4_enable_service_onboarding`
+  - `phase4_enable_published_app_path`
+  - `phase4_enable_vdi_reference_stack`
+
+### Changed
+- Terraform variables, outputs, examples, and runbook notes updated for Phase 4 planning/execution.
+
 ## [0.2.0] - 2026-03-07
 ### Added
 - Terraform Phase 2 inter-cloud VPN/BGP deployment across A-C, A-D, B-C, B-D pairs.

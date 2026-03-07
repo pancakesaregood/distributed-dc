@@ -98,3 +98,42 @@ output "phase3_gcp_gke_clusters" {
     site_d = module.gcp_gke_site_d[0].summary
   } : {}
 }
+
+output "phase4_service_onboarding_enabled" {
+  description = "Whether Phase 4 worker capacity is enabled."
+  value       = var.phase4_enable_service_onboarding
+}
+
+output "phase4_aws_eks_nodegroups" {
+  description = "Phase 4 EKS node group summaries for Site A/B when enabled."
+  value = local.phase4_capacity_enabled ? {
+    site_a = module.aws_eks_nodegroup_site_a[0].summary
+    site_b = module.aws_eks_nodegroup_site_b[0].summary
+  } : {}
+}
+
+output "phase4_gcp_gke_node_pools" {
+  description = "Phase 4 GKE node pool summaries for Site C/D when enabled."
+  value = local.phase4_capacity_enabled ? {
+    site_c = module.gcp_gke_node_pool_site_c[0].summary
+    site_d = module.gcp_gke_node_pool_site_d[0].summary
+  } : {}
+}
+
+output "phase4_deliverable_flags" {
+  description = "Phase 4 source-material deliverable flags."
+  value = {
+    service_onboarding_capacity = var.phase4_enable_service_onboarding
+    published_app_path          = var.phase4_enable_published_app_path
+    vdi_reference_stack         = var.phase4_enable_vdi_reference_stack
+  }
+}
+
+output "phase5_deliverable_flags" {
+  description = "Phase 5 source-material deliverable flags."
+  value = {
+    resilience_validation = var.phase5_enable_resilience_validation
+    backup_restore_drills = var.phase5_enable_backup_restore_drills
+    handover_signoff      = var.phase5_enable_handover_signoff
+  }
+}

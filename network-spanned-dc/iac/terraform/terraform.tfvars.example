@@ -59,3 +59,39 @@ phase3_site_c_cluster_ipv4_cidr_block  = null
 phase3_site_c_services_ipv4_cidr_block = null
 phase3_site_d_cluster_ipv4_cidr_block  = null
 phase3_site_d_services_ipv4_cidr_block = null
+
+# Phase 4 service onboarding (worker capacity).
+phase4_enable_service_onboarding = false
+
+phase4_aws_node_desired_size      = 2
+phase4_aws_node_min_size          = 1
+phase4_aws_node_max_size          = 4
+phase4_aws_node_instance_types    = ["t3.large"]
+phase4_aws_node_capacity_type     = "ON_DEMAND"
+phase4_aws_node_disk_size         = 80
+phase4_aws_node_ami_type          = null
+phase4_aws_node_labels            = {}
+phase4_aws_node_taints            = []
+phase4_aws_node_max_unavailable   = 1
+
+phase4_gcp_node_machine_type       = "e2-standard-4"
+phase4_gcp_node_disk_size_gb       = 100
+phase4_gcp_node_disk_type          = "pd-standard"
+phase4_gcp_node_image_type         = "COS_CONTAINERD"
+phase4_gcp_node_spot               = false
+phase4_gcp_node_enable_autoscaling = true
+phase4_gcp_node_min_count          = 1
+phase4_gcp_node_max_count          = 3
+phase4_gcp_node_initial_count      = 1
+phase4_gcp_node_service_account    = null
+phase4_gcp_node_labels             = {}
+phase4_gcp_node_tags               = []
+
+# Source-material Phase 4 deliverable tracking flags.
+phase4_enable_published_app_path  = false
+phase4_enable_vdi_reference_stack = false
+
+# Source-material Phase 5 deliverable tracking flags.
+phase5_enable_resilience_validation = false
+phase5_enable_backup_restore_drills = false
+phase5_enable_handover_signoff      = false

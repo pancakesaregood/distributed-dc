@@ -12,6 +12,8 @@ It is intentionally phased:
 - Phase 1 in code now: per-site network boundaries and subnet baselines.
 - Phase 2 in code now: AWS<->GCP VPN/BGP links and route policy automation.
 - Phase 3 in code now: optional EKS/GKE control-plane baseline.
+- Phase 4 in code now: optional worker-capacity onboarding for EKS/GKE.
+- Phase 5 in code now: resilience evidence capture and handover tracking flags.
 
 ## What This Creates
 
@@ -32,6 +34,12 @@ It is intentionally phased:
 - Platform Phase 3 (when `phase3_enable_platform = true`):
   - AWS Site A/B: one EKS control plane per site in app subnets.
   - GCP Site C/D: one regional GKE cluster per site with default node pool removed.
+- Service Onboarding Phase 4 (when `phase4_enable_service_onboarding = true`):
+  - AWS Site A/B: one managed EKS node group per site.
+  - GCP Site C/D: one managed GKE node pool per site.
+- Phase 5 operations pack:
+  - Evidence capture script: `scripts/invoke_phase5_evidence_capture.ps1`
+  - Generated artifacts: health snapshots, summary markdown, execution record template.
 
 ## Prerequisites
 
@@ -84,8 +92,13 @@ Bootstrap user requirements (one-time, human account):
 
 ## Notes
 
-- This baseline does not yet create NAT, internet gateways, firewall policies, or worker node pools.
+- This baseline does not yet create NAT, internet gateways, firewall policies, published app path resources, or VDI stack resources.
 - EKS/GKE control planes are optional and gated by `phase3_enable_platform`.
+- Worker capacity is optional and gated by `phase4_enable_service_onboarding` (requires Phase 3).
+- Phase 5 deliverable tracking flags are available:
+  - `phase5_enable_resilience_validation`
+  - `phase5_enable_backup_restore_drills`
+  - `phase5_enable_handover_signoff`
 - The logical site IPv6 ULA plan from architecture docs is preserved as metadata in variables and can be used by overlay or service-level routing design.
 - AWS VPC IPv6 ranges are provider-allocated unless you integrate IPAM/BYOIP.
 - For production, set a unique `phase2_secret_seed` or replace deterministic tunnel PSK handling with a managed secret workflow.
