@@ -59,4 +59,31 @@ locals {
       bgp_preference = 200
     }
   ]
+
+  phase2_pair_tunnel_inside_cidrs = {
+    ac = {
+      cgw0_t1 = "169.254.21.0/30"
+      cgw0_t2 = "169.254.21.4/30"
+    }
+    ad = {
+      cgw0_t1 = "169.254.22.0/30"
+      cgw0_t2 = "169.254.22.4/30"
+    }
+    bc = {
+      cgw0_t1 = "169.254.23.0/30"
+      cgw0_t2 = "169.254.23.4/30"
+    }
+    bd = {
+      cgw0_t1 = "169.254.24.0/30"
+      cgw0_t2 = "169.254.24.4/30"
+    }
+  }
+
+  phase2_pair_tunnel_preshared_keys = {
+    for pair, tunnels in local.phase2_pair_tunnel_inside_cidrs :
+    pair => {
+      for tunnel_key, _ in tunnels :
+      tunnel_key => substr(sha256("${var.phase2_secret_seed}-${pair}-${tunnel_key}"), 0, 32)
+    }
+  }
 }

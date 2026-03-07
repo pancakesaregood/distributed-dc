@@ -4,3 +4,25 @@ __pycache__/
 *.pyc
 .DS_Store
 Thumbs.db
+
+# Terraform local state and secrets
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.auto.tfvars
+*.tfplan
+tfplan
+tfplan*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local cloud credential artifacts
+*.json.key
+*.sa.json
+
+# Local tool artifacts
+iac/terraform/terraform.exe

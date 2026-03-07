@@ -37,14 +37,14 @@ module "gcp_site_c" {
     google = google.site_c
   }
 
-  site_name    = "site-c"
-  name_prefix  = var.name_prefix
-  environment  = var.environment
-  region       = var.gcp_site_c_region
-  ipv4_cidr    = var.site_c_ipv4_cidr
-  ipv6_ula     = var.site_c_ipv6_ula
-  enable_ipv6  = var.gcp_enable_ipv6
-  labels       = local.common_tags
+  site_name   = "site-c"
+  name_prefix = var.name_prefix
+  environment = var.environment
+  region      = var.gcp_site_c_region
+  ipv4_cidr   = var.site_c_ipv4_cidr
+  ipv6_ula    = var.site_c_ipv6_ula
+  enable_ipv6 = var.gcp_enable_ipv6
+  labels      = local.common_tags
 }
 
 module "gcp_site_d" {
@@ -54,12 +54,12 @@ module "gcp_site_d" {
     google = google.site_d
   }
 
-  site_name    = "site-d"
-  name_prefix  = var.name_prefix
-  environment  = var.environment
-  region       = var.gcp_site_d_region
-  ipv4_cidr    = var.site_d_ipv4_cidr
-  ipv6_ula     = var.site_d_ipv6_ula
-  enable_ipv6  = var.gcp_enable_ipv6
-  labels       = local.common_tags
+  site_name   = "site-d"
+  name_prefix = var.name_prefix
+  environment = var.environment
+  region      = var.gcp_site_d_region
+  ipv4_cidr   = var.site_d_ipv4_cidr
+  ipv6_ula    = var.site_d_ipv6_ula
+  enable_ipv6 = var.gcp_enable_ipv6
+  labels      = local.common_tags
 }

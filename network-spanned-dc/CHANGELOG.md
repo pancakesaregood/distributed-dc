@@ -1,4 +1,15 @@
-﻿# Changelog
+# Changelog
+
+## [0.2.0] - 2026-03-07
+### Added
+- Terraform Phase 2 inter-cloud VPN/BGP deployment across A-C, A-D, B-C, B-D pairs.
+- Terraform Phase 3 platform baseline with EKS control planes in AWS Site A/Site B and GKE clusters in GCP Site C/Site D.
+- New reusable Terraform modules for inter-cloud pairing and cloud Kubernetes control planes.
+- Deployment/runbook notes in `iac/terraform/SESSION_NOTES.md`, including quota and API prerequisites.
+
+### Changed
+- Terraform root variables, outputs, and documentation updated for phased cloud deployment controls.
+- `phase3_enable_platform` feature flag added to safely control platform resource rollout.
 
 ## [0.1.0] - 2026-03-05
 ### Added
