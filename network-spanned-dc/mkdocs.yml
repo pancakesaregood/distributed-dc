@@ -34,6 +34,7 @@ nav:
       - Diagram Index: 03_diagrams/diagram_index.md
       - Global Topology: 03_diagrams/topology_global.mmd.md
       - Per-Site Topology: 03_diagrams/topology_per_site.mmd.md
+      - Dual-Cloud 4-Site Topology: 03_diagrams/dual_cloud_4site_topology.mmd.md
       - Physical Rack Topology (Two-Rack Site): 03_diagrams/physical_rack_topology_2rack.mmd.md
       - One-Site Full Stack (Upstream Abstracted): 03_diagrams/site_full_stack_upstream_abstracted.mmd.md
       - Segmentation Diagram: 03_diagrams/segmentation.mmd.md
@@ -80,6 +81,7 @@ nav:
       - Abstractions and Clarifications Needed: 09_appendix/abstractions_clarifications_needed.md
   - 10 Implementation:
       - Implementation Proposal: 10_implementation/readme.md
+      - Dual-Cloud 4-Site Proposal (AWS + GCP): 10_implementation/proposal_dual_cloud_4site.md
   - 11 FAQ:
       - FAQ Home: 11_FAQ/readme.md
       - Team FAQ: 11_FAQ/team_faq.md
@@ -99,6 +101,7 @@ nav:
       - GitOps and Operations Automation: 12_business_cases/business_case_03_gitops_automation.md
       - VDI Service Enablement: 12_business_cases/business_case_04_vdi_enablement.md
       - Backup and DR Assurance: 12_business_cases/business_case_05_backup_dr_assurance.md
+      - Dual-Cloud Public Cloud Extension: 12_business_cases/business_case_06_dual_cloud_public_cloud_extension.md
   - 13 Operations Foundations:
       - Foundations Home: 13_operations_foundations/readme.md
       - Monitoring: 13_operations_foundations/monitoring.md
