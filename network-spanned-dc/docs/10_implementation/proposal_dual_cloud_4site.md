@@ -138,6 +138,17 @@ Stateful guidance:
 - Execute game-day tests for site, path, and provider failure scenarios.
 - Record evidence against RTO/RPO targets and close gaps.
 
+## Implementation Artifacts in This Repository
+- Terraform root: `network-spanned-dc/iac/terraform`
+- AWS site module: `network-spanned-dc/iac/terraform/modules/aws_site`
+- GCP site module: `network-spanned-dc/iac/terraform/modules/gcp_site`
+- Example variable file: `network-spanned-dc/iac/terraform/terraform.tfvars.example`
+
+Current build scope:
+- Phase 1 baseline network resources for all four sites.
+- Dual-stack network intent (IPv6 where provider features permit).
+- Inter-cloud path policy matrix captured as Terraform outputs for next-phase VPN/BGP implementation.
+
 ## Acceptance Criteria for This Use Case
 - All four sites are active with tested connectivity and policy controls.
 - Tier 1 stateless services pass active-active failover tests across both clouds.

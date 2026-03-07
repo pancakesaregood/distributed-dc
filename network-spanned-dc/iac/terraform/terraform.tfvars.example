@@ -1,0 +1,26 @@
+name_prefix  = "ddc"
+environment  = "proposal"
+owner        = "platform"
+
+# AWS profile can be null to rely on environment credentials.
+aws_profile = "default"
+
+aws_site_a_region = "us-east-1"
+aws_site_b_region = "us-west-2"
+
+gcp_project_id       = "your-gcp-project-id"
+gcp_credentials_json = null
+gcp_site_c_region    = "us-east4"
+gcp_site_d_region    = "us-west1"
+
+site_a_ipv4_cidr = "10.10.0.0/20"
+site_b_ipv4_cidr = "10.20.0.0/20"
+site_c_ipv4_cidr = "10.30.0.0/20"
+site_d_ipv4_cidr = "10.40.0.0/20"
+
+site_a_ipv6_ula = "fdca:fcaf:e000::/56"
+site_b_ipv6_ula = "fdca:fcaf:e100::/56"
+site_c_ipv6_ula = "fdca:fcaf:e200::/56"
+site_d_ipv6_ula = "fdca:fcaf:e300::/56"
+
+gcp_enable_ipv6 = true
