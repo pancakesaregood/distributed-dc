@@ -55,6 +55,24 @@ This appendix lists the standards and primary technology references used across 
 - RFC 8010 - Internet Printing Protocol/1.1 Encoding and Transport: https://www.rfc-editor.org/rfc/rfc8010
 - RFC 8011 - Internet Printing Protocol/1.1 Model and Semantics: https://www.rfc-editor.org/rfc/rfc8011
 
+## Cloud Platform References
+
+### AWS
+
+- AWS Regions and Availability Zones: https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html
+- AWS Transit Gateway Peering: https://docs.aws.amazon.com/vpc/latest/tgw/tgw-peering.html
+- AWS Site-to-Site VPN IPv4 and IPv6 Tunnel Options: https://docs.aws.amazon.com/vpn/latest/s2svpn/ipv4-ipv6.html
+- Amazon Route 53 Routing Policies: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html
+
+### Google Cloud
+
+- Google Cloud Regions and Zones: https://cloud.google.com/about/locations
+- VPC Networks Overview: https://cloud.google.com/vpc/docs/vpc
+- VPC IPv6 Support: https://cloud.google.com/vpc/docs/ipv6-support
+- Cloud VPN Overview (HA VPN): https://cloud.google.com/network-connectivity/docs/vpn/concepts/overview
+- Cloud Router BGP Route Advertisement: https://cloud.google.com/network-connectivity/docs/router/how-to/advertising-custom-ip
+- GKE Multi-Cluster Services: https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-services
+
 ## Open Source Project References
 
 ### Routing, Overlay, and Translation

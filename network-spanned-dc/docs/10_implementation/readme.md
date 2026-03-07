@@ -76,3 +76,6 @@ This proposal defines a practical implementation plan for the four-site spanned 
 - Required DR and restore tests executed with evidence.
 - No critical unresolved items in implementation decision register.
 - Operations team confirms readiness for steady-state ownership.
+
+## Related Use Case Proposal
+- [Dual-Cloud Four-Site Proposal (AWS + GCP)](proposal_dual_cloud_4site.md)
