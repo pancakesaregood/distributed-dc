@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.5.0] - 2026-03-08
+### Added
+- Phase 4 Cloudflare edge extensions:
+  - additional hostname mapping (`admin`, `www`, `@`) support
+  - published-app TLS SAN support for additional hostnames
+  - Cloudflare DNS output expansion for additional records
+- New Terraform resources and wiring for:
+  - published-app TLS listeners and ACM validation (`phase4_published_app_tls.tf`)
+  - Cloudflare edge records module entrypoint (`phase4_cloudflare_edge.tf`)
+- VDI operations and service onboarding tooling:
+  - `scripts/invoke_phase4_vdi_ecr_image_mirror.ps1`
+  - `scripts/invoke_phase4_vdi_service_bootstrap.ps1`
+  - `scripts/invoke_phase4_published_app_cutover.ps1`
+  - `scripts/invoke_phase4_vdi_eks_backend_cutover.ps1`
+  - `scripts/invoke_vdi_ops_console.ps1`
+  - `tools/vdi_ops_console/*` (local admin panel)
+- Kubernetes manifests for VDI bootstrap and sample desktop:
+  - `iac/k8s/vdi/guacamole-nodeport.yaml`
+  - `iac/k8s/vdi/guacamole-postgresql-init.sql`
+  - `iac/k8s/vdi/vdi-desktop-vnc.yaml`
+
+### Changed
+- Terraform Phase 4 modules/variables/outputs updated for:
+  - ingress internet edge controls for published app path
+  - ALB root redirect and HTTPS listener integration
+  - Cloudflare DNS automation and TLS validation flows
+  - VDI reference stack controls and output shaping
+- `invoke_phase4_vdi_enablement.ps1` expanded with:
+  - stronger preflight validation (AWS/GCP checks and published app checks)
+  - backend target override support
+  - improved diagnostics collection and health-check orchestration
+  - Cloudflare/TLS apply argument handling improvements
+- `invoke_phase5_evidence_capture.ps1` expanded to capture:
+  - published app endpoint states
+  - Cloudflare DNS resolving/target-alignment states
+- Terraform runbook/session documentation updated in:
+  - `iac/terraform/README.md`
+  - `iac/terraform/SESSION_NOTES.md`
+
 ## [0.4.0] - 2026-03-07
 ### Added
 - Phase 5 resilience-validation pack:

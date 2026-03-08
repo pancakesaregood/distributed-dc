@@ -19,6 +19,12 @@ variable "node_group_suffix" {
   default     = "general"
 }
 
+variable "node_role_name_suffix" {
+  description = "Optional suffix for the IAM role name used by this node group. Null keeps the legacy role name."
+  type        = string
+  default     = null
+}
+
 variable "cluster_name" {
   description = "EKS cluster name."
   type        = string

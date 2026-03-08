@@ -1,5 +1,6 @@
 locals {
-  base_name = "${var.name_prefix}-${var.environment}-${var.site_name}"
+  base_name      = "${var.name_prefix}-${var.environment}-${var.site_name}"
+  node_role_name = var.node_role_name_suffix == null ? "${local.base_name}-eks-node-role" : "${local.base_name}-eks-node-role-${var.node_role_name_suffix}"
 }
 
 data "aws_iam_policy_document" "node_assume" {
@@ -16,13 +17,13 @@ data "aws_iam_policy_document" "node_assume" {
 }
 
 resource "aws_iam_role" "node" {
-  name               = "${local.base_name}-eks-node-role"
+  name               = local.node_role_name
   assume_role_policy = data.aws_iam_policy_document.node_assume.json
 
   tags = merge(
     var.tags,
     {
-      Name      = "${local.base_name}-eks-node-role"
+      Name      = local.node_role_name
       site      = var.site_name
       component = "k8s-worker"
     }

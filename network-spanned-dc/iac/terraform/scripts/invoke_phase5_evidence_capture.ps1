@@ -7,6 +7,9 @@ param(
   [switch]$SkipTerraform,
   [switch]$SkipAws,
   [switch]$SkipGcp,
+  [switch]$SkipPublishedAppChecks,
+  [switch]$SkipCloudflareDnsChecks,
+  [string]$DnsResolver = "1.1.1.1",
   [switch]$FailOnCommandError
 )
 
@@ -92,6 +95,99 @@ function Try-ParseJson {
   }
 }
 
+function Invoke-HttpProbe {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Uri,
+    [int]$TimeoutSec = 15
+  )
+
+  try {
+    $response = Invoke-WebRequest -Uri $Uri -Method Get -TimeoutSec $TimeoutSec -MaximumRedirection 0 -ErrorAction Stop
+    return [pscustomobject]@{
+      ok          = $true
+      status_code = [int]$response.StatusCode
+      error       = $null
+    }
+  } catch {
+    $statusCode = $null
+    if ($null -ne $_.Exception.Response -and $null -ne $_.Exception.Response.StatusCode) {
+      $statusCode = [int]$_.Exception.Response.StatusCode
+      return [pscustomobject]@{
+        ok          = $true
+        status_code = $statusCode
+        error       = $_.Exception.Message
+      }
+    }
+
+    return [pscustomobject]@{
+      ok          = $false
+      status_code = $null
+      error       = $_.Exception.Message
+    }
+  }
+}
+
+function Resolve-CloudflareDnsState {
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Hostname,
+    [Parameter(Mandatory = $true)]
+    [string]$Target,
+    [Parameter(Mandatory = $true)]
+    [bool]$Proxied,
+    [string]$Resolver = "1.1.1.1"
+  )
+
+  $resolved = $false
+  $targetMatch = $false
+  $cnameTarget = $null
+  $addresses = @()
+  $errorMessages = New-Object System.Collections.Generic.List[string]
+
+  try {
+    $cnameResult = Resolve-DnsName -Name $Hostname -Type CNAME -Server $Resolver -ErrorAction Stop
+    $firstCname = $cnameResult | Select-Object -First 1
+    if ($null -ne $firstCname -and -not [string]::IsNullOrWhiteSpace($firstCname.NameHost)) {
+      $cnameTarget = $firstCname.NameHost.TrimEnd(".")
+      $resolved = $true
+    }
+  } catch {
+    $errorMessages.Add($_.Exception.Message)
+  }
+
+  if (-not $resolved) {
+    try {
+      $aResult = Resolve-DnsName -Name $Hostname -Type A -Server $Resolver -ErrorAction Stop
+      $addresses = @($aResult | Where-Object { -not [string]::IsNullOrWhiteSpace($_.IPAddress) } | Select-Object -ExpandProperty IPAddress)
+      if ($addresses.Count -gt 0) {
+        $resolved = $true
+      }
+    } catch {
+      $errorMessages.Add($_.Exception.Message)
+    }
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace($cnameTarget)) {
+    $targetMatch = $cnameTarget.ToLowerInvariant() -eq $Target.TrimEnd(".").ToLowerInvariant()
+  } elseif ($Proxied -and $resolved) {
+    # Proxied records can hide origin target behind Cloudflare A/AAAA responses.
+    $targetMatch = $true
+  }
+
+  return [pscustomobject]@{
+    hostname     = $Hostname
+    target       = $Target
+    proxied      = $Proxied
+    resolver     = $Resolver
+    resolved     = $resolved
+    target_match = $targetMatch
+    cname_target = $cnameTarget
+    addresses    = @($addresses)
+    error        = ($errorMessages.ToArray() -join " | ")
+  }
+}
+
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $runDir = Join-Path $OutputRoot ("phase5-" + $timestamp)
 New-Item -ItemType Directory -Path $runDir -Force | Out-Null
@@ -115,6 +211,11 @@ $summary = [ordered]@{
     eks_clusters_active          = 0
     gke_clusters_total           = 0
     gke_clusters_running         = 0
+    published_app_endpoints_total   = 0
+    published_app_endpoints_healthy = 0
+    cloudflare_records_total        = 0
+    cloudflare_records_resolving    = 0
+    cloudflare_records_target_match = 0
   }
   errors        = @()
 }
@@ -123,6 +224,10 @@ $awsVpnStates = @()
 $gcpVpnStates = @()
 $eksClusterStates = @()
 $gkeClusterStates = @()
+$publishedAppEndpointStates = @()
+$cloudflareDnsStates = @()
+$phase4PublishedAppPaths = $null
+$phase4CloudflareRecords = $null
 
 if (-not $SkipTerraform) {
   $terraform = Resolve-ToolPath -CommandName "terraform"
@@ -138,6 +243,18 @@ if (-not $SkipTerraform) {
       $tfVersion = Invoke-CapturedCommand -Executable $terraform -Arguments @("version") -OutputPath (Join-Path $tfDir "terraform_version.txt") -Label "terraform-version"
       $tfOutputs = Invoke-CapturedCommand -Executable $terraform -Arguments @("output", "-json") -OutputPath (Join-Path $tfDir "terraform_outputs.json") -Label "terraform-output"
       $tfState = Invoke-CapturedCommand -Executable $terraform -Arguments @("state", "list") -OutputPath (Join-Path $tfDir "terraform_state_list.txt") -Label "terraform-state-list"
+
+      if ($tfOutputs.ExitCode -eq 0) {
+        $tfOutputsJson = Try-ParseJson -Text $tfOutputs.Output
+        if ($null -ne $tfOutputsJson) {
+          if ($null -ne $tfOutputsJson.phase4_published_app_paths) {
+            $phase4PublishedAppPaths = $tfOutputsJson.phase4_published_app_paths.value
+          }
+          if ($null -ne $tfOutputsJson.phase4_cloudflare_edge_records) {
+            $phase4CloudflareRecords = $tfOutputsJson.phase4_cloudflare_edge_records.value
+          }
+        }
+      }
 
       $summary.checks.terraform = [ordered]@{
         version_exit_code = $tfVersion.ExitCode
@@ -286,6 +403,80 @@ if (-not $SkipGcp) {
   $summary.checks.gcp = "skipped"
 }
 
+if (-not $SkipPublishedAppChecks) {
+  if ($null -eq $phase4PublishedAppPaths -or @($phase4PublishedAppPaths.PSObject.Properties).Count -eq 0) {
+    $summary.checks.published_app = "not-configured"
+  } else {
+    foreach ($siteProperty in $phase4PublishedAppPaths.PSObject.Properties) {
+      $site = $siteProperty.Name
+      $siteSummary = $siteProperty.Value
+      if ($null -eq $siteSummary -or [string]::IsNullOrWhiteSpace($siteSummary.load_balancer_dns)) {
+        continue
+      }
+
+      $healthPath = if ([string]::IsNullOrWhiteSpace($siteSummary.health_check_path)) { "/" } else { $siteSummary.health_check_path }
+      $probeUri = "http://$($siteSummary.load_balancer_dns)$healthPath"
+      $probe = Invoke-HttpProbe -Uri $probeUri
+      $trafficMode = "$($siteSummary.traffic_mode)"
+      $isHealthy = $false
+      $expected = ""
+      if ($trafficMode -eq "fixed-response") {
+        $expected = "503"
+        $isHealthy = $probe.ok -and $probe.status_code -eq 503
+      } else {
+        $expected = "2xx-4xx"
+        $isHealthy = $probe.ok -and $probe.status_code -ge 200 -and $probe.status_code -lt 500
+      }
+
+      $publishedAppEndpointStates += [pscustomobject]@{
+        site         = $site
+        uri          = $probeUri
+        traffic_mode = $trafficMode
+        expected     = $expected
+        status_code  = $probe.status_code
+        healthy      = $isHealthy
+        error        = $probe.error
+      }
+    }
+
+    $summary.checks.published_app = "captured"
+  }
+} else {
+  $summary.checks.published_app = "skipped"
+}
+
+if (-not $SkipCloudflareDnsChecks) {
+  if ($null -eq $phase4CloudflareRecords -or @($phase4CloudflareRecords.PSObject.Properties).Count -eq 0) {
+    $summary.checks.cloudflare_dns = "not-configured"
+  } else {
+    foreach ($recordProperty in $phase4CloudflareRecords.PSObject.Properties) {
+      $site = $recordProperty.Name
+      $record = $recordProperty.Value
+      if ($null -eq $record -or [string]::IsNullOrWhiteSpace($record.hostname) -or [string]::IsNullOrWhiteSpace($record.target)) {
+        continue
+      }
+
+      $dnsState = Resolve-CloudflareDnsState -Hostname $record.hostname -Target $record.target -Proxied ([bool]$record.proxied) -Resolver $DnsResolver
+      $cloudflareDnsStates += [pscustomobject]@{
+        site         = $site
+        hostname     = $dnsState.hostname
+        target       = $dnsState.target
+        proxied      = $dnsState.proxied
+        resolver     = $dnsState.resolver
+        resolved     = $dnsState.resolved
+        target_match = $dnsState.target_match
+        cname_target = $dnsState.cname_target
+        addresses    = @($dnsState.addresses)
+        error        = $dnsState.error
+      }
+    }
+
+    $summary.checks.cloudflare_dns = "captured"
+  }
+} else {
+  $summary.checks.cloudflare_dns = "skipped"
+}
+
 $summary.metrics.aws_vpn_connections_total = @($awsVpnStates).Count
 $summary.metrics.aws_vpn_connections_up = (@($awsVpnStates | Where-Object { $_.state -eq "available" })).Count
 $summary.metrics.gcp_vpn_tunnels_total = @($gcpVpnStates).Count
@@ -294,6 +485,11 @@ $summary.metrics.eks_clusters_total = @($eksClusterStates).Count
 $summary.metrics.eks_clusters_active = (@($eksClusterStates | Where-Object { $_.status -eq "ACTIVE" })).Count
 $summary.metrics.gke_clusters_total = @($gkeClusterStates).Count
 $summary.metrics.gke_clusters_running = (@($gkeClusterStates | Where-Object { $_.status -eq "RUNNING" })).Count
+$summary.metrics.published_app_endpoints_total = @($publishedAppEndpointStates).Count
+$summary.metrics.published_app_endpoints_healthy = (@($publishedAppEndpointStates | Where-Object { $_.healthy })).Count
+$summary.metrics.cloudflare_records_total = @($cloudflareDnsStates).Count
+$summary.metrics.cloudflare_records_resolving = (@($cloudflareDnsStates | Where-Object { $_.resolved })).Count
+$summary.metrics.cloudflare_records_target_match = (@($cloudflareDnsStates | Where-Object { $_.target_match })).Count
 $summary.errors = @($script:CommandErrors)
 
 Save-Json -Path (Join-Path $runDir "phase5_summary.json") -Object $summary
@@ -301,6 +497,8 @@ Save-Json -Path (Join-Path $runDir "aws_vpn_states.json") -Object $awsVpnStates
 Save-Json -Path (Join-Path $runDir "gcp_vpn_states.json") -Object $gcpVpnStates
 Save-Json -Path (Join-Path $runDir "eks_cluster_states.json") -Object $eksClusterStates
 Save-Json -Path (Join-Path $runDir "gke_cluster_states.json") -Object $gkeClusterStates
+Save-Json -Path (Join-Path $runDir "published_app_endpoint_states.json") -Object $publishedAppEndpointStates
+Save-Json -Path (Join-Path $runDir "cloudflare_dns_states.json") -Object $cloudflareDnsStates
 
 $summaryMarkdown = @"
 # Phase 5 Evidence Summary
@@ -316,6 +514,9 @@ $summaryMarkdown = @"
 | GCP VPN tunnels (`ESTABLISHED`) | $($summary.metrics.gcp_vpn_tunnels_established) | $($summary.metrics.gcp_vpn_tunnels_total) |
 | EKS clusters (`ACTIVE`) | $($summary.metrics.eks_clusters_active) | $($summary.metrics.eks_clusters_total) |
 | GKE clusters (`RUNNING`) | $($summary.metrics.gke_clusters_running) | $($summary.metrics.gke_clusters_total) |
+| Published app endpoints (expected status) | $($summary.metrics.published_app_endpoints_healthy) | $($summary.metrics.published_app_endpoints_total) |
+| Cloudflare DNS records (resolving) | $($summary.metrics.cloudflare_records_resolving) | $($summary.metrics.cloudflare_records_total) |
+| Cloudflare DNS records (target match) | $($summary.metrics.cloudflare_records_target_match) | $($summary.metrics.cloudflare_records_total) |
 
 ## Deliverable Mapping (Phase 5)
 

@@ -29,6 +29,12 @@ variable "listener_port" {
   default     = 80
 }
 
+variable "https_listener_port" {
+  description = "Optional inbound HTTPS listener port to allow on the ALB security group."
+  type        = number
+  default     = null
+}
+
 variable "allowed_ingress_ipv4_cidrs" {
   description = "Allowed IPv4 CIDRs for client ingress traffic."
   type        = list(string)
@@ -51,6 +57,12 @@ variable "backend_target_port" {
   description = "Backend application port for target registration and health checks."
   type        = number
   default     = 80
+}
+
+variable "root_redirect_path" {
+  description = "Optional HTTP path to redirect ALB root requests ('/') toward."
+  type        = string
+  default     = null
 }
 
 variable "backend_ipv4_targets" {

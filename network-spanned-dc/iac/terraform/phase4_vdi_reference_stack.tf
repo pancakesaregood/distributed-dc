@@ -57,6 +57,8 @@ module "gcp_vdi_reference_stack_site_c" {
   environment                          = var.environment
   project_id                           = var.gcp_project_id
   network_self_link                    = module.gcp_site_c.network_self_link
+  manage_broker_identity               = var.phase4_vdi_gcp_manage_broker_identity
+  broker_service_account_email         = var.phase4_vdi_gcp_node_service_account
   broker_ingress_ipv4_cidrs            = [var.site_c_ipv4_cidr]
   desktop_controlled_egress_ipv4_cidrs = var.phase4_vdi_gcp_desktop_controlled_egress_ipv4_cidrs
 }
@@ -74,12 +76,14 @@ module "gcp_vdi_reference_stack_site_d" {
   environment                          = var.environment
   project_id                           = var.gcp_project_id
   network_self_link                    = module.gcp_site_d.network_self_link
+  manage_broker_identity               = var.phase4_vdi_gcp_manage_broker_identity
+  broker_service_account_email         = var.phase4_vdi_gcp_node_service_account
   broker_ingress_ipv4_cidrs            = [var.site_d_ipv4_cidr]
   desktop_controlled_egress_ipv4_cidrs = var.phase4_vdi_gcp_desktop_controlled_egress_ipv4_cidrs
 }
 
 module "aws_eks_nodegroup_site_a_vdi" {
-  count  = local.phase4_vdi_reference_stack_enabled ? 1 : 0
+  count  = local.phase4_vdi_reference_stack_enabled && var.phase4_vdi_enable_aws_worker_pools ? 1 : 0
   source = "./modules/aws_eks_nodegroup"
 
   providers = {
@@ -90,6 +94,7 @@ module "aws_eks_nodegroup_site_a_vdi" {
   name_prefix                      = var.name_prefix
   environment                      = var.environment
   node_group_suffix                = "vdi"
+  node_role_name_suffix            = "vdi"
   cluster_name                     = module.aws_eks_site_a[0].summary.cluster_name
   subnet_ids                       = module.aws_site_a.vdi_subnet_ids
   desired_size                     = var.phase4_vdi_aws_node_desired_size
@@ -113,7 +118,7 @@ module "aws_eks_nodegroup_site_a_vdi" {
 }
 
 module "aws_eks_nodegroup_site_b_vdi" {
-  count  = local.phase4_vdi_reference_stack_enabled ? 1 : 0
+  count  = local.phase4_vdi_reference_stack_enabled && var.phase4_vdi_enable_aws_worker_pools ? 1 : 0
   source = "./modules/aws_eks_nodegroup"
 
   providers = {
@@ -124,6 +129,7 @@ module "aws_eks_nodegroup_site_b_vdi" {
   name_prefix                      = var.name_prefix
   environment                      = var.environment
   node_group_suffix                = "vdi"
+  node_role_name_suffix            = "vdi"
   cluster_name                     = module.aws_eks_site_b[0].summary.cluster_name
   subnet_ids                       = module.aws_site_b.vdi_subnet_ids
   desired_size                     = var.phase4_vdi_aws_node_desired_size
@@ -147,7 +153,7 @@ module "aws_eks_nodegroup_site_b_vdi" {
 }
 
 module "gcp_gke_node_pool_site_c_vdi" {
-  count  = local.phase4_vdi_reference_stack_enabled ? 1 : 0
+  count  = local.phase4_vdi_reference_stack_enabled && var.phase4_vdi_enable_gcp_worker_pools ? 1 : 0
   source = "./modules/gcp_gke_node_pool"
 
   providers = {
@@ -169,7 +175,7 @@ module "gcp_gke_node_pool_site_c_vdi" {
   min_node_count                    = var.phase4_vdi_gcp_node_min_count
   max_node_count                    = var.phase4_vdi_gcp_node_max_count
   initial_node_count                = var.phase4_vdi_gcp_node_initial_count
-  service_account                   = coalesce(var.phase4_vdi_gcp_node_service_account, module.gcp_vdi_reference_stack_site_c[0].summary.service_account_email)
+  service_account                   = var.phase4_vdi_gcp_node_service_account != null ? var.phase4_vdi_gcp_node_service_account : module.gcp_vdi_reference_stack_site_c[0].summary.service_account_email
   node_labels                       = merge(var.phase4_gcp_node_labels, var.phase4_vdi_gcp_node_labels, { site = "site-c", workload = "vdi" })
   node_tags                         = distinct(concat(var.phase4_gcp_node_tags, var.phase4_vdi_gcp_node_tags, [module.gcp_vdi_reference_stack_site_c[0].summary.broker_network_tag, module.gcp_vdi_reference_stack_site_c[0].summary.desktop_network_tag]))
   node_oauth_scopes                 = var.phase4_gcp_node_oauth_scopes
@@ -182,7 +188,7 @@ module "gcp_gke_node_pool_site_c_vdi" {
 }
 
 module "gcp_gke_node_pool_site_d_vdi" {
-  count  = local.phase4_vdi_reference_stack_enabled ? 1 : 0
+  count  = local.phase4_vdi_reference_stack_enabled && var.phase4_vdi_enable_gcp_worker_pools ? 1 : 0
   source = "./modules/gcp_gke_node_pool"
 
   providers = {
@@ -204,7 +210,7 @@ module "gcp_gke_node_pool_site_d_vdi" {
   min_node_count                    = var.phase4_vdi_gcp_node_min_count
   max_node_count                    = var.phase4_vdi_gcp_node_max_count
   initial_node_count                = var.phase4_vdi_gcp_node_initial_count
-  service_account                   = coalesce(var.phase4_vdi_gcp_node_service_account, module.gcp_vdi_reference_stack_site_d[0].summary.service_account_email)
+  service_account                   = var.phase4_vdi_gcp_node_service_account != null ? var.phase4_vdi_gcp_node_service_account : module.gcp_vdi_reference_stack_site_d[0].summary.service_account_email
   node_labels                       = merge(var.phase4_gcp_node_labels, var.phase4_vdi_gcp_node_labels, { site = "site-d", workload = "vdi" })
   node_tags                         = distinct(concat(var.phase4_gcp_node_tags, var.phase4_vdi_gcp_node_tags, [module.gcp_vdi_reference_stack_site_d[0].summary.broker_network_tag, module.gcp_vdi_reference_stack_site_d[0].summary.desktop_network_tag]))
   node_oauth_scopes                 = var.phase4_gcp_node_oauth_scopes

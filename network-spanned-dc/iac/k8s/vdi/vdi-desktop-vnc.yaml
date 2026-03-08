@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vdi-desktop-auth
+  namespace: vdi
+type: Opaque
+stringData:
+  password: "__VDI_DESKTOP_PASSWORD__"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vdi-desktop
+  namespace: vdi
+  labels:
+    app.kubernetes.io/name: vdi-desktop
+    app.kubernetes.io/part-of: vdi
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vdi-desktop
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vdi-desktop
+        app.kubernetes.io/part-of: vdi
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      nodeSelector:
+        workload: vdi
+      tolerations:
+      - key: workload
+        operator: Equal
+        value: vdi
+        effect: NoSchedule
+      containers:
+      - name: desktop
+        image: __VDI_DESKTOP_IMAGE__
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        env:
+        - name: VNC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vdi-desktop-auth
+              key: password
+        ports:
+        - name: vnc
+          containerPort: 5900
+          protocol: TCP
+        - name: web
+          containerPort: 80
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: vnc
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 12
+        livenessProbe:
+          tcpSocket:
+            port: vnc
+          initialDelaySeconds: 90
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 1500m
+            memory: 2048Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vdi-desktop
+  namespace: vdi
+  labels:
+    app.kubernetes.io/name: vdi-desktop
+    app.kubernetes.io/part-of: vdi
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: vdi-desktop
+  ports:
+  - name: vnc
+    port: 5900
+    protocol: TCP
+    targetPort: vnc

@@ -23,3 +23,9 @@ provider "google" {
   region      = var.gcp_site_d_region
   credentials = var.gcp_credentials_json
 }
+
+provider "cloudflare" {
+  # Cloudflare provider validates token format at plan time even when edge resources are disabled.
+  # Use a syntactically valid inert placeholder unless an explicit token is provided.
+  api_token = var.cloudflare_api_token == "disabled" ? "0000000000000000000000000000000000000000" : var.cloudflare_api_token
+}

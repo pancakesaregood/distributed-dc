@@ -12,6 +12,8 @@ module "aws_site_a" {
   ipv4_cidr   = var.site_a_ipv4_cidr
   ipv6_ula    = var.site_a_ipv6_ula
   tags        = local.common_tags
+
+  enable_ingress_internet_edge = var.phase4_aws_enable_ingress_internet_edge
 }
 
 module "aws_site_b" {
@@ -28,6 +30,8 @@ module "aws_site_b" {
   ipv4_cidr   = var.site_b_ipv4_cidr
   ipv6_ula    = var.site_b_ipv6_ula
   tags        = local.common_tags
+
+  enable_ingress_internet_edge = var.phase4_aws_enable_ingress_internet_edge
 }
 
 module "gcp_site_c" {

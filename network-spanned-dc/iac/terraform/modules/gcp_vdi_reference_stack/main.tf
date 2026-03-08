@@ -8,30 +8,40 @@ locals {
     substr(lower("${var.name_prefix}-${var.site_name}-vdi-broker-sa"), 0, 30),
     "-"
   )
+
+  broker_service_account_email = var.manage_broker_identity ? google_service_account.broker[0].email : var.broker_service_account_email
 }
 
 resource "google_service_account" "broker" {
+  count = var.manage_broker_identity ? 1 : 0
+
   account_id   = local.service_account_id
   project      = var.project_id
   display_name = "${upper(var.site_name)} VDI Broker Service Account"
 }
 
 resource "google_project_iam_member" "broker_log_writer" {
+  count = var.manage_broker_identity ? 1 : 0
+
   project = var.project_id
   role    = "roles/logging.logWriter"
-  member  = "serviceAccount:${google_service_account.broker.email}"
+  member  = "serviceAccount:${google_service_account.broker[0].email}"
 }
 
 resource "google_project_iam_member" "broker_metric_writer" {
+  count = var.manage_broker_identity ? 1 : 0
+
   project = var.project_id
   role    = "roles/monitoring.metricWriter"
-  member  = "serviceAccount:${google_service_account.broker.email}"
+  member  = "serviceAccount:${google_service_account.broker[0].email}"
 }
 
 resource "google_project_iam_member" "broker_secret_accessor" {
+  count = var.manage_broker_identity ? 1 : 0
+
   project = var.project_id
   role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${google_service_account.broker.email}"
+  member  = "serviceAccount:${google_service_account.broker[0].email}"
 }
 
 resource "google_compute_firewall" "broker_https_ingress" {

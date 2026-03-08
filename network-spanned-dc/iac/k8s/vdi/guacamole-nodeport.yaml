@@ -1,0 +1,254 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vdi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: guacamole-db-auth
+  namespace: vdi
+type: Opaque
+stringData:
+  database: "__GUACAMOLE_DB_NAME__"
+  username: "__GUACAMOLE_DB_USER__"
+  password: "__GUACAMOLE_DB_PASSWORD__"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guacamole-db
+  namespace: vdi
+  labels:
+    app.kubernetes.io/name: guacamole-db
+    app.kubernetes.io/part-of: vdi
+spec:
+  selector:
+    app.kubernetes.io/name: guacamole-db
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: postgres
+    protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guacamole-db
+  namespace: vdi
+  labels:
+    app.kubernetes.io/name: guacamole-db
+    app.kubernetes.io/part-of: vdi
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: guacamole-db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: guacamole-db
+        app.kubernetes.io/part-of: vdi
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      nodeSelector:
+        workload: vdi
+      tolerations:
+      - key: workload
+        operator: Equal
+        value: vdi
+        effect: NoSchedule
+      containers:
+      - name: postgres
+        image: __POSTGRES_IMAGE__
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        ports:
+        - name: postgres
+          containerPort: 5432
+          protocol: TCP
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: guacamole-db-auth
+              key: database
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: guacamole-db-auth
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: guacamole-db-auth
+              key: password
+        readinessProbe:
+          tcpSocket:
+            port: postgres
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 12
+        livenessProbe:
+          tcpSocket:
+            port: postgres
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          timeoutSeconds: 3
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 150m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
+        - name: db-init
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: db-data
+        emptyDir: {}
+      - name: db-init
+        configMap:
+          name: guacamole-db-init
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guacamole
+  namespace: vdi
+  labels:
+    app.kubernetes.io/name: guacamole
+    app.kubernetes.io/part-of: vdi
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: guacamole
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: guacamole
+        app.kubernetes.io/part-of: vdi
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      nodeSelector:
+        workload: vdi
+      tolerations:
+      - key: workload
+        operator: Equal
+        value: vdi
+        effect: NoSchedule
+      containers:
+      - name: guacd
+        image: __GUACD_IMAGE__
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        ports:
+        - name: guacd
+          containerPort: 4822
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      - name: guacamole
+        image: __GUACAMOLE_IMAGE__
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        env:
+        - name: GUACD_HOSTNAME
+          value: "127.0.0.1"
+        - name: GUACD_PORT
+          value: "4822"
+        - name: POSTGRESQL_HOSTNAME
+          value: "guacamole-db.vdi.svc.cluster.local"
+        - name: POSTGRESQL_PORT
+          value: "5432"
+        - name: POSTGRESQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: guacamole-db-auth
+              key: database
+        - name: POSTGRESQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: guacamole-db-auth
+              key: username
+        - name: POSTGRESQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: guacamole-db-auth
+              key: password
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /guacamole/
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 12
+        livenessProbe:
+          httpGet:
+            path: /guacamole/
+            port: http
+          initialDelaySeconds: 90
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1536Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: guacamole-nodeport
+  namespace: vdi
+  labels:
+    app.kubernetes.io/name: guacamole
+    app.kubernetes.io/part-of: vdi
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: guacamole
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+    nodePort: 30080

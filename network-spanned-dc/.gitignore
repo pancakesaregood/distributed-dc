@@ -29,3 +29,6 @@ iac/terraform/terraform.exe
 
 # Generated validation evidence
 iac/terraform/evidence/
+
+# External vendor checkout used for local API testing only (not vendored in repo)
+tools/cloudflare-python/

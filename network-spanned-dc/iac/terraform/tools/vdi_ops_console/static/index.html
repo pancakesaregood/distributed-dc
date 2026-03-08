@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VDI Reactor Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="frame">
+    <header class="topbar">
+      <h1>VDI Reactor Control Board</h1>
+      <div class="overall">
+        <span id="overall-light" class="light amber"></span>
+        <div>
+          <p id="overall-text">Awaiting telemetry...</p>
+          <p id="last-updated" class="dim">--</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="module map-module">
+      <h2>Spanned-DC Topology Map</h2>
+      <svg id="topology" viewBox="0 0 900 470" role="img" aria-label="Topology map">
+        <g id="link-layer">
+          <line id="link-ac" x1="190" y1="130" x2="710" y2="130" class="map-link"></line>
+          <line id="link-ad" x1="190" y1="130" x2="710" y2="320" class="map-link"></line>
+          <line id="link-bc" x1="190" y1="320" x2="710" y2="130" class="map-link"></line>
+          <line id="link-bd" x1="190" y1="320" x2="710" y2="320" class="map-link"></line>
+          <line id="link-cf-site-a" x1="450" y1="40" x2="190" y2="130" class="map-link"></line>
+          <line id="link-cf-site-b" x1="450" y1="40" x2="190" y2="320" class="map-link"></line>
+        </g>
+        <g id="node-layer">
+          <g transform="translate(190,130)">
+            <circle id="node-site-a" r="48" class="node"></circle>
+            <text class="node-label" y="6">SITE A</text>
+          </g>
+          <g transform="translate(190,320)">
+            <circle id="node-site-b" r="48" class="node"></circle>
+            <text class="node-label" y="6">SITE B</text>
+          </g>
+          <g transform="translate(710,130)">
+            <circle id="node-site-c" r="48" class="node"></circle>
+            <text class="node-label" y="6">SITE C</text>
+          </g>
+          <g transform="translate(710,320)">
+            <circle id="node-site-d" r="48" class="node"></circle>
+            <text class="node-label" y="6">SITE D</text>
+          </g>
+          <g transform="translate(450,40)">
+            <circle id="node-cloudflare" r="38" class="node edge"></circle>
+            <text class="node-label small" y="4">CLOUDFLARE</text>
+          </g>
+        </g>
+      </svg>
+    </section>
+
+    <section class="module">
+      <h2>Plant Status Panels</h2>
+      <div id="site-grid" class="site-grid"></div>
+    </section>
+
+    <section class="module controls">
+      <h2>Admin Operations (Authorized Personnel)</h2>
+      <div class="control-row">
+        <label for="site-select">Site</label>
+        <select id="site-select">
+          <option value="site-a">Site A</option>
+          <option value="site-b">Site B</option>
+        </select>
+        <button data-action="restart" data-target="desktop">Restart Desktop</button>
+        <button data-action="restart" data-target="guacamole">Restart Guacamole</button>
+        <button data-action="restart" data-target="db">Restart DB</button>
+        <button data-action="reset">Reset Hung Desktop Pod</button>
+      </div>
+      <div class="control-row">
+        <button data-action="sessions">Inspect Active Sessions</button>
+        <button data-action="processes">Inspect Desktop Processes</button>
+        <a id="assist-link" class="assist-link" href="#" target="_blank" rel="noopener">Open Assist Session</a>
+      </div>
+      <pre id="action-log" class="terminal">Awaiting command...</pre>
+    </section>
+
+    <section class="module split">
+      <div>
+        <h2>Active Sessions</h2>
+        <table id="session-table">
+          <thead>
+            <tr><th>User</th><th>Connection</th><th>Start (UTC)</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <h2>Desktop Process Snapshot</h2>
+        <pre id="process-output" class="terminal">Run "Inspect Desktop Processes" to load output.</pre>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

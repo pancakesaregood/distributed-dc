@@ -11,28 +11,34 @@ output "intercloud_pair_policy" {
 output "aws_site_a_network" {
   description = "AWS Site A network outputs."
   value = {
-    vpc_id             = module.aws_site_a.vpc_id
-    vpc_ipv4_cidr      = module.aws_site_a.vpc_ipv4_cidr
-    vpc_ipv6_cidr      = module.aws_site_a.vpc_ipv6_cidr
-    ingress_subnets    = module.aws_site_a.ingress_subnet_ids
-    app_subnets        = module.aws_site_a.app_subnet_ids
-    data_subnets       = module.aws_site_a.data_subnet_ids
-    vdi_subnets        = module.aws_site_a.vdi_subnet_ids
-    availability_zones = module.aws_site_a.availability_zones
+    vpc_id                        = module.aws_site_a.vpc_id
+    vpc_ipv4_cidr                 = module.aws_site_a.vpc_ipv4_cidr
+    vpc_ipv6_cidr                 = module.aws_site_a.vpc_ipv6_cidr
+    ingress_subnets               = module.aws_site_a.ingress_subnet_ids
+    app_subnets                   = module.aws_site_a.app_subnet_ids
+    data_subnets                  = module.aws_site_a.data_subnet_ids
+    vdi_subnets                   = module.aws_site_a.vdi_subnet_ids
+    availability_zones            = module.aws_site_a.availability_zones
+    ingress_internet_edge_enabled = module.aws_site_a.ingress_internet_edge_enabled
+    ingress_internet_gateway_id   = module.aws_site_a.ingress_internet_gateway_id
+    ingress_public_route_table_id = module.aws_site_a.ingress_public_route_table_id
   }
 }
 
 output "aws_site_b_network" {
   description = "AWS Site B network outputs."
   value = {
-    vpc_id             = module.aws_site_b.vpc_id
-    vpc_ipv4_cidr      = module.aws_site_b.vpc_ipv4_cidr
-    vpc_ipv6_cidr      = module.aws_site_b.vpc_ipv6_cidr
-    ingress_subnets    = module.aws_site_b.ingress_subnet_ids
-    app_subnets        = module.aws_site_b.app_subnet_ids
-    data_subnets       = module.aws_site_b.data_subnet_ids
-    vdi_subnets        = module.aws_site_b.vdi_subnet_ids
-    availability_zones = module.aws_site_b.availability_zones
+    vpc_id                        = module.aws_site_b.vpc_id
+    vpc_ipv4_cidr                 = module.aws_site_b.vpc_ipv4_cidr
+    vpc_ipv6_cidr                 = module.aws_site_b.vpc_ipv6_cidr
+    ingress_subnets               = module.aws_site_b.ingress_subnet_ids
+    app_subnets                   = module.aws_site_b.app_subnet_ids
+    data_subnets                  = module.aws_site_b.data_subnet_ids
+    vdi_subnets                   = module.aws_site_b.vdi_subnet_ids
+    availability_zones            = module.aws_site_b.availability_zones
+    ingress_internet_edge_enabled = module.aws_site_b.ingress_internet_edge_enabled
+    ingress_internet_gateway_id   = module.aws_site_b.ingress_internet_gateway_id
+    ingress_public_route_table_id = module.aws_site_b.ingress_public_route_table_id
   }
 }
 
@@ -132,9 +138,48 @@ output "phase4_gcp_gke_node_pools" {
 output "phase4_published_app_paths" {
   description = "Phase 4 published app path summaries for Site A/B when enabled."
   value = local.phase4_published_app_path_enabled ? {
-    site_a = module.aws_published_app_path_site_a[0].summary
-    site_b = module.aws_published_app_path_site_b[0].summary
+    site_a = merge(module.aws_published_app_path_site_a[0].summary, {
+      https_listener_port = local.phase4_published_app_tls_site_a_enabled ? var.phase4_published_app_https_port : null
+      https_listener_arn  = length(aws_lb_listener.phase4_site_a_https_forward) > 0 ? aws_lb_listener.phase4_site_a_https_forward[0].arn : (length(aws_lb_listener.phase4_site_a_https_fixed) > 0 ? aws_lb_listener.phase4_site_a_https_fixed[0].arn : null)
+      tls_certificate_arn = length(aws_acm_certificate_validation.phase4_site_a_published_app) > 0 ? aws_acm_certificate_validation.phase4_site_a_published_app[0].certificate_arn : null
+    })
+    site_b = merge(module.aws_published_app_path_site_b[0].summary, {
+      https_listener_port = local.phase4_published_app_tls_site_b_enabled ? var.phase4_published_app_https_port : null
+      https_listener_arn  = length(aws_lb_listener.phase4_site_b_https_forward) > 0 ? aws_lb_listener.phase4_site_b_https_forward[0].arn : (length(aws_lb_listener.phase4_site_b_https_fixed) > 0 ? aws_lb_listener.phase4_site_b_https_fixed[0].arn : null)
+      tls_certificate_arn = length(aws_acm_certificate_validation.phase4_site_b_published_app) > 0 ? aws_acm_certificate_validation.phase4_site_b_published_app[0].certificate_arn : null
+    })
   } : {}
+}
+
+output "phase4_cloudflare_edge_records" {
+  description = "Cloudflare DNS records for Phase 4 published app endpoints and optional additional hostnames when enabled."
+  value = local.phase4_cloudflare_edge_enabled ? {
+    site_a = length(cloudflare_record.phase4_published_app_site_a) > 0 ? {
+      id       = cloudflare_record.phase4_published_app_site_a[0].id
+      hostname = cloudflare_record.phase4_published_app_site_a[0].hostname
+      proxied  = cloudflare_record.phase4_published_app_site_a[0].proxied
+      target   = cloudflare_record.phase4_published_app_site_a[0].content
+    } : null
+    site_b = length(cloudflare_record.phase4_published_app_site_b) > 0 ? {
+      id       = cloudflare_record.phase4_published_app_site_b[0].id
+      hostname = cloudflare_record.phase4_published_app_site_b[0].hostname
+      proxied  = cloudflare_record.phase4_published_app_site_b[0].proxied
+      target   = cloudflare_record.phase4_published_app_site_b[0].content
+    } : null
+    additional = {
+      for record_name, record in cloudflare_record.phase4_published_app_additional :
+      record_name => {
+        id       = record.id
+        hostname = record.hostname
+        proxied  = record.proxied
+        target   = record.content
+      }
+    }
+  } : {
+    site_a     = null
+    site_b     = null
+    additional = {}
+  }
 }
 
 output "phase4_vdi_reference_stacks" {
@@ -143,21 +188,21 @@ output "phase4_vdi_reference_stacks" {
     aws = {
       site_a = {
         controls = module.aws_vdi_reference_stack_site_a[0].summary
-        worker   = module.aws_eks_nodegroup_site_a_vdi[0].summary
+        worker   = length(module.aws_eks_nodegroup_site_a_vdi) > 0 ? module.aws_eks_nodegroup_site_a_vdi[0].summary : null
       }
       site_b = {
         controls = module.aws_vdi_reference_stack_site_b[0].summary
-        worker   = module.aws_eks_nodegroup_site_b_vdi[0].summary
+        worker   = length(module.aws_eks_nodegroup_site_b_vdi) > 0 ? module.aws_eks_nodegroup_site_b_vdi[0].summary : null
       }
     }
     gcp = {
       site_c = {
         controls = module.gcp_vdi_reference_stack_site_c[0].summary
-        worker   = module.gcp_gke_node_pool_site_c_vdi[0].summary
+        worker   = length(module.gcp_gke_node_pool_site_c_vdi) > 0 ? module.gcp_gke_node_pool_site_c_vdi[0].summary : null
       }
       site_d = {
         controls = module.gcp_vdi_reference_stack_site_d[0].summary
-        worker   = module.gcp_gke_node_pool_site_d_vdi[0].summary
+        worker   = length(module.gcp_gke_node_pool_site_d_vdi) > 0 ? module.gcp_gke_node_pool_site_d_vdi[0].summary : null
       }
     }
   } : null
@@ -168,6 +213,9 @@ output "phase4_deliverable_flags" {
   value = {
     service_onboarding_capacity = var.phase4_enable_service_onboarding
     published_app_path          = var.phase4_enable_published_app_path
+    published_app_tls           = var.phase4_enable_published_app_tls
+    aws_ingress_internet_edge   = var.phase4_aws_enable_ingress_internet_edge
+    cloudflare_edge             = var.phase4_enable_cloudflare_edge
     vdi_reference_stack         = var.phase4_enable_vdi_reference_stack
   }
 }

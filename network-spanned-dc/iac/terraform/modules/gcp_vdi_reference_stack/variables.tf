@@ -23,6 +23,18 @@ variable "network_self_link" {
   type        = string
 }
 
+variable "manage_broker_identity" {
+  description = "Whether this module should create and bind a dedicated broker service account."
+  type        = bool
+  default     = true
+}
+
+variable "broker_service_account_email" {
+  description = "Existing broker service account email to use when manage_broker_identity=false."
+  type        = string
+  default     = null
+}
+
 variable "broker_ingress_ipv4_cidrs" {
   description = "IPv4 CIDRs allowed to reach broker HTTPS."
   type        = list(string)

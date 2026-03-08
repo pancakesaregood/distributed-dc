@@ -42,6 +42,11 @@ locals {
       }
     }
   )
+
+  ingress_subnet_keys = [
+    for subnet_key, subnet in local.subnet_plan :
+    subnet_key if subnet.tier == "ingress"
+  ]
 }
 
 resource "aws_vpc" "this" {
@@ -81,4 +86,54 @@ resource "aws_subnet" "tier" {
       component = "subnet"
     }
   )
+}
+
+resource "aws_internet_gateway" "ingress" {
+  count = var.enable_ingress_internet_edge ? 1 : 0
+
+  vpc_id = aws_vpc.this.id
+
+  tags = merge(
+    var.tags,
+    {
+      Name      = "${local.base_name}-ingress-igw"
+      site      = var.site_name
+      component = "ingress-internet-edge"
+    }
+  )
+}
+
+resource "aws_route_table" "ingress_public" {
+  count = var.enable_ingress_internet_edge ? 1 : 0
+
+  vpc_id = aws_vpc.this.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.ingress[0].id
+  }
+
+  route {
+    ipv6_cidr_block = "::/0"
+    gateway_id      = aws_internet_gateway.ingress[0].id
+  }
+
+  tags = merge(
+    var.tags,
+    {
+      Name      = "${local.base_name}-ingress-public-rt"
+      site      = var.site_name
+      component = "ingress-internet-edge"
+    }
+  )
+}
+
+resource "aws_route_table_association" "ingress_public" {
+  for_each = var.enable_ingress_internet_edge ? {
+    for subnet_key in local.ingress_subnet_keys :
+    subnet_key => aws_subnet.tier[subnet_key].id
+  } : {}
+
+  subnet_id      = each.value
+  route_table_id = aws_route_table.ingress_public[0].id
 }

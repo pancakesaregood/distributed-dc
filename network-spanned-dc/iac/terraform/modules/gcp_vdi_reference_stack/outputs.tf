@@ -2,7 +2,7 @@ output "summary" {
   description = "VDI policy and identity control summary for one GCP site."
   value = {
     site                  = var.site_name
-    service_account_email = google_service_account.broker.email
+    service_account_email = local.broker_service_account_email
     broker_network_tag    = local.broker_tag
     desktop_network_tag   = local.desktop_tag
     firewall_rules = {

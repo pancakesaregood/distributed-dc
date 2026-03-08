@@ -18,6 +18,21 @@ output "availability_zones" {
   value       = local.azs
 }
 
+output "ingress_internet_edge_enabled" {
+  description = "Whether ingress internet edge resources are enabled for this site."
+  value       = var.enable_ingress_internet_edge
+}
+
+output "ingress_internet_gateway_id" {
+  description = "Ingress internet gateway ID when enabled."
+  value       = var.enable_ingress_internet_edge ? aws_internet_gateway.ingress[0].id : null
+}
+
+output "ingress_public_route_table_id" {
+  description = "Ingress public route table ID when enabled."
+  value       = var.enable_ingress_internet_edge ? aws_route_table.ingress_public[0].id : null
+}
+
 output "ingress_subnet_ids" {
   description = "Ingress subnet IDs."
   value = [

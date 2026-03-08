@@ -6,6 +6,7 @@ output "summary" {
     load_balancer_dns    = aws_lb.this.dns_name
     load_balancer_zone   = aws_lb.this.zone_id
     listener_port        = var.listener_port
+    https_listener_port  = var.https_listener_port
     target_group_arn     = aws_lb_target_group.app.arn
     health_check_path    = var.health_check_path
     backend_target_count = length(var.backend_ipv4_targets)

@@ -3,6 +3,16 @@ param(
   [string]$AwsProfile = "",
   [string]$GcpCredentialsPath = "",
   [switch]$EnablePublishedAppPath,
+  [switch]$EnableCloudflareEdge,
+  [string]$CloudflareApiToken = "",
+  [string]$CloudflareZoneId = "",
+  [string]$CloudflareZoneName = "",
+  [string]$CloudflareSiteARecordName = "",
+  [string]$CloudflareSiteBRecordName = "",
+  [string[]]$SiteAPublishedAppBackendTargets = @(),
+  [string[]]$SiteBPublishedAppBackendTargets = @(),
+  [int]$PublishedAppBackendPort = 0,
+  [string]$PublishedAppHealthCheckPath = "",
   [switch]$EnableVdiReferenceStack,
   [switch]$EnablePhase5Flags,
   [switch]$PlanOnly,
@@ -56,9 +66,53 @@ if (-not [string]::IsNullOrWhiteSpace($GcpCredentialsPath)) {
 
 $terraform = Get-TerraformCmd
 $publishedEnabled = $EnablePublishedAppPath.IsPresent.ToString().ToLowerInvariant()
+$ingressInternetEdgeEnabled = $EnablePublishedAppPath.IsPresent.ToString().ToLowerInvariant()
+$cloudflareEnabled = $EnableCloudflareEdge.IsPresent.ToString().ToLowerInvariant()
 $vdiEnabled = $EnableVdiReferenceStack.IsPresent.ToString().ToLowerInvariant()
 $phase5Enabled = $EnablePhase5Flags.IsPresent.ToString().ToLowerInvariant()
 $command = if ($PlanOnly) { "plan" } else { "apply" }
+
+$hasCloudflareSiteA = -not [string]::IsNullOrWhiteSpace($CloudflareSiteARecordName)
+$hasCloudflareSiteB = -not [string]::IsNullOrWhiteSpace($CloudflareSiteBRecordName)
+if ($EnableCloudflareEdge) {
+  if ([string]::IsNullOrWhiteSpace($CloudflareApiToken)) {
+    $CloudflareApiToken = $env:CLOUDFLARE_API_TOKEN
+  }
+
+  if ([string]::IsNullOrWhiteSpace($CloudflareApiToken)) {
+    throw "CloudflareApiToken is required when -EnableCloudflareEdge is set. Pass -CloudflareApiToken or set CLOUDFLARE_API_TOKEN."
+  }
+
+  if ([string]::IsNullOrWhiteSpace($CloudflareZoneId) -and [string]::IsNullOrWhiteSpace($CloudflareZoneName)) {
+    throw "CloudflareZoneId or CloudflareZoneName is required when -EnableCloudflareEdge is set."
+  }
+
+  if (-not $hasCloudflareSiteA -and -not $hasCloudflareSiteB) {
+    throw "At least one of CloudflareSiteARecordName or CloudflareSiteBRecordName is required when -EnableCloudflareEdge is set."
+  }
+}
+
+$existingTfVarCloudflareToken = $env:TF_VAR_cloudflare_api_token
+$hadTfVarCloudflareToken = (Test-Path Env:TF_VAR_cloudflare_api_token)
+
+$temporaryVarFile = ""
+$overrideVariables = [ordered]@{}
+if ($PSBoundParameters.ContainsKey("SiteAPublishedAppBackendTargets")) {
+  $overrideVariables["phase4_site_a_published_app_backend_ipv4_targets"] = @($SiteAPublishedAppBackendTargets)
+}
+if ($PSBoundParameters.ContainsKey("SiteBPublishedAppBackendTargets")) {
+  $overrideVariables["phase4_site_b_published_app_backend_ipv4_targets"] = @($SiteBPublishedAppBackendTargets)
+}
+if ($PublishedAppBackendPort -gt 0) {
+  $overrideVariables["phase4_published_app_backend_port"] = $PublishedAppBackendPort
+}
+if (-not [string]::IsNullOrWhiteSpace($PublishedAppHealthCheckPath)) {
+  $overrideVariables["phase4_published_app_health_check_path"] = $PublishedAppHealthCheckPath
+}
+if ($overrideVariables.Count -gt 0) {
+  $temporaryVarFile = Join-Path ([System.IO.Path]::GetTempPath()) ("ddc-dev-up-overrides-" + [guid]::NewGuid().ToString("N") + ".tfvars.json")
+  $overrideVariables | ConvertTo-Json -Depth 20 | Set-Content -Path $temporaryVarFile
+}
 
 $args = @(
   $command,
@@ -66,11 +120,32 @@ $args = @(
   "-var", "phase3_enable_platform=true",
   "-var", "phase4_enable_service_onboarding=true",
   "-var", "phase4_enable_published_app_path=$publishedEnabled",
+  "-var", "phase4_aws_enable_ingress_internet_edge=$ingressInternetEdgeEnabled",
+  "-var", "phase4_enable_cloudflare_edge=$cloudflareEnabled",
   "-var", "phase4_enable_vdi_reference_stack=$vdiEnabled",
   "-var", "phase5_enable_resilience_validation=$phase5Enabled",
   "-var", "phase5_enable_backup_restore_drills=$phase5Enabled",
   "-var", "phase5_enable_handover_signoff=$phase5Enabled"
 )
+
+if ($EnableCloudflareEdge) {
+  if (-not [string]::IsNullOrWhiteSpace($CloudflareZoneId)) {
+    $args += @("-var", "phase4_cloudflare_zone_id=$CloudflareZoneId")
+  }
+  if (-not [string]::IsNullOrWhiteSpace($CloudflareZoneName)) {
+    $args += @("-var", "phase4_cloudflare_zone_name=$CloudflareZoneName")
+  }
+  if ($hasCloudflareSiteA) {
+    $args += @("-var", "phase4_cloudflare_site_a_record_name=$CloudflareSiteARecordName")
+  }
+  if ($hasCloudflareSiteB) {
+    $args += @("-var", "phase4_cloudflare_site_b_record_name=$CloudflareSiteBRecordName")
+  }
+}
+
+if (-not [string]::IsNullOrWhiteSpace($temporaryVarFile)) {
+  $args += @("-var-file", $temporaryVarFile)
+}
 
 if (-not $PlanOnly -and $AutoApprove) {
   $args += "-auto-approve"
@@ -78,6 +153,10 @@ if (-not $PlanOnly -and $AutoApprove) {
 
 Push-Location $TerraformDir
 try {
+  if ($EnableCloudflareEdge) {
+    $env:TF_VAR_cloudflare_api_token = $CloudflareApiToken
+  }
+
   if (-not $SkipInit) {
     Invoke-Terraform -Executable $terraform -Arguments @("init")
   }
@@ -85,8 +164,23 @@ try {
   Write-Host "Starting dev environment with Phase 3/4 enabled."
   Write-Host "Inter-cloud VPN/BGP: true"
   Write-Host "Published app path: $publishedEnabled"
+  Write-Host "AWS ingress internet edge: $ingressInternetEdgeEnabled"
+  if ($EnablePublishedAppPath) {
+    Write-Host ("Published app targets site-a: {0}; site-b: {1}; backend_port={2}; health_path={3}" -f $SiteAPublishedAppBackendTargets.Count, $SiteBPublishedAppBackendTargets.Count, $PublishedAppBackendPort, $PublishedAppHealthCheckPath)
+  }
+  Write-Host "Cloudflare edge: $cloudflareEnabled"
   Write-Host "VDI reference stack: $vdiEnabled"
   Invoke-Terraform -Executable $terraform -Arguments $args
 } finally {
   Pop-Location
+  if ($EnableCloudflareEdge) {
+    if ($hadTfVarCloudflareToken) {
+      $env:TF_VAR_cloudflare_api_token = $existingTfVarCloudflareToken
+    } else {
+      Remove-Item Env:TF_VAR_cloudflare_api_token -ErrorAction SilentlyContinue
+    }
+  }
+  if (-not [string]::IsNullOrWhiteSpace($temporaryVarFile) -and (Test-Path $temporaryVarFile)) {
+    Remove-Item -Path $temporaryVarFile -Force -ErrorAction SilentlyContinue
+  }
 }

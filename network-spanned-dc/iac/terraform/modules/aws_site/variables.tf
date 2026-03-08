@@ -33,3 +33,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "enable_ingress_internet_edge" {
+  description = "Create IGW and public routing for ingress subnets."
+  type        = bool
+  default     = false
+}

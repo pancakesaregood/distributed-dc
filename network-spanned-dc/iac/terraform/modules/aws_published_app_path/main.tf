@@ -21,6 +21,18 @@ resource "aws_security_group" "alb" {
     ipv6_cidr_blocks = var.allowed_ingress_ipv6_cidrs
   }
 
+  dynamic "ingress" {
+    for_each = var.https_listener_port == null ? [] : [var.https_listener_port]
+    content {
+      description      = "Published app client TLS ingress"
+      from_port        = ingress.value
+      to_port          = ingress.value
+      protocol         = "tcp"
+      cidr_blocks      = var.allowed_ingress_ipv4_cidrs
+      ipv6_cidr_blocks = var.allowed_ingress_ipv6_cidrs
+    }
+  }
+
   egress {
     description = "Backend and service egress"
     from_port   = 0
@@ -110,6 +122,32 @@ resource "aws_lb_listener" "http_forward" {
   }
 }
 
+resource "aws_lb_listener_rule" "http_root_redirect_forward" {
+  count = length(var.backend_ipv4_targets) > 0 && var.root_redirect_path != null ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_forward[0].arn
+  priority     = 1
+
+  action {
+    type = "redirect"
+
+    redirect {
+      host        = "#{host}"
+      path        = var.root_redirect_path
+      port        = "#{port}"
+      protocol    = "#{protocol}"
+      query       = "#{query}"
+      status_code = "HTTP_302"
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+}
+
 resource "aws_lb_listener" "http_fixed" {
   count = length(var.backend_ipv4_targets) == 0 ? 1 : 0
 
@@ -124,6 +162,32 @@ resource "aws_lb_listener" "http_fixed" {
       content_type = "application/json"
       message_body = "{\"status\":\"unavailable\",\"reason\":\"no registered backends\"}"
       status_code  = "503"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "http_root_redirect_fixed" {
+  count = length(var.backend_ipv4_targets) == 0 && var.root_redirect_path != null ? 1 : 0
+
+  listener_arn = aws_lb_listener.http_fixed[0].arn
+  priority     = 1
+
+  action {
+    type = "redirect"
+
+    redirect {
+      host        = "#{host}"
+      path        = var.root_redirect_path
+      port        = "#{port}"
+      protocol    = "#{protocol}"
+      query       = "#{query}"
+      status_code = "HTTP_302"
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = ["/"]
     }
   }
 }

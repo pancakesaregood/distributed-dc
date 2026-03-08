@@ -10,6 +10,7 @@ aws_site_b_region = "us-west-2"
 
 gcp_project_id       = "your-gcp-project-id"
 gcp_credentials_json = null
+cloudflare_api_token = "disabled"
 gcp_site_c_region    = "us-east4"
 gcp_site_d_region    = "us-west1"
 
@@ -107,13 +108,31 @@ phase4_gcp_node_workload_metadata_mode            = "GCE_METADATA"
 
 # Source-material Phase 4 deliverable tracking flags.
 phase4_enable_published_app_path  = false
+phase4_enable_published_app_tls   = false
+phase4_aws_enable_ingress_internet_edge = false
+phase4_enable_cloudflare_edge     = false
 phase4_enable_vdi_reference_stack = false
+
+# Optional Cloudflare edge layer for published app endpoints.
+# Set cloudflare_api_token to a real token (or pass via scripts/env) when enabling this layer.
+phase4_cloudflare_zone_id            = null
+phase4_cloudflare_zone_name          = null
+phase4_cloudflare_site_a_record_name = null
+phase4_cloudflare_site_b_record_name = null
+phase4_cloudflare_additional_records = {}
+phase4_cloudflare_record_proxied     = false
+phase4_cloudflare_record_ttl         = 300
 
 # Optional published app path baseline (AWS Site A/B).
 phase4_published_app_listener_port = 80
+phase4_published_app_https_port    = 443
+phase4_published_app_tls_ssl_policy = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+phase4_site_a_published_app_tls_subject_alternative_names = []
+phase4_site_b_published_app_tls_subject_alternative_names = []
 phase4_published_app_allowed_ingress_ipv4_cidrs = ["0.0.0.0/0"]
 phase4_published_app_allowed_ingress_ipv6_cidrs = ["::/0"]
 phase4_published_app_health_check_path           = "/healthz"
+phase4_published_app_root_redirect_path          = "/guacamole/"
 phase4_published_app_backend_port                = 80
 phase4_published_app_waf_rate_limit              = 2000
 
@@ -129,7 +148,7 @@ phase4_vdi_identity_secret_arn_patterns             = ["arn:aws:secretsmanager:*
 phase4_vdi_aws_node_desired_size                    = 1
 phase4_vdi_aws_node_min_size                        = 1
 phase4_vdi_aws_node_max_size                        = 2
-phase4_vdi_aws_node_instance_types                  = ["t3.large"]
+phase4_vdi_aws_node_instance_types                  = ["t3.small"]
 phase4_vdi_aws_node_labels                          = {}
 phase4_vdi_aws_node_taints = [
   {
@@ -139,8 +158,11 @@ phase4_vdi_aws_node_taints = [
   }
 ]
 phase4_vdi_aws_node_max_unavailable = 1
+phase4_vdi_enable_aws_worker_pools  = true
 
 phase4_vdi_gcp_desktop_controlled_egress_ipv4_cidrs = ["0.0.0.0/0"]
+phase4_vdi_gcp_manage_broker_identity               = true
+phase4_vdi_enable_gcp_worker_pools                  = true
 phase4_vdi_gcp_node_machine_type                     = "e2-standard-8"
 phase4_vdi_gcp_node_disk_size_gb                     = 120
 phase4_vdi_gcp_node_disk_type                        = "pd-balanced"

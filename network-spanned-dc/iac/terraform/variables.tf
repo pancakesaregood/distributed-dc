@@ -46,6 +46,13 @@ variable "gcp_credentials_json" {
   sensitive   = true
 }
 
+variable "cloudflare_api_token" {
+  description = "Cloudflare API token used by Terraform when Cloudflare edge resources are enabled."
+  type        = string
+  default     = "disabled"
+  sensitive   = true
+}
+
 variable "gcp_site_c_region" {
   description = "GCP region for Site C."
   type        = string
@@ -281,6 +288,38 @@ variable "phase4_enable_published_app_path" {
   }
 }
 
+variable "phase4_enable_published_app_tls" {
+  description = "Enable origin HTTPS listener and ACM certificate automation for published app ALBs."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.phase4_enable_published_app_tls || var.phase4_enable_published_app_path
+    error_message = "phase4_enable_published_app_tls requires phase4_enable_published_app_path=true."
+  }
+
+  validation {
+    condition     = !var.phase4_enable_published_app_tls || var.phase4_enable_cloudflare_edge
+    error_message = "phase4_enable_published_app_tls requires phase4_enable_cloudflare_edge=true for DNS validation automation."
+  }
+
+  validation {
+    condition     = !var.phase4_enable_published_app_tls || var.phase4_cloudflare_zone_name != null
+    error_message = "phase4_enable_published_app_tls requires phase4_cloudflare_zone_name so ACM domains can be constructed."
+  }
+}
+
+variable "phase4_aws_enable_ingress_internet_edge" {
+  description = "Enable AWS ingress internet edge (IGW + public routing) required by published app ALBs."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.phase4_enable_published_app_path || var.phase4_aws_enable_ingress_internet_edge
+    error_message = "phase4_enable_published_app_path requires phase4_aws_enable_ingress_internet_edge=true."
+  }
+}
+
 variable "phase4_enable_vdi_reference_stack" {
   description = "Track whether VDI reference stack and identity controls are enabled."
   type        = bool
@@ -289,6 +328,102 @@ variable "phase4_enable_vdi_reference_stack" {
   validation {
     condition     = !var.phase4_enable_vdi_reference_stack || var.phase4_enable_service_onboarding
     error_message = "phase4_enable_vdi_reference_stack requires phase4_enable_service_onboarding=true."
+  }
+}
+
+variable "phase4_enable_cloudflare_edge" {
+  description = "Enable Cloudflare DNS automation for Phase 4 published app endpoints."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.phase4_enable_cloudflare_edge || var.phase4_enable_published_app_path
+    error_message = "phase4_enable_cloudflare_edge requires phase4_enable_published_app_path=true."
+  }
+
+  validation {
+    condition = (
+      !var.phase4_enable_cloudflare_edge ||
+      var.phase4_cloudflare_site_a_record_name != null ||
+      var.phase4_cloudflare_site_b_record_name != null ||
+      length(var.phase4_cloudflare_additional_records) > 0
+    )
+    error_message = "phase4_enable_cloudflare_edge requires at least one Cloudflare record name (site A, site B, or phase4_cloudflare_additional_records)."
+  }
+
+  validation {
+    condition = (
+      !var.phase4_enable_cloudflare_edge ||
+      var.phase4_cloudflare_zone_id != null ||
+      var.phase4_cloudflare_zone_name != null
+    )
+    error_message = "phase4_enable_cloudflare_edge requires phase4_cloudflare_zone_id or phase4_cloudflare_zone_name."
+  }
+
+  validation {
+    condition     = !var.phase4_enable_cloudflare_edge || var.cloudflare_api_token != "disabled"
+    error_message = "phase4_enable_cloudflare_edge requires cloudflare_api_token to be provided."
+  }
+}
+
+variable "phase4_cloudflare_zone_id" {
+  description = "Optional Cloudflare Zone ID where published app DNS records will be managed."
+  type        = string
+  default     = null
+}
+
+variable "phase4_cloudflare_zone_name" {
+  description = "Optional Cloudflare zone name where published app DNS records will be managed (for example: slothkko.com)."
+  type        = string
+  default     = null
+}
+
+variable "phase4_cloudflare_site_a_record_name" {
+  description = "DNS record name for the Site A published app endpoint (for example: app or app-a). Null skips Site A."
+  type        = string
+  default     = null
+}
+
+variable "phase4_cloudflare_site_b_record_name" {
+  description = "DNS record name for the Site B published app endpoint (for example: app-b). Null skips Site B."
+  type        = string
+  default     = null
+}
+
+variable "phase4_cloudflare_additional_records" {
+  description = "Additional Cloudflare CNAME records mapped to a published app target site (`site_a` or `site_b`). Record names may be labels (for example `admin`) or FQDNs."
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition = (
+      alltrue([
+        for record_name in keys(var.phase4_cloudflare_additional_records) :
+        trimspace(record_name) != ""
+      ]) &&
+      alltrue([
+        for target_site in values(var.phase4_cloudflare_additional_records) :
+        contains(["site_a", "site_b"], lower(trimspace(target_site)))
+      ])
+    )
+    error_message = "phase4_cloudflare_additional_records keys must be non-empty and values must be one of: site_a, site_b."
+  }
+}
+
+variable "phase4_cloudflare_record_proxied" {
+  description = "Whether Cloudflare proxy (orange cloud) is enabled for published app DNS records. Keep false for DNS-only mode."
+  type        = bool
+  default     = false
+}
+
+variable "phase4_cloudflare_record_ttl" {
+  description = "Cloudflare DNS TTL for published app records. Use 1 for automatic when proxied, or >=60 for DNS-only records."
+  type        = number
+  default     = 300
+
+  validation {
+    condition     = var.phase4_cloudflare_record_ttl == 1 || var.phase4_cloudflare_record_ttl >= 60
+    error_message = "phase4_cloudflare_record_ttl must be 1 (automatic) or at least 60 seconds."
   }
 }
 
@@ -337,7 +472,7 @@ variable "phase4_vdi_aws_node_max_size" {
 variable "phase4_vdi_aws_node_instance_types" {
   description = "EC2 instance types for EKS VDI node groups."
   type        = list(string)
-  default     = ["t3.large"]
+  default     = ["t3.small"]
 }
 
 variable "phase4_vdi_aws_node_labels" {
@@ -376,10 +511,28 @@ variable "phase4_vdi_aws_node_max_unavailable" {
   default     = 1
 }
 
+variable "phase4_vdi_enable_aws_worker_pools" {
+  description = "Enable AWS EKS worker node groups for the VDI reference stack."
+  type        = bool
+  default     = true
+}
+
 variable "phase4_vdi_gcp_desktop_controlled_egress_ipv4_cidrs" {
   description = "IPv4 CIDRs VDI desktops may reach for controlled update egress in GCP."
   type        = list(string)
   default     = ["0.0.0.0/0"]
+}
+
+variable "phase4_vdi_enable_gcp_worker_pools" {
+  description = "Enable GCP GKE worker node pools for the VDI reference stack."
+  type        = bool
+  default     = true
+}
+
+variable "phase4_vdi_gcp_manage_broker_identity" {
+  description = "Create and bind dedicated GCP broker service accounts for VDI reference stacks."
+  type        = bool
+  default     = true
 }
 
 variable "phase4_vdi_gcp_node_machine_type" {
@@ -460,6 +613,46 @@ variable "phase4_published_app_listener_port" {
   default     = 80
 }
 
+variable "phase4_published_app_https_port" {
+  description = "Inbound HTTPS listener port for published app load balancers."
+  type        = number
+  default     = 443
+}
+
+variable "phase4_published_app_tls_ssl_policy" {
+  description = "TLS security policy for published app HTTPS listeners."
+  type        = string
+  default     = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+}
+
+variable "phase4_site_a_published_app_tls_subject_alternative_names" {
+  description = "Additional hostnames for the Site A published app ACM certificate. Values may be labels, FQDNs, or '@' for zone apex."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for hostname in var.phase4_site_a_published_app_tls_subject_alternative_names :
+      trimspace(hostname) != ""
+    ])
+    error_message = "phase4_site_a_published_app_tls_subject_alternative_names entries must not be empty."
+  }
+}
+
+variable "phase4_site_b_published_app_tls_subject_alternative_names" {
+  description = "Additional hostnames for the Site B published app ACM certificate. Values may be labels, FQDNs, or '@' for zone apex."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for hostname in var.phase4_site_b_published_app_tls_subject_alternative_names :
+      trimspace(hostname) != ""
+    ])
+    error_message = "phase4_site_b_published_app_tls_subject_alternative_names entries must not be empty."
+  }
+}
+
 variable "phase4_published_app_allowed_ingress_ipv4_cidrs" {
   description = "Allowed IPv4 client CIDRs for the published app path."
   type        = list(string)
@@ -476,6 +669,17 @@ variable "phase4_published_app_health_check_path" {
   description = "HTTP health check path used for published app backend gating."
   type        = string
   default     = "/healthz"
+}
+
+variable "phase4_published_app_root_redirect_path" {
+  description = "Optional HTTP path that root requests ('/') should redirect to on published app listeners."
+  type        = string
+  default     = "/guacamole/"
+
+  validation {
+    condition     = var.phase4_published_app_root_redirect_path == null || startswith(var.phase4_published_app_root_redirect_path, "/")
+    error_message = "phase4_published_app_root_redirect_path must be null or an absolute path beginning with '/'."
+  }
 }
 
 variable "phase4_published_app_backend_port" {
