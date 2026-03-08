@@ -7,6 +7,7 @@ param(
   [string]$GuacdImage = "guacamole/guacd:1.5.5",
   [string]$GuacamoleImage = "guacamole/guacamole:1.5.5",
   [string]$PostgresImage = "postgres:16-alpine",
+  [string]$NginxImage = "nginx:1.27-alpine",
   [string]$GuacamoleDbName = "",
   [string]$GuacamoleDbUser = "",
   [string]$GuacamoleDbPassword = "",
@@ -22,6 +23,7 @@ param(
   [string]$EcrGuacdRepositoryName = "ddc-vdi-guacd",
   [string]$EcrGuacamoleRepositoryName = "ddc-vdi-guacamole",
   [string]$EcrPostgresRepositoryName = "ddc-vdi-postgres",
+  [string]$EcrNginxRepositoryName = "ddc-vdi-nginx",
   [string]$EcrDesktopRepositoryName = "ddc-vdi-desktop",
   [switch]$SiteAOnly,
   [switch]$SiteBOnly,
@@ -294,11 +296,12 @@ if (
   $manifestTemplate.IndexOf("__GUACD_IMAGE__", [System.StringComparison]::Ordinal) -lt 0 -or
   $manifestTemplate.IndexOf("__GUACAMOLE_IMAGE__", [System.StringComparison]::Ordinal) -lt 0 -or
   $manifestTemplate.IndexOf("__POSTGRES_IMAGE__", [System.StringComparison]::Ordinal) -lt 0 -or
+  $manifestTemplate.IndexOf("__NGINX_IMAGE__", [System.StringComparison]::Ordinal) -lt 0 -or
   $manifestTemplate.IndexOf("__GUACAMOLE_DB_NAME__", [System.StringComparison]::Ordinal) -lt 0 -or
   $manifestTemplate.IndexOf("__GUACAMOLE_DB_USER__", [System.StringComparison]::Ordinal) -lt 0 -or
   $manifestTemplate.IndexOf("__GUACAMOLE_DB_PASSWORD__", [System.StringComparison]::Ordinal) -lt 0
 ) {
-  throw "Manifest template must include image and DB credential placeholders (__GUACD_IMAGE__, __GUACAMOLE_IMAGE__, __POSTGRES_IMAGE__, __GUACAMOLE_DB_NAME__, __GUACAMOLE_DB_USER__, __GUACAMOLE_DB_PASSWORD__): $ManifestPath"
+  throw "Manifest template must include image and DB credential placeholders (__GUACD_IMAGE__, __GUACAMOLE_IMAGE__, __POSTGRES_IMAGE__, __NGINX_IMAGE__, __GUACAMOLE_DB_NAME__, __GUACAMOLE_DB_USER__, __GUACAMOLE_DB_PASSWORD__): $ManifestPath"
 }
 
 $desktopManifestTemplate = ""
@@ -401,6 +404,7 @@ try {
   $guacdTag = Get-ImageTag -Image $GuacdImage
   $guacamoleTag = Get-ImageTag -Image $GuacamoleImage
   $postgresTag = Get-ImageTag -Image $PostgresImage
+  $nginxTag = Get-ImageTag -Image $NginxImage
 
   $targets = @()
   if (-not $SiteBOnly) {
@@ -414,12 +418,14 @@ try {
     $effectiveGuacdImage = $GuacdImage
     $effectiveGuacamoleImage = $GuacamoleImage
     $effectivePostgresImage = $PostgresImage
+    $effectiveNginxImage = $NginxImage
     $effectiveDesktopImage = $DesktopImage
     if ($UseRegionalEcrImages) {
       $registry = "{0}.dkr.ecr.{1}.amazonaws.com" -f $EcrAccountId, $target.region
       $effectiveGuacdImage = "$registry/${EcrGuacdRepositoryName}:$guacdTag"
       $effectiveGuacamoleImage = "$registry/${EcrGuacamoleRepositoryName}:$guacamoleTag"
       $effectivePostgresImage = "$registry/${EcrPostgresRepositoryName}:$postgresTag"
+      $effectiveNginxImage = "$registry/${EcrNginxRepositoryName}:$nginxTag"
     }
     if ($UseRegionalEcrDesktopImage) {
       $registry = "{0}.dkr.ecr.{1}.amazonaws.com" -f $EcrAccountId, $target.region
@@ -430,7 +436,7 @@ try {
     $escapedGuacamoleDbName = Escape-YamlDoubleQuoted -Value $effectiveGuacamoleDbName
     $escapedGuacamoleDbUser = Escape-YamlDoubleQuoted -Value $effectiveGuacamoleDbUser
     $escapedGuacamoleDbPassword = Escape-YamlDoubleQuoted -Value $effectiveGuacamoleDbPassword
-    $renderedManifest = $manifestTemplate.Replace("__GUACD_IMAGE__", $effectiveGuacdImage).Replace("__GUACAMOLE_IMAGE__", $effectiveGuacamoleImage).Replace("__POSTGRES_IMAGE__", $effectivePostgresImage).Replace("__GUACAMOLE_DB_NAME__", $escapedGuacamoleDbName).Replace("__GUACAMOLE_DB_USER__", $escapedGuacamoleDbUser).Replace("__GUACAMOLE_DB_PASSWORD__", $escapedGuacamoleDbPassword)
+    $renderedManifest = $manifestTemplate.Replace("__GUACD_IMAGE__", $effectiveGuacdImage).Replace("__GUACAMOLE_IMAGE__", $effectiveGuacamoleImage).Replace("__POSTGRES_IMAGE__", $effectivePostgresImage).Replace("__NGINX_IMAGE__", $effectiveNginxImage).Replace("__GUACAMOLE_DB_NAME__", $escapedGuacamoleDbName).Replace("__GUACAMOLE_DB_USER__", $escapedGuacamoleDbUser).Replace("__GUACAMOLE_DB_PASSWORD__", $escapedGuacamoleDbPassword)
     $renderedDesktopManifest = ""
     if ($EnableSampleVdiDesktop) {
       $renderedDesktopManifest = $desktopManifestTemplate.Replace("__VDI_DESKTOP_IMAGE__", $effectiveDesktopImage).Replace("__VDI_DESKTOP_PASSWORD__", $effectiveDesktopVncPassword)
@@ -448,7 +454,7 @@ try {
       Write-Host ""
       Write-Host "== VDI service bootstrap: $($target.site) =="
       Write-Host "Cluster: $($target.cluster) | Region: $($target.region) | Context: $($target.context)"
-      Write-Host "Images: postgres=$effectivePostgresImage ; guacd=$effectiveGuacdImage ; guacamole=$effectiveGuacamoleImage"
+      Write-Host "Images: postgres=$effectivePostgresImage ; guacd=$effectiveGuacdImage ; guacamole=$effectiveGuacamoleImage ; nginx=$effectiveNginxImage"
       if ($EnableSampleVdiDesktop) {
         Write-Host "Desktop image: $effectiveDesktopImage"
       }

@@ -291,9 +291,10 @@ Notes:
   - `-CloudflareRecordProxied` enables orange-cloud proxy mode.
   - `-CloudflareRecordTtl` sets record TTL (`1` for automatic/proxied, or `>=60`).
 - `invoke_vdi_ops_console.ps1` serves the ops panel locally (default `127.0.0.1`) and does not publish it through ALB/Cloudflare by itself.
-- `invoke_phase4_vdi_ecr_image_mirror.ps1` mirrors `postgres`, `guacamole/guacd`, and `guacamole/guacamole` into regional private ECR repos for private-node pulls.
+- `invoke_phase4_vdi_ecr_image_mirror.ps1` mirrors `postgres`, `guacamole/guacd`, `guacamole/guacamole`, and `nginx` into regional private ECR repos for private-node pulls.
 - add `-MirrorDesktopImage` to also mirror a sample VNC desktop image into `ddc-vdi-desktop`.
-- `invoke_phase4_vdi_service_bootstrap.ps1` applies `iac/k8s/vdi/guacamole-nodeport.yaml` to each EKS cluster, can inject regional ECR image URIs with `-UseRegionalEcrImages`, and can rotate seed admin credentials with `-GuacAdminPassword` (or `GUACADMIN_PASSWORD` env var).
+- `invoke_phase4_vdi_service_bootstrap.ps1` applies `iac/k8s/vdi/guacamole-nodeport.yaml` to each EKS cluster, can inject regional ECR image URIs with `-UseRegionalEcrImages`, can override the front-proxy image with `-NginxImage`, and can rotate seed admin credentials with `-GuacAdminPassword` (or `GUACADMIN_PASSWORD` env var).
+- The Guacamole manifest now deploys a lightweight `nginx` front-proxy that serves a Slothkko-themed root portal on `/` and injects a matching theme stylesheet on `/guacamole/` login pages.
 - `invoke_phase4_vdi_service_bootstrap.ps1 -EnableSampleVdiDesktop` applies `iac/k8s/vdi/vdi-desktop-vnc.yaml`, deploys `vdi-desktop` in each target cluster, and seeds a Guacamole VNC connection (`VDI Desktop` by default).
 - `invoke_phase4_published_app_cutover.ps1` discovers private ENI IPs in AWS app subnets (and data subnets by default), then invokes `invoke_phase4_vdi_enablement.ps1` with discovered target lists.
 - Use `-IncludeIngressSubnets:$true` if your backend ENIs live in ingress subnets.

@@ -659,3 +659,30 @@ $env:AWS_PROFILE="ddc"
     - `scripts/invoke_phase4_guac_seed_ops_connections.ps1`
     - `scripts/invoke_dev_environment_up.ps1`
   - ran repository grep-based secret checks (no exposed Cloudflare token, SSH password, private keys, or static access keys in tracked content)
+
+## Slothkko Root Portal + Guac Theme Activation Pass (2026-03-08 08:14 America/Toronto)
+- Scope completed:
+  - finalized rollout of the Slothkko-themed Guacamole front-proxy manifest and enabled root portal serving on published hosts.
+  - applied pending ALB listener rule cleanup so `/` no longer redirects to `/guacamole/`.
+- Infrastructure apply executed:
+  - targeted Terraform plan/apply removed 4 root redirect listener rules:
+    - `module.aws_published_app_path_site_a[0].aws_lb_listener_rule.http_root_redirect_forward[0]`
+    - `module.aws_published_app_path_site_b[0].aws_lb_listener_rule.http_root_redirect_forward[0]`
+    - `aws_lb_listener_rule.phase4_site_a_https_root_redirect_forward[0]`
+    - `aws_lb_listener_rule.phase4_site_b_https_root_redirect_forward[0]`
+  - apply result: `0 added, 0 changed, 4 destroyed`.
+- Live verification:
+  - DNS now resolves for Cloudflare-proxied hostnames:
+    - `admin.slothkko.com` -> `<REDACTED_PUBLIC_IP>`
+    - `app-a.slothkko.com` -> `<REDACTED_PUBLIC_IP>`
+    - `slothkko.com` -> `<REDACTED_PUBLIC_IP>`
+  - HTTP probes:
+    - `https://admin.slothkko.com/` -> `200` (Slothkko VDI Access Portal HTML)
+    - `https://app-a.slothkko.com/` -> `200` (same root portal)
+    - `https://app-b.slothkko.com/` -> `200` (same root portal)
+  - Guacamole theming probe:
+    - `https://admin.slothkko.com/guacamole/` HTML includes injected stylesheet:
+      - `<link rel="stylesheet" href="/portal/guac-theme.css">`
+- Security/config hygiene:
+  - reviewed modified files for embedded secrets/keys; only template placeholders and documentation examples remain.
+  - no Cloudflare token, private keys, or static credentials present in tracked diffs.

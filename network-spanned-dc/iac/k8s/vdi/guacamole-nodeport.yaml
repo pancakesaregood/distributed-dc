@@ -15,6 +15,510 @@ stringData:
   password: "__GUACAMOLE_DB_PASSWORD__"
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vdi-portal-assets
+  namespace: vdi
+data:
+  index.html: |
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>slothkko.exe | Access Portal</title>
+      <meta name="description" content="slothkko.exe access portal for Guacamole VDI sessions.">
+      <link rel="stylesheet" href="/portal/portal.css">
+    </head>
+    <body>
+      <div class="wallpaper" aria-hidden="true"></div>
+      <div class="texture" aria-hidden="true"></div>
+
+      <main class="hero-host">
+        <section class="hero-card" aria-labelledby="portal-title">
+          <header class="hero-head">
+            <img class="mascot" src="/portal/sloth-smile.svg" alt="Slothkko mascot">
+            <div>
+              <p class="kicker">slothkko.exe</p>
+              <h1 id="portal-title">VDI Access Portal</h1>
+            </div>
+          </header>
+
+          <p class="subtitle">
+            Clientless desktop and operations access through the Guacamole gateway.
+            Launch from here, then authenticate with your assigned credentials.
+          </p>
+
+          <section class="status-grid" aria-label="platform status summary">
+            <article class="status-card">
+              <span class="dot up" aria-hidden="true"></span>
+              <h2>Site A</h2>
+              <p>Published path online</p>
+            </article>
+            <article class="status-card">
+              <span class="dot up" aria-hidden="true"></span>
+              <h2>Site B</h2>
+              <p>Published path online</p>
+            </article>
+            <article class="status-card">
+              <span class="dot warn" aria-hidden="true"></span>
+              <h2>Ops Stack</h2>
+              <p>Use internal CIDR routes</p>
+            </article>
+          </section>
+
+          <div class="actions">
+            <a class="primary" href="/guacamole/">Open Guacamole Login</a>
+            <a class="secondary" href="https://admin.slothkko.com/guacamole/">Admin Console</a>
+          </div>
+
+          <footer class="footnote">
+            <span>Theme source: slothkko.com desktop shell</span>
+            <span id="portal-time">--</span>
+          </footer>
+        </section>
+      </main>
+
+      <script src="/portal/portal.js"></script>
+    </body>
+    </html>
+  portal.css: |
+    :root {
+      --font-ui: "Trebuchet MS", "Tahoma", "Segoe UI", sans-serif;
+      --desktop-top: #111b30;
+      --desktop-mid: #0b1527;
+      --desktop-bottom: #060d1a;
+      --ink-strong: #dde9ff;
+      --ink-soft: #b7c9e8;
+      --panel: rgba(18, 30, 48, 0.92);
+      --panel-strong: rgba(14, 24, 39, 0.97);
+      --edge-light: #9fb9e9;
+      --edge-mid: #4c6490;
+      --focus: #7fb8ff;
+      --ok: #65dca1;
+      --warn: #ffd27d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      color: var(--ink-strong);
+      font-family: var(--font-ui);
+      background: #060d1b;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .wallpaper,
+    .texture {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .wallpaper {
+      background:
+        radial-gradient(circle at 22% 18%, rgba(90, 133, 215, 0.25), transparent 44%),
+        radial-gradient(circle at 75% 72%, rgba(120, 95, 190, 0.18), transparent 44%),
+        linear-gradient(180deg, var(--desktop-top), var(--desktop-mid) 52%, var(--desktop-bottom));
+    }
+
+    .texture {
+      opacity: 0.24;
+      background-image:
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0, rgba(255, 255, 255, 0.14) 1px, transparent 1px, transparent 3px),
+        url("/portal/grain.svg");
+      background-size: auto, 320px 320px;
+      mix-blend-mode: soft-light;
+    }
+
+    .hero-host {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .hero-card {
+      width: min(680px, 100%);
+      border: 1px solid rgba(96, 132, 188, 0.66);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(8, 18, 33, 0.9), rgba(6, 14, 26, 0.93));
+      box-shadow: 0 30px 58px rgba(0, 0, 0, 0.52);
+      backdrop-filter: blur(4px);
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mascot {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      border: 1px solid rgba(122, 163, 224, 0.45);
+      background: rgba(13, 29, 49, 0.85);
+      padding: 8px;
+      box-shadow: inset 0 0 0 1px rgba(221, 233, 255, 0.08);
+    }
+
+    .kicker {
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+    }
+
+    h1 {
+      margin: 4px 0 0;
+      font-size: 1.25rem;
+      letter-spacing: 0.03em;
+      color: #edf5ff;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #afc7ea;
+      line-height: 1.5;
+      font-size: 0.94rem;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .status-card {
+      border: 1px solid rgba(97, 128, 181, 0.55);
+      border-radius: 10px;
+      background: rgba(14, 29, 48, 0.88);
+      padding: 10px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .status-card h2 {
+      margin: 0;
+      font-size: 0.8rem;
+      color: #cce0ff;
+    }
+
+    .status-card p {
+      margin: 0;
+      font-size: 0.74rem;
+      color: #9fbee5;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .dot.up {
+      background: var(--ok);
+      box-shadow: 0 0 8px rgba(101, 220, 161, 0.6);
+    }
+
+    .dot.warn {
+      background: var(--warn);
+      box-shadow: 0 0 8px rgba(255, 210, 125, 0.6);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .primary,
+    .secondary {
+      border: 1px solid #3a5b8d;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      color: #d0e2ff;
+      background: linear-gradient(180deg, rgba(33, 54, 85, 0.9), rgba(24, 41, 66, 0.9));
+      box-shadow: 0 1px 0 rgba(192, 217, 255, 0.15) inset;
+    }
+
+    .primary:hover,
+    .secondary:hover {
+      background: linear-gradient(180deg, rgba(47, 76, 118, 0.9), rgba(30, 52, 82, 0.9));
+      border-color: #4f79b8;
+    }
+
+    .footnote {
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.73rem;
+      color: #a7c2e8;
+    }
+
+    @media (max-width: 640px) {
+      .hero-host {
+        padding: 14px;
+      }
+
+      .hero-card {
+        padding: 16px;
+        border-radius: 12px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .primary,
+      .secondary {
+        text-align: center;
+      }
+
+      .footnote {
+        flex-direction: column;
+      }
+    }
+  portal.js: |
+    (function () {
+      const el = document.getElementById("portal-time");
+      if (!el) {
+        return;
+      }
+
+      const stamp = function () {
+        const now = new Date();
+        el.textContent = "Updated " + now.toLocaleString();
+      };
+
+      stamp();
+      setInterval(stamp, 15000);
+    }());
+  guac-theme.css: |
+    :root {
+      --slk-font-ui: "Trebuchet MS", "Tahoma", "Segoe UI", sans-serif;
+      --slk-panel: rgba(14, 24, 39, 0.96);
+      --slk-panel-border: rgba(96, 132, 188, 0.68);
+      --slk-text: #dde9ff;
+      --slk-text-soft: #afc7ea;
+      --slk-input-bg: rgba(19, 35, 57, 0.92);
+      --slk-input-border: #3e6299;
+      --slk-button-border: #3a5b8d;
+    }
+
+    body {
+      font-family: var(--slk-font-ui);
+      background:
+        radial-gradient(circle at 22% 18%, rgba(90, 133, 215, 0.24), transparent 44%),
+        radial-gradient(circle at 75% 72%, rgba(120, 95, 190, 0.18), transparent 44%),
+        linear-gradient(180deg, #111b30, #0b1527 52%, #060d1a);
+    }
+
+    .login-ui {
+      color: var(--slk-text);
+      background: transparent;
+    }
+
+    .login-ui .login-dialog-middle {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+
+    .login-ui .login-dialog {
+      width: min(520px, 92vw);
+      border: 1px solid var(--slk-panel-border);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(8, 18, 33, 0.92), rgba(6, 14, 26, 0.95));
+      box-shadow: 0 30px 58px rgba(0, 0, 0, 0.52);
+      padding: 24px 22px;
+      backdrop-filter: blur(4px);
+    }
+
+    .login-ui .logo {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(122, 163, 224, 0.45);
+      background:
+        url("/portal/sloth-smile.svg") center/58px 58px no-repeat,
+        rgba(13, 29, 49, 0.88);
+      box-shadow: inset 0 0 0 1px rgba(221, 233, 255, 0.08);
+    }
+
+    .login-ui .version {
+      margin-bottom: 14px;
+    }
+
+    .login-ui .version .app-name {
+      font-size: 1.05rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #edf5ff;
+    }
+
+    .login-ui .version .version-number {
+      margin-top: 2px;
+      color: var(--slk-text-soft);
+      font-size: 0.78rem;
+    }
+
+    .login-ui p {
+      color: var(--slk-text-soft);
+      line-height: 1.45;
+    }
+
+    .login-ui .login-fields input,
+    .login-ui .login-fields select,
+    .login-ui .login-fields textarea,
+    .login-ui .login-fields .password-field,
+    .login-ui .login-fields .username-field {
+      border-color: var(--slk-input-border);
+      background: var(--slk-input-bg);
+      color: var(--slk-text);
+      border-radius: 8px;
+    }
+
+    .login-ui .login-fields input {
+      padding: 9px 10px;
+    }
+
+    .login-ui .buttons input[type="submit"] {
+      border: 1px solid var(--slk-button-border);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(33, 54, 85, 0.92), rgba(24, 41, 66, 0.92));
+      color: #d0e2ff;
+      padding: 9px 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      box-shadow: 0 1px 0 rgba(192, 217, 255, 0.15) inset;
+    }
+
+    .login-ui .buttons input[type="submit"]:hover {
+      background: linear-gradient(180deg, rgba(47, 76, 118, 0.9), rgba(30, 52, 82, 0.9));
+      border-color: #4f79b8;
+    }
+
+    .login-ui .login-error {
+      margin: 0 auto 12px;
+      width: min(520px, 92vw);
+      border: 1px solid rgba(176, 62, 88, 0.75);
+      border-radius: 10px;
+      background: rgba(72, 18, 34, 0.82);
+      color: #ffd7e1;
+      padding: 10px 12px;
+    }
+  sloth-smile.svg: |
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Smiling sloth">
+      <defs>
+        <linearGradient id="fur" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="#d2b08a" />
+          <stop offset="1" stop-color="#b08461" />
+        </linearGradient>
+      </defs>
+      <circle cx="32" cy="32" r="30" fill="#203858" />
+      <ellipse cx="32" cy="35" rx="22" ry="20" fill="url(#fur)" />
+      <circle cx="18" cy="18" r="6" fill="#b08461" />
+      <circle cx="46" cy="18" r="6" fill="#b08461" />
+      <ellipse cx="24" cy="31" rx="8" ry="7" fill="#8a6246" />
+      <ellipse cx="40" cy="31" rx="8" ry="7" fill="#8a6246" />
+      <ellipse cx="32" cy="39" rx="12" ry="10" fill="#f7ebd8" />
+      <circle cx="24" cy="31" r="2.2" fill="#111822" />
+      <circle cx="40" cy="31" r="2.2" fill="#111822" />
+      <circle cx="31" cy="39" r="1.5" fill="#3b2b20" />
+      <path d="M26 43c2.2 2.6 9.8 2.6 12 0" fill="none" stroke="#3b2b20" stroke-width="2.3" stroke-linecap="round" />
+    </svg>
+  grain.svg: |
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+      <filter id="n">
+        <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="2" stitchTiles="stitch" />
+        <feColorMatrix type="saturate" values="0" />
+      </filter>
+      <rect width="120" height="120" filter="url(#n)" opacity="0.24" />
+    </svg>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vdi-portal-nginx
+  namespace: vdi
+data:
+  default.conf: |
+    map $http_upgrade $connection_upgrade {
+      default upgrade;
+      ''      close;
+    }
+
+    server {
+      listen 8081;
+      server_name _;
+
+      root /etc/vdi-portal;
+      index index.html;
+
+      location = /healthz {
+        add_header Content-Type text/plain;
+        return 200 "ok\n";
+      }
+
+      location = / {
+        try_files /index.html =404;
+      }
+
+      location /portal/ {
+        alias /etc/vdi-portal/;
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=300";
+      }
+
+      location = /guacamole {
+        return 302 /guacamole/;
+      }
+
+      location /guacamole/ {
+        proxy_pass http://127.0.0.1:8080/guacamole/;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Accept-Encoding "";
+
+        proxy_buffering off;
+
+        sub_filter '</head>' '<link rel="stylesheet" href="/portal/guac-theme.css"></head>';
+        sub_filter_types text/html;
+        sub_filter_once on;
+      }
+    }
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: guacamole-db
@@ -67,10 +571,6 @@ spec:
       - name: postgres
         image: __POSTGRES_IMAGE__
         imagePullPolicy: IfNotPresent
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop: ["ALL"]
         ports:
         - name: postgres
           containerPort: 5432
@@ -108,7 +608,7 @@ spec:
         resources:
           requests:
             cpu: 150m
-            memory: 256Mi
+            memory: 128Mi
           limits:
             cpu: 1000m
             memory: 1024Mi
@@ -171,7 +671,7 @@ spec:
         resources:
           requests:
             cpu: 100m
-            memory: 128Mi
+            memory: 64Mi
           limits:
             cpu: 500m
             memory: 512Mi
@@ -207,13 +707,13 @@ spec:
               name: guacamole-db-auth
               key: password
         ports:
-        - name: http
+        - name: guac-http
           containerPort: 8080
           protocol: TCP
         readinessProbe:
           httpGet:
             path: /guacamole/
-            port: http
+            port: guac-http
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -221,18 +721,63 @@ spec:
         livenessProbe:
           httpGet:
             path: /guacamole/
-            port: http
+            port: guac-http
           initialDelaySeconds: 90
           periodSeconds: 20
           timeoutSeconds: 5
           failureThreshold: 6
         resources:
           requests:
-            cpu: 250m
-            memory: 512Mi
+            cpu: 200m
+            memory: 256Mi
           limits:
             cpu: 1000m
             memory: 1536Mi
+      - name: portal-proxy
+        image: __NGINX_IMAGE__
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 8081
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+          initialDelaySeconds: 20
+          periodSeconds: 20
+          timeoutSeconds: 3
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 50m
+            memory: 32Mi
+          limits:
+            cpu: 300m
+            memory: 256Mi
+        volumeMounts:
+        - name: portal-assets
+          mountPath: /etc/vdi-portal
+          readOnly: true
+        - name: portal-nginx
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+          readOnly: true
+      volumes:
+      - name: portal-assets
+        configMap:
+          name: vdi-portal-assets
+      - name: portal-nginx
+        configMap:
+          name: vdi-portal-nginx
 ---
 apiVersion: v1
 kind: Service

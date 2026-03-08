@@ -6,10 +6,12 @@ param(
   [string]$PostgresSourceImage = "postgres:16-alpine",
   [string]$GuacdSourceImage = "guacamole/guacd:1.5.5",
   [string]$GuacamoleSourceImage = "guacamole/guacamole:1.5.5",
+  [string]$NginxSourceImage = "nginx:1.27-alpine",
   [string]$DesktopSourceImage = "dorowu/ubuntu-desktop-lxde-vnc:latest",
   [string]$EcrPostgresRepositoryName = "ddc-vdi-postgres",
   [string]$EcrGuacdRepositoryName = "ddc-vdi-guacd",
   [string]$EcrGuacamoleRepositoryName = "ddc-vdi-guacamole",
+  [string]$EcrNginxRepositoryName = "ddc-vdi-nginx",
   [string]$EcrDesktopRepositoryName = "ddc-vdi-desktop",
   [switch]$MirrorDesktopImage,
   [switch]$SkipSourcePull
@@ -175,6 +177,7 @@ if (-not $SkipSourcePull) {
   Invoke-CommandChecked -Executable $docker -Arguments @("pull", $PostgresSourceImage) -Label "docker-pull-postgres"
   Invoke-CommandChecked -Executable $docker -Arguments @("pull", $GuacdSourceImage) -Label "docker-pull-guacd"
   Invoke-CommandChecked -Executable $docker -Arguments @("pull", $GuacamoleSourceImage) -Label "docker-pull-guacamole"
+  Invoke-CommandChecked -Executable $docker -Arguments @("pull", $NginxSourceImage) -Label "docker-pull-nginx"
   if ($MirrorDesktopImage) {
     Invoke-CommandChecked -Executable $docker -Arguments @("pull", $DesktopSourceImage) -Label "docker-pull-desktop"
   }
@@ -189,6 +192,7 @@ $accountId = $accountResult.output.Trim()
 $postgresTag = Get-ImageTag -Image $PostgresSourceImage
 $guacdTag = Get-ImageTag -Image $GuacdSourceImage
 $guacamoleTag = Get-ImageTag -Image $GuacamoleSourceImage
+$nginxTag = Get-ImageTag -Image $NginxSourceImage
 $desktopTag = Get-ImageTag -Image $DesktopSourceImage
 
 $mirrored = New-Object System.Collections.Generic.List[object]
@@ -199,6 +203,7 @@ foreach ($region in $regions) {
   Ensure-EcrRepository -AwsExecutable $aws -Region $region -RepositoryName $EcrPostgresRepositoryName
   Ensure-EcrRepository -AwsExecutable $aws -Region $region -RepositoryName $EcrGuacdRepositoryName
   Ensure-EcrRepository -AwsExecutable $aws -Region $region -RepositoryName $EcrGuacamoleRepositoryName
+  Ensure-EcrRepository -AwsExecutable $aws -Region $region -RepositoryName $EcrNginxRepositoryName
   if ($MirrorDesktopImage) {
     Ensure-EcrRepository -AwsExecutable $aws -Region $region -RepositoryName $EcrDesktopRepositoryName
   }
@@ -218,17 +223,20 @@ foreach ($region in $regions) {
   $targetPostgres = "$registry/${EcrPostgresRepositoryName}:$postgresTag"
   $targetGuacd = "$registry/${EcrGuacdRepositoryName}:$guacdTag"
   $targetGuacamole = "$registry/${EcrGuacamoleRepositoryName}:$guacamoleTag"
+  $targetNginx = "$registry/${EcrNginxRepositoryName}:$nginxTag"
   $targetDesktop = "$registry/${EcrDesktopRepositoryName}:$desktopTag"
 
   Invoke-CommandChecked -Executable $docker -Arguments @("tag", $PostgresSourceImage, $targetPostgres) -Label "docker-tag-postgres-$region"
   Invoke-CommandChecked -Executable $docker -Arguments @("tag", $GuacdSourceImage, $targetGuacd) -Label "docker-tag-guacd-$region"
   Invoke-CommandChecked -Executable $docker -Arguments @("tag", $GuacamoleSourceImage, $targetGuacamole) -Label "docker-tag-guacamole-$region"
+  Invoke-CommandChecked -Executable $docker -Arguments @("tag", $NginxSourceImage, $targetNginx) -Label "docker-tag-nginx-$region"
   if ($MirrorDesktopImage) {
     Invoke-CommandChecked -Executable $docker -Arguments @("tag", $DesktopSourceImage, $targetDesktop) -Label "docker-tag-desktop-$region"
   }
   Invoke-CommandChecked -Executable $docker -Arguments @("push", $targetPostgres) -Label "docker-push-postgres-$region"
   Invoke-CommandChecked -Executable $docker -Arguments @("push", $targetGuacd) -Label "docker-push-guacd-$region"
   Invoke-CommandChecked -Executable $docker -Arguments @("push", $targetGuacamole) -Label "docker-push-guacamole-$region"
+  Invoke-CommandChecked -Executable $docker -Arguments @("push", $targetNginx) -Label "docker-push-nginx-$region"
   if ($MirrorDesktopImage) {
     Invoke-CommandChecked -Executable $docker -Arguments @("push", $targetDesktop) -Label "docker-push-desktop-$region"
   }
@@ -238,6 +246,7 @@ foreach ($region in $regions) {
     postgres_image  = $targetPostgres
     guacd_image     = $targetGuacd
     guacamole_image = $targetGuacamole
+    nginx_image     = $targetNginx
   }
   if ($MirrorDesktopImage) {
     $entry.desktop_image = $targetDesktop
