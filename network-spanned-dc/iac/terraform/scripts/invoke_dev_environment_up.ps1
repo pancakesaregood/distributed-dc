@@ -3,6 +3,7 @@ param(
   [string]$AwsProfile = "",
   [string]$GcpCredentialsPath = "",
   [switch]$EnablePublishedAppPath,
+  [switch]$EnableOpsStack,
   [switch]$EnableCloudflareEdge,
   [string]$CloudflareApiToken = "",
   [string]$CloudflareZoneId = "",
@@ -69,6 +70,7 @@ $publishedEnabled = $EnablePublishedAppPath.IsPresent.ToString().ToLowerInvarian
 $ingressInternetEdgeEnabled = $EnablePublishedAppPath.IsPresent.ToString().ToLowerInvariant()
 $cloudflareEnabled = $EnableCloudflareEdge.IsPresent.ToString().ToLowerInvariant()
 $vdiEnabled = $EnableVdiReferenceStack.IsPresent.ToString().ToLowerInvariant()
+$opsEnabled = $EnableOpsStack.IsPresent.ToString().ToLowerInvariant()
 $phase5Enabled = $EnablePhase5Flags.IsPresent.ToString().ToLowerInvariant()
 $command = if ($PlanOnly) { "plan" } else { "apply" }
 
@@ -123,6 +125,7 @@ $args = @(
   "-var", "phase4_aws_enable_ingress_internet_edge=$ingressInternetEdgeEnabled",
   "-var", "phase4_enable_cloudflare_edge=$cloudflareEnabled",
   "-var", "phase4_enable_vdi_reference_stack=$vdiEnabled",
+  "-var", "phase4_enable_ops_stack=$opsEnabled",
   "-var", "phase5_enable_resilience_validation=$phase5Enabled",
   "-var", "phase5_enable_backup_restore_drills=$phase5Enabled",
   "-var", "phase5_enable_handover_signoff=$phase5Enabled"
@@ -170,6 +173,7 @@ try {
   }
   Write-Host "Cloudflare edge: $cloudflareEnabled"
   Write-Host "VDI reference stack: $vdiEnabled"
+  Write-Host "Ops server stack: $opsEnabled"
   Invoke-Terraform -Executable $terraform -Arguments $args
 } finally {
   Pop-Location

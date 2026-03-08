@@ -901,6 +901,149 @@ variable "phase4_gcp_node_workload_metadata_mode" {
   }
 }
 
+variable "phase4_enable_ops_stack" {
+  description = "Enable Phase 4 standalone ops servers (OpenProject in Site C, git server in Site B, and Ansible control node in Site A)."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.phase4_enable_ops_stack || var.phase4_aws_enable_ingress_internet_edge
+    error_message = "phase4_enable_ops_stack requires phase4_aws_enable_ingress_internet_edge=true so AWS ops instances can bootstrap packages."
+  }
+
+  validation {
+    condition = (
+      !var.phase4_enable_ops_stack ||
+      (var.phase4_ops_admin_ssh_public_key != null && trimspace(var.phase4_ops_admin_ssh_public_key) != "") ||
+      (var.phase4_ops_admin_ssh_password != null && trimspace(var.phase4_ops_admin_ssh_password) != "")
+    )
+    error_message = "phase4_enable_ops_stack requires phase4_ops_admin_ssh_public_key or phase4_ops_admin_ssh_password."
+  }
+}
+
+variable "phase4_ops_admin_username" {
+  description = "Bootstrap admin username configured on OpenProject, git, and Ansible nodes."
+  type        = string
+  default     = "opsadmin"
+
+  validation {
+    condition     = can(regex("^[a-z_][a-z0-9_-]{0,30}$", var.phase4_ops_admin_username))
+    error_message = "phase4_ops_admin_username must match Linux username rules: ^[a-z_][a-z0-9_-]{0,30}$."
+  }
+}
+
+variable "phase4_ops_admin_ssh_public_key" {
+  description = "Optional SSH public key injected into the ops admin account on all ops servers."
+  type        = string
+  default     = null
+}
+
+variable "phase4_ops_admin_ssh_password" {
+  description = "Optional SSH password for the ops admin account on all ops servers."
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
+variable "phase4_ops_aws_key_pair_name" {
+  description = "Optional AWS EC2 key pair name attached to Site A/B ops instances."
+  type        = string
+  default     = null
+}
+
+variable "phase4_ops_trusted_ipv4_cidrs" {
+  description = "Additional trusted IPv4 CIDRs allowed SSH access to ops servers."
+  type        = list(string)
+  default     = []
+}
+
+variable "phase4_ops_openproject_http_allowed_ipv4_cidrs" {
+  description = "IPv4 CIDRs allowed to reach OpenProject HTTP/HTTPS in Site C. Null or empty defaults to site CIDRs plus phase4_ops_trusted_ipv4_cidrs."
+  type        = list(string)
+  default     = null
+}
+
+variable "phase4_ops_git_http_allowed_ipv4_cidrs" {
+  description = "IPv4 CIDRs allowed to reach Git server web UI in Site B. Null or empty defaults to site CIDRs plus phase4_ops_trusted_ipv4_cidrs."
+  type        = list(string)
+  default     = null
+}
+
+variable "phase4_ops_openproject_machine_type" {
+  description = "GCP machine type for the Site C OpenProject server."
+  type        = string
+  default     = "e2-standard-4"
+}
+
+variable "phase4_ops_openproject_boot_disk_size_gb" {
+  description = "Boot disk size in GiB for the Site C OpenProject server."
+  type        = number
+  default     = 80
+
+  validation {
+    condition     = var.phase4_ops_openproject_boot_disk_size_gb >= 20
+    error_message = "phase4_ops_openproject_boot_disk_size_gb must be at least 20 GiB."
+  }
+}
+
+variable "phase4_ops_openproject_zone" {
+  description = "Optional explicit zone for Site C OpenProject server. Null defaults to <gcp_site_c_region>-b."
+  type        = string
+  default     = null
+}
+
+variable "phase4_ops_openproject_image" {
+  description = "Container image for OpenProject deployment in Site C."
+  type        = string
+  default     = "openproject/openproject:17"
+}
+
+variable "phase4_ops_openproject_host_name" {
+  description = "Host name advertised by OpenProject (for example: openproject.slothkko.com)."
+  type        = string
+  default     = "openproject.local"
+}
+
+variable "phase4_ops_git_instance_type" {
+  description = "EC2 instance type for the Site B git server."
+  type        = string
+  default     = "t3.small"
+}
+
+variable "phase4_ops_git_root_volume_size_gb" {
+  description = "Root volume size in GiB for the Site B git server."
+  type        = number
+  default     = 60
+
+  validation {
+    condition     = var.phase4_ops_git_root_volume_size_gb >= 20
+    error_message = "phase4_ops_git_root_volume_size_gb must be at least 20 GiB."
+  }
+}
+
+variable "phase4_ops_git_image" {
+  description = "Container image for Git server deployment in Site B."
+  type        = string
+  default     = "docker.gitea.com/gitea:1.25.4"
+}
+
+variable "phase4_ops_ansible_instance_type" {
+  description = "EC2 instance type for the Site A Ansible control node."
+  type        = string
+  default     = "t3.small"
+}
+
+variable "phase4_ops_ansible_root_volume_size_gb" {
+  description = "Root volume size in GiB for the Site A Ansible control node."
+  type        = number
+  default     = 40
+
+  validation {
+    condition     = var.phase4_ops_ansible_root_volume_size_gb >= 20
+    error_message = "phase4_ops_ansible_root_volume_size_gb must be at least 20 GiB."
+  }
+}
+
 variable "phase5_enable_resilience_validation" {
   description = "Track readiness to execute Phase 5 failover scenarios and DR runbooks."
   type        = bool

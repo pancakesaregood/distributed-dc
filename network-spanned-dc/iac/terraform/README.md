@@ -48,6 +48,10 @@ It is intentionally phased:
 - VDI Reference Stack Phase 4 extension (when `phase4_enable_vdi_reference_stack = true`):
   - AWS Site A/B: VDI broker and desktop security-group policy boundaries, broker IAM role/profile, and dedicated EKS VDI node groups.
   - GCP Site C/D: VDI firewall policy controls, broker service-account IAM bindings, and dedicated GKE VDI node pools.
+- Ops Servers Phase 4 extension (when `phase4_enable_ops_stack = true`):
+  - Site C (GCP): OpenProject host on Compute Engine with Docker bootstrap and public IP.
+  - Site B (AWS): Git server host on EC2 with Gitea container (`3000/tcp` web and `2222/tcp` SSH).
+  - Site A (AWS): Ansible control node on EC2 with baseline inventory wiring to OpenProject and Git hosts.
 - Phase 5 operations pack:
   - Evidence capture script: `scripts/invoke_phase5_evidence_capture.ps1`
   - Generated artifacts: health snapshots, summary markdown, execution record template.
@@ -79,6 +83,7 @@ Use these PowerShell helpers to reduce costs between dev sessions:
 - Mirror VDI images into private ECR: `scripts/invoke_phase4_vdi_ecr_image_mirror.ps1`
 - Bootstrap Guacamole service on EKS VDI pools: `scripts/invoke_phase4_vdi_service_bootstrap.ps1`
 - Launch admin-only VDI reactor console: `scripts/invoke_vdi_ops_console.ps1`
+- Seed Guacamole SSH targets for ops servers: `scripts/invoke_phase4_guac_seed_ops_connections.ps1`
 - Discover and cut over published app backends: `scripts/invoke_phase4_published_app_cutover.ps1`
 - Discover EKS VDI node targets and cut over published app path: `scripts/invoke_phase4_vdi_eks_backend_cutover.ps1`
 
@@ -98,6 +103,15 @@ cd network-spanned-dc\iac\terraform
   -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -EnablePublishedAppPath `
   -EnableVdiReferenceStack
+
+# Start with standalone ops servers (OpenProject + Git + Ansible).
+# Provide at least one credential path via TF vars (public key and/or password).
+$env:TF_VAR_phase4_ops_admin_ssh_public_key = "<ssh-public-key>"
+.\scripts\invoke_dev_environment_up.ps1 `
+  -AwsProfile "ddc" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
+  -EnablePublishedAppPath `
+  -EnableOpsStack
 
 # Start with published app path + Cloudflare DNS automation (DNS-only mode).
 $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
@@ -155,6 +169,10 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
   -AdminUsername "ops-admin" `
   -AdminPassword "<strong-password>" `
   -OpenBrowser
+
+# Seed Guacamole with SSH connections for OpenProject/Git/Ansible hosts after ops stack apply.
+.\scripts\invoke_phase4_guac_seed_ops_connections.ps1 `
+  -AwsProfile "ddc"
 
 # Quota-safe apply (AWS workers only, keep GCP VDI controls but skip GCP VDI worker pools).
 .\scripts\invoke_phase4_vdi_enablement.ps1 `
@@ -265,6 +283,7 @@ Notes:
 - Add `-SuspendIntercloud` to disable Phase 2 (`phase2_enable_intercloud=false`) and remove AWS/GCP VPN/BGP resources between sessions.
 - `invoke_phase4_vdi_enablement.ps1` runs post-apply worker health checks unless `-SkipHealthChecks` is set.
 - `invoke_phase4_vdi_enablement.ps1 -EnablePublishedAppPath` now also sets `phase4_aws_enable_ingress_internet_edge=true` and runs AWS ingress-route preflight checks.
+- `invoke_dev_environment_up.ps1 -EnableOpsStack` sets `phase4_enable_ops_stack=true` in the apply/plan.
 - Use `-EnablePublishedAppTls` with Cloudflare edge to provision per-site ACM certs (DNS-validated via Cloudflare) and HTTPS listeners on the published app ALBs.
 - Use `-SiteAPublishedAppBackendTargets` and `-SiteBPublishedAppBackendTargets` to override published app backend IP lists for a single pass.
 - Optional overrides: `-PublishedAppBackendPort` and `-PublishedAppHealthCheckPath`.
@@ -280,6 +299,7 @@ Notes:
 - Use `-IncludeIngressSubnets:$true` if your backend ENIs live in ingress subnets.
 - Use `-AllowEmptyTargets` only if you intentionally want fixed-response fallback (`503`) on one or both sites.
 - `invoke_phase4_vdi_eks_backend_cutover.ps1` discovers backend targets from EKS nodegroup instances (`-NodegroupSuffix vdi` by default) and invokes `invoke_phase4_vdi_enablement.ps1` with VDI-oriented defaults (`backend_port=30080`, `health_path=/guacamole/`).
+- `invoke_phase4_guac_seed_ops_connections.ps1` reads `phase4_ops_servers` Terraform output and upserts Guacamole SSH connections in Site A/B Guacamole databases.
 - After cutover, ALB target health can take ~30-120 seconds to transition from `unhealthy` to `healthy` while NodePort checks converge.
 - Override nodegroup names with `-SiteANodegroupName` and `-SiteBNodegroupName` when naming diverges from standard suffix conventions.
 - Published app preflight now validates backend target IPv4 format, detects duplicates, and warns when targets are not attached to ENIs in the site VPC.
@@ -368,6 +388,14 @@ Bootstrap user requirements (one-time, human account):
   - `phase4_vdi_aws_desktop_controlled_egress_ipv4_cidrs` / `phase4_vdi_aws_desktop_controlled_egress_ipv6_cidrs`
   - `phase4_vdi_gcp_desktop_controlled_egress_ipv4_cidrs`
   - `phase4_vdi_gcp_manage_broker_identity` (defaults to `true`; set `false` if the current GCP identity cannot create service accounts)
+- Phase 4 standalone ops server controls:
+  - `phase4_enable_ops_stack` (defaults to `false`; requires `phase4_aws_enable_ingress_internet_edge=true`)
+  - `phase4_ops_admin_username`, `phase4_ops_admin_ssh_public_key`, `phase4_ops_admin_ssh_password`
+  - `phase4_ops_openproject_*` (Site C machine/image/network controls)
+  - `phase4_ops_git_*` (Site B instance/image/network controls)
+  - `phase4_ops_ansible_*` (Site A instance sizing controls)
+  - `phase4_ops_trusted_ipv4_cidrs`, `phase4_ops_openproject_http_allowed_ipv4_cidrs`, `phase4_ops_git_http_allowed_ipv4_cidrs`
+  - By default, OpenProject/Git HTTP ingress is restricted to site CIDRs plus `phase4_ops_trusted_ipv4_cidrs`; set explicit `phase4_ops_*_http_allowed_ipv4_cidrs` only when broader access is required.
 - Phase 3 API hardening controls:
   - `phase3_aws_endpoint_private_access`
   - `phase3_aws_public_access_cidrs`

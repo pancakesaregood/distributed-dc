@@ -176,6 +176,38 @@ phase4_vdi_gcp_node_service_account                  = null
 phase4_vdi_gcp_node_labels                           = {}
 phase4_vdi_gcp_node_tags                             = []
 
+# Optional standalone ops servers baseline.
+phase4_enable_ops_stack = false
+
+# Set at least one of public key or password before enabling phase4_enable_ops_stack.
+phase4_ops_admin_username       = "opsadmin"
+phase4_ops_admin_ssh_public_key = null
+phase4_ops_admin_ssh_password   = null
+phase4_ops_aws_key_pair_name    = null
+
+# Additional trusted operator ranges for SSH access on top of all site CIDRs.
+phase4_ops_trusted_ipv4_cidrs = []
+
+# Public/UI ingress controls.
+phase4_ops_openproject_http_allowed_ipv4_cidrs = null
+phase4_ops_git_http_allowed_ipv4_cidrs         = null
+
+# OpenProject (Site C / GCP)
+phase4_ops_openproject_machine_type      = "e2-standard-4"
+phase4_ops_openproject_boot_disk_size_gb = 80
+phase4_ops_openproject_zone              = null
+phase4_ops_openproject_image             = "openproject/openproject:17"
+phase4_ops_openproject_host_name         = "openproject.local"
+
+# Git server (Site B / AWS)
+phase4_ops_git_instance_type       = "t3.small"
+phase4_ops_git_root_volume_size_gb = 60
+phase4_ops_git_image               = "docker.gitea.com/gitea:1.25.4"
+
+# Ansible control node (Site A / AWS)
+phase4_ops_ansible_instance_type       = "t3.small"
+phase4_ops_ansible_root_volume_size_gb = 40
+
 # Source-material Phase 5 deliverable tracking flags.
 phase5_enable_resilience_validation = false
 phase5_enable_backup_restore_drills = false

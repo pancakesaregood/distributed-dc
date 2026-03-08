@@ -175,7 +175,7 @@ output "phase4_cloudflare_edge_records" {
         target   = record.content
       }
     }
-  } : {
+    } : {
     site_a     = null
     site_b     = null
     additional = {}
@@ -208,6 +208,39 @@ output "phase4_vdi_reference_stacks" {
   } : null
 }
 
+output "phase4_ops_servers" {
+  description = "Phase 4 standalone ops server endpoints and Guacamole SSH target metadata when enabled."
+  value = var.phase4_enable_ops_stack ? {
+    openproject = {
+      site        = "site-c"
+      private_ip  = google_compute_instance.phase4_openproject_server[0].network_interface[0].network_ip
+      public_ip   = google_compute_address.phase4_site_c_openproject_public_ip[0].address
+      ssh_port    = 22
+      ssh_user    = var.phase4_ops_admin_username
+      app_url     = "http://${google_compute_address.phase4_site_c_openproject_public_ip[0].address}/"
+      guac_target = "OpenProject (Site C)"
+    }
+    git = {
+      site           = "site-b"
+      private_ip     = aws_instance.phase4_git_server[0].private_ip
+      public_ip      = aws_instance.phase4_git_server[0].public_ip
+      ssh_port       = 2222
+      ssh_user       = var.phase4_ops_admin_username
+      app_url        = "http://${aws_instance.phase4_git_server[0].public_ip}:3000/"
+      clone_ssh_hint = "ssh://${var.phase4_ops_admin_username}@${aws_instance.phase4_git_server[0].public_ip}:2222/<org>/<repo>.git"
+      guac_target    = "Git Server (Site B)"
+    }
+    ansible = {
+      site        = "site-a"
+      private_ip  = aws_instance.phase4_ansible_control_node[0].private_ip
+      public_ip   = aws_instance.phase4_ansible_control_node[0].public_ip
+      ssh_port    = 22
+      ssh_user    = var.phase4_ops_admin_username
+      guac_target = "Ansible Control (Site A)"
+    }
+  } : null
+}
+
 output "phase4_deliverable_flags" {
   description = "Phase 4 source-material deliverable flags."
   value = {
@@ -217,6 +250,7 @@ output "phase4_deliverable_flags" {
     aws_ingress_internet_edge   = var.phase4_aws_enable_ingress_internet_edge
     cloudflare_edge             = var.phase4_enable_cloudflare_edge
     vdi_reference_stack         = var.phase4_enable_vdi_reference_stack
+    ops_stack                   = var.phase4_enable_ops_stack
   }
 }
 

@@ -611,3 +611,51 @@ $env:AWS_PROFILE="ddc"
   - `site-a`: red because `desktop_ready=false` (`vdi-desktop_ready=0/1`)
   - `site-b`: green (`desktop_ready=true`, active session detected)
   - `site-c/site-d`: red by design in this pass (`worker not enabled`)
+
+## Ops Server Baseline + Guac Access Pass (2026-03-08 07:36 America/Toronto)
+- Added new Terraform layer:
+  - `phase4_ops_servers.tf`
+  - provisions when `phase4_enable_ops_stack=true`:
+    - OpenProject server in GCP Site C (Compute Engine + public IP + tagged internet egress route)
+    - Git server in AWS Site B (EC2 + Gitea container on `3000`/`2222`)
+    - Ansible control node in AWS Site A (EC2 + Ansible tooling + baseline inventory)
+  - adds AWS IAM instance profiles with `AmazonSSMManagedInstanceCore` for Site A/B ops nodes.
+  - adds security controls:
+    - AWS SGs for SSH/web where applicable
+    - GCP firewall rules for OpenProject SSH/http access
+- Added new Terraform variables and tfvars examples for:
+  - enabling/tuning ops stack (`phase4_enable_ops_stack`, `phase4_ops_*`)
+  - ops admin access bootstrap (public key and/or password)
+  - OpenProject/Git/Ansible sizing and ingress controls
+- Added new output:
+  - `phase4_ops_servers` (private/public endpoints + Guacamole target metadata)
+- Added Guacamole seeding helper:
+  - `scripts/invoke_phase4_guac_seed_ops_connections.ps1`
+  - reads `phase4_ops_servers` output and upserts SSH connections in Site A/B Guacamole DBs.
+- Runtime bring-up notes:
+  - OpenProject bootstrap now completes cleanly on GCP (`google-startup-scripts.service` exit `0`) after fixing Docker apt repo codename/substitution issues in startup script rendering.
+  - Gitea endpoint validated at `http://<REDACTED_PUBLIC_ENDPOINT>/` (`200`) before ingress lockdown.
+  - OpenProject endpoint validated with expected host header:
+    - `curl -H "Host: openproject.slothkko.com" http://<REDACTED_PUBLIC_IP>/` -> `302`
+    - direct IP probe without host header returns application-level `400` by design.
+- Guac-only access hardening applied:
+  - requirement: app UIs should only be reachable from Guacamole-side/internal site networks.
+  - Terraform defaults changed:
+    - `phase4_ops_openproject_http_allowed_ipv4_cidrs = null` and `phase4_ops_git_http_allowed_ipv4_cidrs = null`
+    - null/empty now resolves to internal site CIDRs (`<REDACTED_PRIVATE_CIDR>`, `<REDACTED_PRIVATE_CIDR>`, `<REDACTED_PRIVATE_CIDR>`, `<REDACTED_PRIVATE_CIDR>`) plus optional `phase4_ops_trusted_ipv4_cidrs`.
+  - targeted apply executed:
+    - `aws_security_group.phase4_site_b_git[0]` (Gitea `3000/tcp`)
+    - `google_compute_firewall.phase4_site_c_openproject_http[0]` (OpenProject `80/443`)
+  - external probe verification after apply:
+    - `http://<REDACTED_PUBLIC_ENDPOINT>/` -> unreachable from public internet
+    - `http://<REDACTED_PUBLIC_IP>/` -> unreachable from public internet
+- Updated:
+  - `scripts/invoke_dev_environment_up.ps1` with `-EnableOpsStack`
+  - `README.md` with ops stack + Guac seeding workflows
+- Validation status:
+  - run `terraform fmt` on updated files
+  - run `terraform validate`
+  - run PowerShell parser checks:
+    - `scripts/invoke_phase4_guac_seed_ops_connections.ps1`
+    - `scripts/invoke_dev_environment_up.ps1`
+  - ran repository grep-based secret checks (no exposed Cloudflare token, SSH password, private keys, or static access keys in tracked content)
