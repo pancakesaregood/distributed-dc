@@ -753,7 +753,7 @@ CREATE INDEX guacamole_user_password_history_user_id
 -- under the License.
 --
 
--- Create default user "guacadmin" with password "guacadmin"
+-- Create bootstrap admin user; password hash/salt is injected at deploy time
 INSERT INTO guacamole_entity (name, type) VALUES ('guacadmin', 'USER');
 INSERT INTO guacamole_user (entity_id, password_hash, password_salt, password_date)
 SELECT

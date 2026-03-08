@@ -90,12 +90,12 @@ cd network-spanned-dc\iac\terraform
 # Start core platform (Phase 3 + Phase 4 service onboarding).
 .\scripts\invoke_dev_environment_up.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json"
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json"
 
 # Start with published app path and VDI reference stack.
 .\scripts\invoke_dev_environment_up.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -EnablePublishedAppPath `
   -EnableVdiReferenceStack
 
@@ -103,7 +103,7 @@ cd network-spanned-dc\iac\terraform
 $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 .\scripts\invoke_dev_environment_up.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -EnablePublishedAppPath `
   -EnableCloudflareEdge `
   -CloudflareZoneName "slothkko.com" `
@@ -113,7 +113,7 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 # Enable Phase 4 VDI stack and run worker health checks (EKS/GKE).
 .\scripts\invoke_phase4_vdi_enablement.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -GcpProjectId "worldbuilder-413006" `
   -DisableGcpBrokerIdentity `
   -PreflightOnly
@@ -121,7 +121,7 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 # Apply Phase 4 VDI stack after preflight passes.
 .\scripts\invoke_phase4_vdi_enablement.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -GcpProjectId "worldbuilder-413006" `
   -DisableGcpBrokerIdentity `
   -AutoApprove
@@ -159,7 +159,7 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 # Quota-safe apply (AWS workers only, keep GCP VDI controls but skip GCP VDI worker pools).
 .\scripts\invoke_phase4_vdi_enablement.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -GcpProjectId "worldbuilder-413006" `
   -DisableGcpBrokerIdentity `
   -DisableGcpWorkerPools `
@@ -169,7 +169,7 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 .\scripts\invoke_phase4_vdi_enablement.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -GcpProjectId "worldbuilder-413006" `
   -EnablePublishedAppPath `
   -EnablePublishedAppTls `
@@ -192,7 +192,7 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 # Switch published app path from fixed-response to forward mode using explicit backend IP targets.
 .\scripts\invoke_phase4_vdi_enablement.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -GcpProjectId "worldbuilder-413006" `
   -EnablePublishedAppPath `
   -SiteAPublishedAppBackendTargets @("10.10.2.45", "10.10.2.46") `
@@ -204,14 +204,14 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 # Auto-discover backend targets from AWS app/data subnets and run cutover preflight.
 .\scripts\invoke_phase4_published_app_cutover.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -GcpProjectId "worldbuilder-413006" `
   -PreflightOnly
 
 # Apply auto-discovered forward-mode cutover.
 .\scripts\invoke_phase4_published_app_cutover.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -GcpProjectId "worldbuilder-413006" `
   -AutoApprove
 
@@ -219,7 +219,7 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 # (backend_port 30080, health_path /guacamole/).
 .\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -GcpProjectId "worldbuilder-413006" `
   -DisableGcpBrokerIdentity `
   -PreflightOnly
@@ -227,7 +227,7 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 # Apply EKS-targeted cutover.
 .\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -GcpProjectId "worldbuilder-413006" `
   -DisableGcpBrokerIdentity `
   -EnablePublishedAppTls `
@@ -242,18 +242,18 @@ $env:CLOUDFLARE_API_TOKEN = "<cloudflare-api-token>"
 # Stop expensive platform resources (keeps Phase 1/2 foundation and networking).
 .\scripts\invoke_dev_environment_down.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json"
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json"
 
 # Stop platform resources and suspend Phase 2 inter-cloud VPN/BGP links.
 .\scripts\invoke_dev_environment_down.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -SuspendIntercloud
 
 # Maximum savings: destroy everything managed by Terraform.
 .\scripts\invoke_dev_environment_down.ps1 `
   -AwsProfile "ddc" `
-  -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -DestroyAll
 ```
 
@@ -308,7 +308,7 @@ gcloud auth login
 .\scripts\bootstrap_gcp_permissions.ps1 `
   -ProjectId "worldbuilder-413006" `
   -ServiceAccountName "terraform-ddc" `
-  -KeyOutputPath "C:\Users\john\.gcp\ddc-sa.json" `
+  -KeyOutputPath "C:\Users\<user>\.gcp\ddc-sa.json" `
   -EnableGkeRoles
 ```
 

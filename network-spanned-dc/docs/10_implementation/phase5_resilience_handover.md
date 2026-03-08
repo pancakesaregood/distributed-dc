@@ -30,7 +30,7 @@ Default artifact location:
 
 ```powershell
 cd e:\distributed-dc\network-spanned-dc\iac\terraform
-$env:GOOGLE_APPLICATION_CREDENTIALS="C:\Users\john\.gcp\ddc-sa.json"
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\Users\<user>\.gcp\ddc-sa.json"
 $env:AWS_PROFILE="ddc"
 .\scripts\invoke_phase5_evidence_capture.ps1 -ProjectId "worldbuilder-413006"
 ```

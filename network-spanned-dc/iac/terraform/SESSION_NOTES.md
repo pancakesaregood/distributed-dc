@@ -23,7 +23,7 @@
 - Drift check:
   - `terraform plan` returns `No changes`.
 - Local service account key is valid:
-  - `C:\Users\john\.gcp\ddc-sa.json` length is greater than `0`.
+  - `C:\Users\<user>\.gcp\ddc-sa.json` length is greater than `0`.
 
 ## Deployed Network IDs
 - AWS Site A VPC: `vpc-08fb1c45a4dcd2e37`
@@ -98,7 +98,7 @@ gcloud container clusters list --project worldbuilder-413006 --format="table(nam
 ## Terraform Re-Run Sequence
 ```powershell
 cd e:\distributed-dc\network-spanned-dc\iac\terraform
-$env:GOOGLE_APPLICATION_CREDENTIALS="C:\Users\john\.gcp\ddc-sa.json"
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\Users\<user>\.gcp\ddc-sa.json"
 $env:AWS_PROFILE="ddc"
 terraform init
 terraform plan -var "phase3_enable_platform=true"
@@ -141,8 +141,8 @@ Expected now: no pending changes.
 - Remaining cleanup before retry:
   - existing AWS VDI nodegroups `ddc-proposal-site-a-ng-vdi` and `ddc-proposal-site-b-ng-vdi` are in `DELETING` and must finish.
 - Resume commands once deletion completes:
-  - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -PreflightOnly`
-  - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -AutoApprove`
+  - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -PreflightOnly`
+  - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -AutoApprove`
   - verify:
     - `aws eks describe-nodegroup --cluster-name ddc-proposal-site-a-eks --nodegroup-name ddc-proposal-site-a-ng-vdi --region us-east-1 --profile ddc --query "nodegroup.status" --output text`
     - `aws eks describe-nodegroup --cluster-name ddc-proposal-site-b-eks --nodegroup-name ddc-proposal-site-b-ng-vdi --region us-west-2 --profile ddc --query "nodegroup.status" --output text`
@@ -199,8 +199,8 @@ Expected now: no pending changes.
     - `phase4_vdi_gcp_node_*`
   - if GCP identity lacks `iam.serviceAccounts.create`, set `phase4_vdi_gcp_manage_broker_identity=false`
   - run (recommended helper):
-    - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -PlanOnly`
-    - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -AutoApprove`
+    - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -PlanOnly`
+    - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -AutoApprove`
 - Execute failover scenarios and backup/restore drills; record outcomes in latest `execution_record.md`.
 
 ## Published App Unblock Pass (2026-03-07 16:43 America/Toronto)
@@ -219,7 +219,7 @@ Expected now: no pending changes.
   - `terraform validate` passed.
   - Preflight command passed with expected warning (edge missing but will be created).
   - Full apply command succeeded:
-    - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -EnablePublishedAppPath -DisableGcpBrokerIdentity -AutoApprove`
+    - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -EnablePublishedAppPath -DisableGcpBrokerIdentity -AutoApprove`
   - Apply result: `14 added, 0 changed, 0 destroyed`.
   - Published app path now active in both AWS sites with fixed-response listeners and WAF associations.
   - New outputs show ingress edge enabled:
@@ -243,7 +243,7 @@ Expected now: no pending changes.
 
 ## Cloudflare DNS Pass (2026-03-08 01:58 America/Toronto)
 - Executed Cloudflare edge enablement with published app path:
-  - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -EnablePublishedAppPath -EnableCloudflareEdge -CloudflareZoneName "slothkko.com" -CloudflareSiteARecordName "app-a" -CloudflareSiteBRecordName "app-b" -DisableGcpBrokerIdentity -AutoApprove`
+  - `.\scripts\invoke_phase4_vdi_enablement.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -EnablePublishedAppPath -EnableCloudflareEdge -CloudflareZoneName "slothkko.com" -CloudflareSiteARecordName "app-a" -CloudflareSiteBRecordName "app-b" -DisableGcpBrokerIdentity -AutoApprove`
 - Preflight/validate passed.
 - Apply result:
   - `2 added, 2 changed, 0 destroyed`
@@ -307,7 +307,7 @@ Expected now: no pending changes.
 - Validation:
   - script parsed successfully with PowerShell parser
   - preflight execution succeeded:
-    - `.\scripts\invoke_phase4_published_app_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -PreflightOnly`
+    - `.\scripts\invoke_phase4_published_app_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -PreflightOnly`
     - discovered site-a targets (limited to `4`): `<REDACTED_PRIVATE_IP>`, `<REDACTED_PRIVATE_IP>`, `<REDACTED_PRIVATE_IP>`, `<REDACTED_PRIVATE_IP>`
     - discovered site-b targets (limited to `4`): `<REDACTED_PRIVATE_IP>`, `<REDACTED_PRIVATE_IP>`, `<REDACTED_PRIVATE_IP>`, `<REDACTED_PRIVATE_IP>`
     - delegated preflight in `invoke_phase4_vdi_enablement.ps1` passed all checks and skipped apply as expected
@@ -328,7 +328,7 @@ Expected now: no pending changes.
   - supports Cloudflare pass-through and trims accidental quote characters around `CLOUDFLARE_API_TOKEN`
 - Validation:
   - preflight execution succeeded:
-    - `.\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -PreflightOnly`
+    - `.\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -PreflightOnly`
     - discovered site-a EKS VDI targets: `<REDACTED_PRIVATE_IP>`
     - discovered site-b EKS VDI targets: `<REDACTED_PRIVATE_IP>`
     - delegated preflight in `invoke_phase4_vdi_enablement.ps1` passed with `backend_port=30080` and `health_path=/guacamole/`
@@ -342,18 +342,18 @@ Expected now: no pending changes.
   - `scripts/invoke_phase4_vdi_enablement.ps1`
 - Typical use:
   - start core platform:
-    - `.\scripts\invoke_dev_environment_up.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json"`
+    - `.\scripts\invoke_dev_environment_up.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json"`
   - stop platform between sessions:
-    - `.\scripts\invoke_dev_environment_down.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json"`
+    - `.\scripts\invoke_dev_environment_down.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json"`
   - stop platform and suspend inter-cloud VPN/BGP to save more:
-    - `.\scripts\invoke_dev_environment_down.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -SuspendIntercloud`
+    - `.\scripts\invoke_dev_environment_down.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -SuspendIntercloud`
   - maximum savings (full destroy):
-    - `.\scripts\invoke_dev_environment_down.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -DestroyAll`
+    - `.\scripts\invoke_dev_environment_down.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -DestroyAll`
 
 ## Phase 5 Execution Starter
 ```powershell
 cd e:\distributed-dc\network-spanned-dc\iac\terraform
-$env:GOOGLE_APPLICATION_CREDENTIALS="C:\Users\john\.gcp\ddc-sa.json"
+$env:GOOGLE_APPLICATION_CREDENTIALS="C:\Users\<user>\.gcp\ddc-sa.json"
 $env:AWS_PROFILE="ddc"
 .\scripts\invoke_phase5_evidence_capture.ps1 -ProjectId "worldbuilder-413006"
 ```
@@ -386,7 +386,7 @@ $env:AWS_PROFILE="ddc"
     - `invoke_phase4_vdi_eks_backend_cutover.ps1`
       - pass-through for the same TLS/proxy flags
 - Executed:
-  - `.\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -EnablePublishedAppTls -EnableCloudflareEdge -CloudflareZoneName "slothkko.com" -CloudflareSiteARecordName "app-a" -CloudflareSiteBRecordName "app-b" -CloudflareRecordProxied -CloudflareRecordTtl 1 -AutoApprove`
+  - `.\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -EnablePublishedAppTls -EnableCloudflareEdge -CloudflareZoneName "slothkko.com" -CloudflareSiteARecordName "app-a" -CloudflareSiteBRecordName "app-b" -CloudflareRecordProxied -CloudflareRecordTtl 1 -AutoApprove`
 - Apply result:
   - `8 added, 2 changed, 0 destroyed`
   - Cloudflare records stayed proxied (`true`) with automatic TTL (`1`).
@@ -435,7 +435,7 @@ $env:AWS_PROFILE="ddc"
     - `aws_vpc_security_group_ingress_rule.phase4_site_b_published_app_to_vdi_eks_nodeport`
   - both rules allow `tcp/30080` from site ALB SG to site EKS cluster SG.
 - Applied safely through existing helper (explicit Phase 4 enable flags):
-  - `.\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -EnableCloudflareEdge -CloudflareZoneName "slothkko.com" -CloudflareSiteARecordName "app-a" -CloudflareSiteBRecordName "app-b" -AutoApprove`
+  - `.\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -EnableCloudflareEdge -CloudflareZoneName "slothkko.com" -CloudflareSiteARecordName "app-a" -CloudflareSiteBRecordName "app-b" -AutoApprove`
   - apply result: `2 added, 0 changed, 0 destroyed`
 - Post-fix verification:
   - target health:
@@ -456,7 +456,7 @@ $env:AWS_PROFILE="ddc"
   - bare host (`https://app-a.slothkko.com/`) showed Tomcat `404` because Guacamole is served at `/guacamole/`.
 - Immediate runtime remediation:
   - rotated `guacadmin` password directly in both EKS site databases via `kubectl exec ... psql` update against `guacamole_user`.
-  - updated `guacamole-db-init` ConfigMap in both clusters with the same non-default admin password seed (hash/salt) so DB pod re-initialization does not revert to `guacadmin/guacadmin`.
+  - updated `guacamole-db-init` ConfigMap in both clusters with the same non-default admin password seed (hash/salt) so DB pod re-initialization does not revert to `<default-admin-credential>`.
   - verified old credential rejected and new credential accepted on both:
     - `app-a`: old `403`, new `200`
     - `app-b`: old `403`, new `200`
@@ -472,7 +472,7 @@ $env:AWS_PROFILE="ddc"
   - behavior:
     - adds listener rules on HTTP/HTTPS to redirect path `/` to `phase4_published_app_root_redirect_path` (default `/guacamole/`).
 - Applied through standard cutover helper:
-  - `.\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\john\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -EnablePublishedAppTls -EnableCloudflareEdge -CloudflareZoneName "slothkko.com" -CloudflareSiteARecordName "app-a" -CloudflareSiteBRecordName "app-b" -CloudflareRecordProxied -CloudflareRecordTtl 1 -AutoApprove`
+  - `.\scripts\invoke_phase4_vdi_eks_backend_cutover.ps1 -AwsProfile "ddc" -GcpCredentialsPath "C:\Users\<user>\.gcp\ddc-sa.json" -GcpProjectId "worldbuilder-413006" -DisableGcpBrokerIdentity -EnablePublishedAppTls -EnableCloudflareEdge -CloudflareZoneName "slothkko.com" -CloudflareSiteARecordName "app-a" -CloudflareSiteBRecordName "app-b" -CloudflareRecordProxied -CloudflareRecordTtl 1 -AutoApprove`
   - apply result: `4 added, 0 changed, 0 destroyed` (listener redirect rules only).
 - Post-apply verification:
   - `https://app-a.slothkko.com/` -> `302` to `/guacamole/`
