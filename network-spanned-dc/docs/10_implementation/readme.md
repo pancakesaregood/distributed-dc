@@ -79,6 +79,7 @@ This proposal defines a practical implementation plan for the four-site spanned 
 
 ## Related Use Case Proposal
 - [Dual-Cloud Four-Site Proposal (AWS + GCP)](proposal_dual_cloud_4site.md)
+- [Implementation Build Report](implementation_build_report.md)
 
 ## Infrastructure-as-Code Baseline
 - Terraform scaffold for the dual-cloud use case is available in `network-spanned-dc/iac/terraform`.

@@ -734,3 +734,48 @@ $env:AWS_PROFILE="ddc"
     - direct internet test (`curl http://example.com`) -> `000` (timeout/no direct egress path)
     - proxy test (`curl -x http://<REDACTED_PRIVATE_ENDPOINT> http://example.com`) -> `200`
     - blocked-domain test (`curl -x http://<REDACTED_PRIVATE_ENDPOINT> http://facebook.com`) -> `403`
+
+## Guacamole Login Branding Override Pass (2026-03-08 15:40 America/Toronto)
+- User request:
+  - replace default Apache Guacamole login branding/logo with Slothkko branding.
+- Changes made:
+  - updated `iac/k8s/vdi/guacamole-nodeport.yaml`:
+    - expanded `guac-theme.css` selectors to target both `.login-ui` and `#login-ui` (higher match reliability across Guacamole versions/builds).
+    - forced login logo override using `/portal/sloth-smile.svg` and `!important` background rules.
+    - replaced visible app name text with `SLOTHKKO ACCESS` using CSS pseudo-content.
+    - replaced visible version subtitle with `secure workspace`.
+    - added new `guac-branding.js` asset to set browser tab title (`Slothkko Access`) and update favicon links to `/portal/sloth-smile.svg`.
+    - updated NGINX sub_filter injection for `/guacamole/` HTML:
+      - injects both `/portal/guac-theme.css` and `/portal/guac-branding.js` before `</head>`.
+- Runtime incident and recovery:
+  - direct `kubectl apply -f iac/k8s/vdi/guacamole-nodeport.yaml` reapplied placeholder image tokens from template (`__GUACD_IMAGE__`, `__GUACAMOLE_IMAGE__`, `__NGINX_IMAGE__`, `__POSTGRES_IMAGE__`) causing `InvalidImageName` pods.
+  - recovered immediately by restoring deployment images:
+    - `deployment/guacamole`: 
+      - `guacd=<REDACTED_ECR_IMAGE_URI>`
+      - `guacamole=<REDACTED_ECR_IMAGE_URI>`
+      - `portal-proxy=<REDACTED_ECR_IMAGE_URI>`
+    - `deployment/guacamole-db`:
+      - `postgres=<REDACTED_ECR_IMAGE_URI>`
+  - additional side effect from direct apply:
+    - `guacamole-db-auth` secret was overwritten with placeholder literals (`__GUACAMOLE_DB_NAME__`, `__GUACAMOLE_DB_USER__`, `__GUACAMOLE_DB_PASSWORD__`).
+    - because `guacamole-db` uses `emptyDir` storage, the subsequent DB pod restart reinitialized an empty Guacamole DB.
+  - restored DB secret values and re-seeded baseline Guacamole state:
+    - secret restored to:
+      - `database=guacamole_db`
+      - `username=guacamole_user`
+      - `password=<existing restored value>`
+    - rolled `deployment/guacamole-db` and `deployment/guacamole`.
+    - re-seeded users and connections:
+      - users: `guacadmin`, `john`
+      - connections:
+        - `Linux Desktop (VNC)` -> `<REDACTED_INTERNAL_DNS>:5900`
+        - `Windows Desktop (RDP)` -> `<REDACTED_PRIVATE_ENDPOINT>`
+      - permissions restored for both users on both connections (`READ/UPDATE/DELETE/ADMINISTER`).
+- rollout verification:
+  - `deployment/guacamole` and `deployment/guacamole-db` both returned to healthy state.
+- Verification:
+  - `https://admin.slothkko.com/guacamole/` HTML now injects:
+    - `<link rel="stylesheet" href="/portal/guac-theme.css">`
+    - `<script src="/portal/guac-branding.js"></script>`
+  - `https://admin.slothkko.com/portal/guac-theme.css` serves updated `#login-ui` + `.login-ui` overrides and Slothkko text replacement rules.
+  - `https://admin.slothkko.com/portal/guac-branding.js` served `200` with title/favicon branding logic.
