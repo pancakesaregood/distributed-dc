@@ -327,17 +327,14 @@ data:
       --slk-button-border: #3a5b8d;
     }
 
-    body {
+    .login-ui {
       font-family: var(--slk-font-ui);
+      color: var(--slk-text);
       background:
         radial-gradient(circle at 22% 18%, rgba(90, 133, 215, 0.24), transparent 44%),
         radial-gradient(circle at 75% 72%, rgba(120, 95, 190, 0.18), transparent 44%),
         linear-gradient(180deg, #111b30, #0b1527 52%, #060d1a);
-    }
-
-    .login-ui {
-      color: var(--slk-text);
-      background: transparent;
+      min-height: 100vh;
     }
 
     .login-ui .login-dialog-middle {

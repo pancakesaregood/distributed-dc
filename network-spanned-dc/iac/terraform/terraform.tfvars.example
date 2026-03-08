@@ -175,6 +175,23 @@ phase4_vdi_gcp_node_initial_count                    = 1
 phase4_vdi_gcp_node_service_account                  = null
 phase4_vdi_gcp_node_labels                           = {}
 phase4_vdi_gcp_node_tags                             = []
+phase4_vdi_site_a_windows_desktop_enabled            = false
+phase4_vdi_site_a_windows_desktop_ami_id             = null
+phase4_vdi_site_a_windows_desktop_ami_ssm_parameter_name = "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base"
+phase4_vdi_site_a_windows_desktop_instance_type      = "t3.small"
+phase4_vdi_site_a_windows_desktop_subnet_id          = null
+phase4_vdi_site_a_windows_desktop_rdp_username       = "guacuser"
+phase4_vdi_site_a_windows_desktop_user_data          = null
+phase4_vdi_site_a_windows_desktop_disable_api_termination = false
+phase4_enable_forward_proxy_site_a                   = false
+phase4_forward_proxy_site_a_instance_type            = "t3.small"
+phase4_forward_proxy_site_a_subnet_id                = null
+phase4_forward_proxy_site_a_private_ip               = null
+phase4_forward_proxy_site_a_listen_port              = 3128
+phase4_forward_proxy_site_a_allowed_client_ipv4_cidrs = null
+phase4_forward_proxy_site_a_ssh_allowed_ipv4_cidrs   = []
+phase4_forward_proxy_site_a_allow_domains            = []
+phase4_forward_proxy_site_a_block_domains            = []
 
 # Optional standalone ops servers baseline.
 phase4_enable_ops_stack = false

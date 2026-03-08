@@ -14,8 +14,8 @@ module "aws_vdi_reference_stack_site_a" {
   name_prefix                          = var.name_prefix
   environment                          = var.environment
   vpc_id                               = module.aws_site_a.vpc_id
-  broker_ingress_ipv4_cidrs            = [module.aws_site_a.vpc_ipv4_cidr]
-  broker_ingress_ipv6_cidrs            = module.aws_site_a.vpc_ipv6_cidr != null ? [module.aws_site_a.vpc_ipv6_cidr] : []
+  broker_ingress_ipv4_cidrs            = [var.site_a_ipv4_cidr]
+  broker_ingress_ipv6_cidrs            = []
   desktop_controlled_egress_ipv4_cidrs = var.phase4_vdi_aws_desktop_controlled_egress_ipv4_cidrs
   desktop_controlled_egress_ipv6_cidrs = var.phase4_vdi_aws_desktop_controlled_egress_ipv6_cidrs
   identity_ssm_parameter_arn_patterns  = var.phase4_vdi_identity_ssm_parameter_arn_patterns
@@ -35,8 +35,8 @@ module "aws_vdi_reference_stack_site_b" {
   name_prefix                          = var.name_prefix
   environment                          = var.environment
   vpc_id                               = module.aws_site_b.vpc_id
-  broker_ingress_ipv4_cidrs            = [module.aws_site_b.vpc_ipv4_cidr]
-  broker_ingress_ipv6_cidrs            = module.aws_site_b.vpc_ipv6_cidr != null ? [module.aws_site_b.vpc_ipv6_cidr] : []
+  broker_ingress_ipv4_cidrs            = [var.site_b_ipv4_cidr]
+  broker_ingress_ipv6_cidrs            = []
   desktop_controlled_egress_ipv4_cidrs = var.phase4_vdi_aws_desktop_controlled_egress_ipv4_cidrs
   desktop_controlled_egress_ipv6_cidrs = var.phase4_vdi_aws_desktop_controlled_egress_ipv6_cidrs
   identity_ssm_parameter_arn_patterns  = var.phase4_vdi_identity_ssm_parameter_arn_patterns

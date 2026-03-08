@@ -607,6 +607,113 @@ variable "phase4_vdi_gcp_node_tags" {
   default     = []
 }
 
+variable "phase4_vdi_site_a_windows_desktop_enabled" {
+  description = "Enable a dedicated Windows desktop EC2 instance in Site A for Guacamole RDP connections."
+  type        = bool
+  default     = false
+}
+
+variable "phase4_vdi_site_a_windows_desktop_ami_id" {
+  description = "Optional explicit AMI ID for the Site A Windows desktop. Null resolves from phase4_vdi_site_a_windows_desktop_ami_ssm_parameter_name."
+  type        = string
+  default     = null
+}
+
+variable "phase4_vdi_site_a_windows_desktop_ami_ssm_parameter_name" {
+  description = "SSM public parameter name that resolves the Site A Windows desktop AMI when phase4_vdi_site_a_windows_desktop_ami_id is null."
+  type        = string
+  default     = "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base"
+}
+
+variable "phase4_vdi_site_a_windows_desktop_instance_type" {
+  description = "Instance type for the Site A Windows desktop."
+  type        = string
+  default     = "t3.small"
+}
+
+variable "phase4_vdi_site_a_windows_desktop_subnet_id" {
+  description = "Optional explicit subnet ID for the Site A Windows desktop. Null defaults to the first Site A VDI subnet."
+  type        = string
+  default     = null
+}
+
+variable "phase4_vdi_site_a_windows_desktop_rdp_username" {
+  description = "RDP username expected by Guacamole for the Site A Windows desktop."
+  type        = string
+  default     = "guacuser"
+}
+
+variable "phase4_vdi_site_a_windows_desktop_user_data" {
+  description = "Optional EC2 user_data for Site A Windows desktop bootstrap (for example, creating local RDP users)."
+  type        = string
+  default     = null
+}
+
+variable "phase4_vdi_site_a_windows_desktop_disable_api_termination" {
+  description = "Enable EC2 termination protection on the Site A Windows desktop."
+  type        = bool
+  default     = false
+}
+
+variable "phase4_enable_forward_proxy_site_a" {
+  description = "Enable a Site A Squid forward proxy for controlled web browsing from Guacamole desktops."
+  type        = bool
+  default     = false
+}
+
+variable "phase4_forward_proxy_site_a_instance_type" {
+  description = "Instance type for the Site A forward proxy."
+  type        = string
+  default     = "t3.small"
+}
+
+variable "phase4_forward_proxy_site_a_subnet_id" {
+  description = "Optional explicit subnet ID for the Site A forward proxy. Null defaults to the first Site A ingress subnet."
+  type        = string
+  default     = null
+}
+
+variable "phase4_forward_proxy_site_a_private_ip" {
+  description = "Optional static private IP for the Site A forward proxy. Null defaults to a deterministic host in ingress-a."
+  type        = string
+  default     = null
+}
+
+variable "phase4_forward_proxy_site_a_listen_port" {
+  description = "TCP listen port for the Site A forward proxy."
+  type        = number
+  default     = 3128
+
+  validation {
+    condition     = var.phase4_forward_proxy_site_a_listen_port >= 1 && var.phase4_forward_proxy_site_a_listen_port <= 65535
+    error_message = "phase4_forward_proxy_site_a_listen_port must be between 1 and 65535."
+  }
+}
+
+variable "phase4_forward_proxy_site_a_allowed_client_ipv4_cidrs" {
+  description = "IPv4 CIDRs allowed to access the Site A forward proxy. Null or empty defaults to Site A VDI subnet CIDRs."
+  type        = list(string)
+  default     = null
+}
+
+variable "phase4_forward_proxy_site_a_ssh_allowed_ipv4_cidrs" {
+  description = "Optional IPv4 CIDRs allowed SSH access to the Site A forward proxy."
+  type        = list(string)
+  default     = []
+}
+
+variable "phase4_forward_proxy_site_a_allow_domains" {
+  description = "Optional domain allowlist for Site A forward proxy (for example: example.com). Empty means allow all domains except explicit block list."
+  type        = list(string)
+  default     = []
+}
+
+variable "phase4_forward_proxy_site_a_block_domains" {
+  description = "Optional domain blocklist for Site A forward proxy (for example: facebook.com)."
+  type        = list(string)
+  default     = []
+}
+
 variable "phase4_published_app_listener_port" {
   description = "Inbound listener port for published app load balancers."
   type        = number

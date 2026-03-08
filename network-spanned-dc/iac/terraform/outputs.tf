@@ -208,6 +208,42 @@ output "phase4_vdi_reference_stacks" {
   } : null
 }
 
+output "phase4_vdi_desktops" {
+  description = "Guacamole-ready desktop endpoint metadata for Phase 4 VDI desktops."
+  value = local.phase4_vdi_reference_stack_enabled ? {
+    site_a = {
+      linux = {
+        guac_target = "Linux Desktop (VNC)"
+        protocol    = "vnc"
+        hostname    = "vdi-desktop.vdi.svc.cluster.local"
+        port        = 5900
+      }
+      windows = local.phase4_site_a_windows_desktop_enabled ? {
+        guac_target = "Windows Desktop (RDP)"
+        protocol    = "rdp"
+        instance_id = aws_instance.phase4_site_a_windows_desktop[0].id
+        private_ip  = aws_instance.phase4_site_a_windows_desktop[0].private_ip
+        port        = 3389
+        username    = var.phase4_vdi_site_a_windows_desktop_rdp_username
+      } : null
+    }
+  } : null
+}
+
+output "phase4_forward_proxy" {
+  description = "Site A forward proxy endpoint and policy summary when enabled."
+  value = local.phase4_site_a_forward_proxy_enabled ? {
+    site                 = "site-a"
+    private_ip           = aws_instance.phase4_site_a_forward_proxy[0].private_ip
+    public_ip            = aws_instance.phase4_site_a_forward_proxy[0].public_ip
+    listen_port          = var.phase4_forward_proxy_site_a_listen_port
+    proxy_url            = "http://${aws_instance.phase4_site_a_forward_proxy[0].private_ip}:${var.phase4_forward_proxy_site_a_listen_port}"
+    allowed_client_cidrs = local.phase4_site_a_forward_proxy_client_ipv4_cidrs
+    allow_domains        = local.phase4_site_a_forward_proxy_allow_domains
+    block_domains        = local.phase4_site_a_forward_proxy_block_domains
+  } : null
+}
+
 output "phase4_ops_servers" {
   description = "Phase 4 standalone ops server endpoints and Guacamole SSH target metadata when enabled."
   value = var.phase4_enable_ops_stack ? {

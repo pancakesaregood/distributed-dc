@@ -686,3 +686,51 @@ $env:AWS_PROFILE="ddc"
 - Security/config hygiene:
   - reviewed modified files for embedded secrets/keys; only template placeholders and documentation examples remain.
   - no Cloudflare token, private keys, or static credentials present in tracked diffs.
+
+## Forward Proxy Bring-up for Guac Client Surf Control (2026-03-08 09:59 America/Toronto)
+- User request:
+  - add a forward proxy so Guacamole desktop clients can browse the web with policy controls.
+- Root-cause/fix during apply:
+  - targeted Terraform plan was failing with:
+    - `Invalid provider configuration` for unaliased `registry.terraform.io/hashicorp/aws`.
+  - fix applied in `phase4_forward_proxy.tf`:
+    - added `provider = aws.site_a` to `data "aws_iam_policy_document" "phase4_site_a_forward_proxy_assume_role"`.
+  - after fix, targeted plans/applies succeeded.
+- Terraform resources created (Site A):
+  - `aws_iam_role.phase4_site_a_forward_proxy[0]` -> `ddc-proposal-site-a-forward-proxy-role`
+  - `aws_iam_instance_profile.phase4_site_a_forward_proxy[0]` -> `ddc-proposal-site-a-forward-proxy-profile`
+  - `aws_security_group.phase4_site_a_forward_proxy[0]` -> `sg-0f6abf85c4738f606`
+  - ingress rules:
+    - proxy from VDI CIDRs `<REDACTED_PRIVATE_CIDR>`, `<REDACTED_PRIVATE_CIDR>` on `3128/tcp`
+    - SSH admin from `<REDACTED_PUBLIC_CIDR>` on `22/tcp`
+  - egress rules:
+    - IPv4 `<REDACTED_PRIVATE_CIDR>`
+    - IPv6 `::/0`
+  - `aws_instance.phase4_site_a_forward_proxy[0]` -> `i-0ec0f03a88355dce6`
+- Runtime endpoint details:
+  - private proxy endpoint (for Guac desktops): `http://<REDACTED_PRIVATE_ENDPOINT>`
+  - public IP (diagnostic only): `<REDACTED_PUBLIC_IP>`
+- Browsing policy currently active:
+  - allow source clients only from:
+    - `<REDACTED_PRIVATE_CIDR>`
+    - `<REDACTED_PRIVATE_CIDR>`
+  - domain block list:
+    - `facebook.com`
+    - `instagram.com`
+    - `tiktok.com`
+    - `x.com`
+    - `twitter.com`
+  - explicit allow-list is empty (all domains allowed except blocked domains).
+- Commands executed:
+  - `terraform fmt phase4_forward_proxy.tf`
+  - `terraform plan -target="aws_instance.phase4_site_a_forward_proxy" -var="phase2_enable_intercloud=false" -input=false`
+  - `terraform apply -target="aws_instance.phase4_site_a_forward_proxy" -var="phase2_enable_intercloud=false" -input=false -auto-approve`
+  - `terraform plan -target="aws_vpc_security_group_ingress_rule.phase4_site_a_forward_proxy_ssh" -target="aws_vpc_security_group_egress_rule.phase4_site_a_forward_proxy_egress_ipv6" -var="phase2_enable_intercloud=false" -input=false`
+  - `terraform apply -target="aws_vpc_security_group_ingress_rule.phase4_site_a_forward_proxy_ssh" -target="aws_vpc_security_group_egress_rule.phase4_site_a_forward_proxy_egress_ipv6" -var="phase2_enable_intercloud=false" -input=false -auto-approve`
+- Post-apply checks:
+  - EC2 state verified: instance is `running` with expected private/public IPs.
+  - SG rule verification confirms proxy access is restricted to VDI CIDRs.
+  - in-cluster egress validation from live VDI desktop pod (`kubectl exec -n vdi deploy/vdi-desktop`):
+    - direct internet test (`curl http://example.com`) -> `000` (timeout/no direct egress path)
+    - proxy test (`curl -x http://<REDACTED_PRIVATE_ENDPOINT> http://example.com`) -> `200`
+    - blocked-domain test (`curl -x http://<REDACTED_PRIVATE_ENDPOINT> http://facebook.com`) -> `403`

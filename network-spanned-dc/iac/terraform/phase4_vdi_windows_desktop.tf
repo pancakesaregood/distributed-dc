@@ -1,0 +1,76 @@
+locals {
+  phase4_site_a_windows_desktop_enabled = local.phase4_vdi_reference_stack_enabled && var.phase4_vdi_site_a_windows_desktop_enabled
+  phase4_site_a_windows_desktop_subnet_id = (
+    var.phase4_vdi_site_a_windows_desktop_subnet_id != null ?
+    var.phase4_vdi_site_a_windows_desktop_subnet_id :
+    module.aws_site_a.vdi_subnet_ids[0]
+  )
+  phase4_site_a_windows_desktop_ami_id_effective = (
+    var.phase4_vdi_site_a_windows_desktop_ami_id != null ?
+    var.phase4_vdi_site_a_windows_desktop_ami_id :
+    try(data.aws_ssm_parameter.phase4_site_a_windows_desktop_ami[0].value, null)
+  )
+}
+
+data "aws_ssm_parameter" "phase4_site_a_windows_desktop_ami" {
+  provider = aws.site_a
+  count = (
+    local.phase4_site_a_windows_desktop_enabled &&
+    var.phase4_vdi_site_a_windows_desktop_ami_id == null
+  ) ? 1 : 0
+
+  name = var.phase4_vdi_site_a_windows_desktop_ami_ssm_parameter_name
+}
+
+resource "aws_security_group" "phase4_site_a_windows_desktop" {
+  provider = aws.site_a
+  count    = local.phase4_site_a_windows_desktop_enabled ? 1 : 0
+
+  name        = "${var.name_prefix}-${var.environment}-site-a-windows-desktop-sg"
+  description = "Site A Windows desktop for Guacamole RDP"
+  vpc_id      = module.aws_site_a.vpc_id
+
+  tags = {
+    Name        = "${var.name_prefix}-${var.environment}-site-a-windows-desktop-sg"
+    Project     = var.name_prefix
+    Environment = var.environment
+    Role        = "vdi-windows-desktop"
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "phase4_site_a_windows_desktop_rdp_from_site_a_vpc" {
+  provider = aws.site_a
+  count    = local.phase4_site_a_windows_desktop_enabled ? 1 : 0
+
+  security_group_id = aws_security_group.phase4_site_a_windows_desktop[0].id
+  description       = "RDP from Site A VPC"
+  ip_protocol       = "tcp"
+  from_port         = 3389
+  to_port           = 3389
+  cidr_ipv4         = module.aws_site_a.vpc_ipv4_cidr
+}
+
+resource "aws_instance" "phase4_site_a_windows_desktop" {
+  provider = aws.site_a
+  count    = local.phase4_site_a_windows_desktop_enabled ? 1 : 0
+
+  ami                         = local.phase4_site_a_windows_desktop_ami_id_effective
+  instance_type               = var.phase4_vdi_site_a_windows_desktop_instance_type
+  subnet_id                   = local.phase4_site_a_windows_desktop_subnet_id
+  vpc_security_group_ids      = [aws_security_group.phase4_site_a_windows_desktop[0].id]
+  associate_public_ip_address = false
+  disable_api_termination     = var.phase4_vdi_site_a_windows_desktop_disable_api_termination
+  user_data                   = var.phase4_vdi_site_a_windows_desktop_user_data
+
+  tags = {
+    Name        = "${var.name_prefix}-${var.environment}-site-a-windows-desktop"
+    Project     = var.name_prefix
+    Environment = var.environment
+    Role        = "vdi-windows-desktop"
+  }
+
+  lifecycle {
+    # Keep imported/manual desktop stable unless explicitly changed by operators.
+    ignore_changes = [ami, user_data, user_data_base64]
+  }
+}

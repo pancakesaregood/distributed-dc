@@ -296,6 +296,26 @@ Notes:
 - `invoke_phase4_vdi_service_bootstrap.ps1` applies `iac/k8s/vdi/guacamole-nodeport.yaml` to each EKS cluster, can inject regional ECR image URIs with `-UseRegionalEcrImages`, can override the front-proxy image with `-NginxImage`, and can rotate seed admin credentials with `-GuacAdminPassword` (or `GUACADMIN_PASSWORD` env var).
 - The Guacamole manifest now deploys a lightweight `nginx` front-proxy that serves a Slothkko-themed root portal on `/` and injects a matching theme stylesheet on `/guacamole/` login pages.
 - `invoke_phase4_vdi_service_bootstrap.ps1 -EnableSampleVdiDesktop` applies `iac/k8s/vdi/vdi-desktop-vnc.yaml`, deploys `vdi-desktop` in each target cluster, and seeds a Guacamole VNC connection (`VDI Desktop` by default).
+- Site A Windows desktop can be managed by Terraform and surfaced for Guacamole RDP with:
+  - `phase4_vdi_site_a_windows_desktop_enabled`
+  - `phase4_vdi_site_a_windows_desktop_ami_id` or `phase4_vdi_site_a_windows_desktop_ami_ssm_parameter_name`
+  - `phase4_vdi_site_a_windows_desktop_instance_type`
+  - `phase4_vdi_site_a_windows_desktop_subnet_id`
+  - `phase4_vdi_site_a_windows_desktop_rdp_username`
+  - `phase4_vdi_site_a_windows_desktop_user_data`
+  - `phase4_vdi_site_a_windows_desktop_disable_api_termination`
+- Use `terraform output phase4_vdi_desktops` to retrieve Guacamole-ready Linux/Windows desktop endpoint metadata.
+- Site A controlled browsing can be enabled through a Squid forward proxy:
+  - `phase4_enable_forward_proxy_site_a`
+  - `phase4_forward_proxy_site_a_instance_type`
+  - `phase4_forward_proxy_site_a_subnet_id`
+  - `phase4_forward_proxy_site_a_private_ip`
+  - `phase4_forward_proxy_site_a_listen_port`
+  - `phase4_forward_proxy_site_a_allowed_client_ipv4_cidrs`
+  - `phase4_forward_proxy_site_a_allow_domains`
+  - `phase4_forward_proxy_site_a_block_domains`
+  - `phase4_forward_proxy_site_a_ssh_allowed_ipv4_cidrs`
+- Use `terraform output phase4_forward_proxy` to retrieve endpoint/policy metadata for client proxy configuration.
 - `invoke_phase4_published_app_cutover.ps1` discovers private ENI IPs in AWS app subnets (and data subnets by default), then invokes `invoke_phase4_vdi_enablement.ps1` with discovered target lists.
 - Use `-IncludeIngressSubnets:$true` if your backend ENIs live in ingress subnets.
 - Use `-AllowEmptyTargets` only if you intentionally want fixed-response fallback (`503`) on one or both sites.
@@ -385,6 +405,8 @@ Bootstrap user requirements (one-time, human account):
   - `phase4_enable_vdi_reference_stack` (defaults to `false`; requires `phase4_enable_service_onboarding=true`)
   - `phase4_vdi_enable_aws_worker_pools` / `phase4_vdi_enable_gcp_worker_pools` for provider-scoped worker rollout
   - `phase4_vdi_aws_node_*` and `phase4_vdi_gcp_node_*` controls for dedicated VDI worker pools
+  - `phase4_vdi_site_a_windows_desktop_*` controls for optional Site A Windows desktop/RDP endpoint
+  - `phase4_enable_forward_proxy_site_a` + `phase4_forward_proxy_site_a_*` controls for optional Site A Squid forward proxy and browsing policy
   - `phase4_vdi_identity_ssm_parameter_arn_patterns` and `phase4_vdi_identity_secret_arn_patterns` for AWS broker identity policy scope
   - `phase4_vdi_aws_desktop_controlled_egress_ipv4_cidrs` / `phase4_vdi_aws_desktop_controlled_egress_ipv6_cidrs`
   - `phase4_vdi_gcp_desktop_controlled_egress_ipv4_cidrs`
