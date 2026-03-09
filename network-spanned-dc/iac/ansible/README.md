@@ -16,6 +16,9 @@ This folder contains day-2 playbooks for VDI operations.
     - Linux desktop (Kubernetes deployment/service in namespace `vdi`)
     - Windows desktop (AWS EC2 instance in Site A VPC)
   - Creates or updates dedicated Guacamole connections bound to those user-specific desktop targets.
+- `playbooks/vdi_reset_user_password.yml`
+  - Resets the password for an existing user in Keycloak realm `vdi`.
+  - Supports optional temporary password mode (`vdi_password_temporary=true`).
 
 ## Usage
 
@@ -45,6 +48,23 @@ ansible-playbook iac/ansible/playbooks/vdi_add_user.yml \
   -e "aws_profile=ddc"
 ```
 
+Reset only a user's Keycloak password:
+
+```bash
+ansible-playbook iac/ansible/playbooks/vdi_reset_user_password.yml \
+  -e "vdi_username=cox" \
+  -e "vdi_user_password=New-Strong-Password-2026!"
+```
+
+Force password change at next login:
+
+```bash
+ansible-playbook iac/ansible/playbooks/vdi_reset_user_password.yml \
+  -e "vdi_username=cox" \
+  -e "vdi_user_password=Temporary-Password-2026!" \
+  -e "vdi_password_temporary=true"
+```
+
 ## Required Variables
 - `vdi_username`
 - `vdi_user_password`
@@ -67,6 +87,7 @@ ansible-playbook iac/ansible/playbooks/vdi_add_user.yml \
 - `aws_profile` (optional AWS profile name)
 - `vdi_windows_template_role_tag` (default: `vdi-windows-desktop`)
 - `vdi_windows_instance_name_prefix` (default: `slothkko-vdi-win`)
+- `vdi_password_temporary` (for `vdi_reset_user_password.yml`, default: `false`)
 
 ## Notes
 - The playbook is idempotent for user/entity/permission creation and re-apply of dedicated desktop resources.
