@@ -110,6 +110,7 @@ nav:
       - Observability: 13_operations_foundations/observability.md
       - Identity: 13_operations_foundations/identity.md
       - Authentication: 13_operations_foundations/authentication.md
+      - VDI User Provisioning Playbook: 13_operations_foundations/vdi_user_provisioning_playbook.md
       - Storage: 13_operations_foundations/storage.md
       - Capacity Planning: 13_operations_foundations/capacity_planning.md
   - 14 Campus and Edge Services:

@@ -8,9 +8,14 @@ param(
   [string]$GuacamoleImage = "guacamole/guacamole:1.5.5",
   [string]$PostgresImage = "postgres:16-alpine",
   [string]$NginxImage = "nginx:1.27-alpine",
+  [string]$KeycloakImage = "quay.io/keycloak/keycloak:26.1.5",
   [string]$GuacamoleDbName = "",
   [string]$GuacamoleDbUser = "",
   [string]$GuacamoleDbPassword = "",
+  [string]$KeycloakAdminUsername = "kcadmin",
+  [string]$KeycloakAdminPassword = "",
+  [string]$KeycloakBootstrapUsername = "guacadmin",
+  [string]$KeycloakBootstrapPassword = "",
   [string]$DesktopImage = "dorowu/ubuntu-desktop-lxde-vnc:latest",
   [string]$DesktopConnectionName = "VDI Desktop",
   [int]$DesktopVncPort = 5900,
@@ -24,6 +29,7 @@ param(
   [string]$EcrGuacamoleRepositoryName = "ddc-vdi-guacamole",
   [string]$EcrPostgresRepositoryName = "ddc-vdi-postgres",
   [string]$EcrNginxRepositoryName = "ddc-vdi-nginx",
+  [string]$EcrKeycloakRepositoryName = "ddc-vdi-keycloak",
   [string]$EcrDesktopRepositoryName = "ddc-vdi-desktop",
   [switch]$SiteAOnly,
   [switch]$SiteBOnly,
@@ -297,11 +303,16 @@ if (
   $manifestTemplate.IndexOf("__GUACAMOLE_IMAGE__", [System.StringComparison]::Ordinal) -lt 0 -or
   $manifestTemplate.IndexOf("__POSTGRES_IMAGE__", [System.StringComparison]::Ordinal) -lt 0 -or
   $manifestTemplate.IndexOf("__NGINX_IMAGE__", [System.StringComparison]::Ordinal) -lt 0 -or
+  $manifestTemplate.IndexOf("__KEYCLOAK_IMAGE__", [System.StringComparison]::Ordinal) -lt 0 -or
   $manifestTemplate.IndexOf("__GUACAMOLE_DB_NAME__", [System.StringComparison]::Ordinal) -lt 0 -or
   $manifestTemplate.IndexOf("__GUACAMOLE_DB_USER__", [System.StringComparison]::Ordinal) -lt 0 -or
-  $manifestTemplate.IndexOf("__GUACAMOLE_DB_PASSWORD__", [System.StringComparison]::Ordinal) -lt 0
+  $manifestTemplate.IndexOf("__GUACAMOLE_DB_PASSWORD__", [System.StringComparison]::Ordinal) -lt 0 -or
+  $manifestTemplate.IndexOf("__KEYCLOAK_ADMIN_USERNAME__", [System.StringComparison]::Ordinal) -lt 0 -or
+  $manifestTemplate.IndexOf("__KEYCLOAK_ADMIN_PASSWORD__", [System.StringComparison]::Ordinal) -lt 0 -or
+  $manifestTemplate.IndexOf("__KEYCLOAK_BOOTSTRAP_USERNAME__", [System.StringComparison]::Ordinal) -lt 0 -or
+  $manifestTemplate.IndexOf("__KEYCLOAK_BOOTSTRAP_PASSWORD__", [System.StringComparison]::Ordinal) -lt 0
 ) {
-  throw "Manifest template must include image and DB credential placeholders (__GUACD_IMAGE__, __GUACAMOLE_IMAGE__, __POSTGRES_IMAGE__, __NGINX_IMAGE__, __GUACAMOLE_DB_NAME__, __GUACAMOLE_DB_USER__, __GUACAMOLE_DB_PASSWORD__): $ManifestPath"
+  throw "Manifest template must include image and auth placeholders (__GUACD_IMAGE__, __GUACAMOLE_IMAGE__, __POSTGRES_IMAGE__, __NGINX_IMAGE__, __KEYCLOAK_IMAGE__, __GUACAMOLE_DB_NAME__, __GUACAMOLE_DB_USER__, __GUACAMOLE_DB_PASSWORD__, __KEYCLOAK_ADMIN_USERNAME__, __KEYCLOAK_ADMIN_PASSWORD__, __KEYCLOAK_BOOTSTRAP_USERNAME__, __KEYCLOAK_BOOTSTRAP_PASSWORD__): $ManifestPath"
 }
 
 $desktopManifestTemplate = ""
@@ -338,6 +349,34 @@ if ([string]::IsNullOrWhiteSpace($effectiveGuacamoleDbPassword)) {
 if ([string]::IsNullOrWhiteSpace($effectiveGuacamoleDbPassword)) {
   $effectiveGuacamoleDbPassword = New-RandomAlphaNumericSecret -Length 32
   Write-Host "Generated a random Guacamole DB password for this bootstrap run."
+}
+
+$effectiveKeycloakAdminUsername = $KeycloakAdminUsername
+if ([string]::IsNullOrWhiteSpace($effectiveKeycloakAdminUsername)) {
+  $effectiveKeycloakAdminUsername = "kcadmin"
+}
+
+$effectiveKeycloakAdminPassword = $KeycloakAdminPassword
+if ([string]::IsNullOrWhiteSpace($effectiveKeycloakAdminPassword)) {
+  $effectiveKeycloakAdminPassword = $env:KEYCLOAK_ADMIN_PASSWORD
+}
+if ([string]::IsNullOrWhiteSpace($effectiveKeycloakAdminPassword)) {
+  $effectiveKeycloakAdminPassword = New-RandomAlphaNumericSecret -Length 32
+  Write-Host "Generated a random Keycloak admin password for this bootstrap run."
+}
+
+$effectiveKeycloakBootstrapUsername = $KeycloakBootstrapUsername
+if ([string]::IsNullOrWhiteSpace($effectiveKeycloakBootstrapUsername)) {
+  $effectiveKeycloakBootstrapUsername = "guacadmin"
+}
+
+$effectiveKeycloakBootstrapPassword = $KeycloakBootstrapPassword
+if ([string]::IsNullOrWhiteSpace($effectiveKeycloakBootstrapPassword)) {
+  $effectiveKeycloakBootstrapPassword = $env:KEYCLOAK_BOOTSTRAP_PASSWORD
+}
+if ([string]::IsNullOrWhiteSpace($effectiveKeycloakBootstrapPassword)) {
+  $effectiveKeycloakBootstrapPassword = New-RandomAlphaNumericSecret -Length 24
+  Write-Host "Generated a random Keycloak bootstrap-user password for this bootstrap run."
 }
 
 if ($DesktopVncPort -lt 1 -or $DesktopVncPort -gt 65535) {
@@ -405,6 +444,7 @@ try {
   $guacamoleTag = Get-ImageTag -Image $GuacamoleImage
   $postgresTag = Get-ImageTag -Image $PostgresImage
   $nginxTag = Get-ImageTag -Image $NginxImage
+  $keycloakTag = Get-ImageTag -Image $KeycloakImage
 
   $targets = @()
   if (-not $SiteBOnly) {
@@ -419,6 +459,7 @@ try {
     $effectiveGuacamoleImage = $GuacamoleImage
     $effectivePostgresImage = $PostgresImage
     $effectiveNginxImage = $NginxImage
+    $effectiveKeycloakImage = $KeycloakImage
     $effectiveDesktopImage = $DesktopImage
     if ($UseRegionalEcrImages) {
       $registry = "{0}.dkr.ecr.{1}.amazonaws.com" -f $EcrAccountId, $target.region
@@ -426,6 +467,7 @@ try {
       $effectiveGuacamoleImage = "$registry/${EcrGuacamoleRepositoryName}:$guacamoleTag"
       $effectivePostgresImage = "$registry/${EcrPostgresRepositoryName}:$postgresTag"
       $effectiveNginxImage = "$registry/${EcrNginxRepositoryName}:$nginxTag"
+      $effectiveKeycloakImage = "$registry/${EcrKeycloakRepositoryName}:$keycloakTag"
     }
     if ($UseRegionalEcrDesktopImage) {
       $registry = "{0}.dkr.ecr.{1}.amazonaws.com" -f $EcrAccountId, $target.region
@@ -436,7 +478,11 @@ try {
     $escapedGuacamoleDbName = Escape-YamlDoubleQuoted -Value $effectiveGuacamoleDbName
     $escapedGuacamoleDbUser = Escape-YamlDoubleQuoted -Value $effectiveGuacamoleDbUser
     $escapedGuacamoleDbPassword = Escape-YamlDoubleQuoted -Value $effectiveGuacamoleDbPassword
-    $renderedManifest = $manifestTemplate.Replace("__GUACD_IMAGE__", $effectiveGuacdImage).Replace("__GUACAMOLE_IMAGE__", $effectiveGuacamoleImage).Replace("__POSTGRES_IMAGE__", $effectivePostgresImage).Replace("__NGINX_IMAGE__", $effectiveNginxImage).Replace("__GUACAMOLE_DB_NAME__", $escapedGuacamoleDbName).Replace("__GUACAMOLE_DB_USER__", $escapedGuacamoleDbUser).Replace("__GUACAMOLE_DB_PASSWORD__", $escapedGuacamoleDbPassword)
+    $escapedKeycloakAdminUsername = Escape-YamlDoubleQuoted -Value $effectiveKeycloakAdminUsername
+    $escapedKeycloakAdminPassword = Escape-YamlDoubleQuoted -Value $effectiveKeycloakAdminPassword
+    $escapedKeycloakBootstrapUsername = Escape-YamlDoubleQuoted -Value $effectiveKeycloakBootstrapUsername
+    $escapedKeycloakBootstrapPassword = Escape-YamlDoubleQuoted -Value $effectiveKeycloakBootstrapPassword
+    $renderedManifest = $manifestTemplate.Replace("__GUACD_IMAGE__", $effectiveGuacdImage).Replace("__GUACAMOLE_IMAGE__", $effectiveGuacamoleImage).Replace("__POSTGRES_IMAGE__", $effectivePostgresImage).Replace("__NGINX_IMAGE__", $effectiveNginxImage).Replace("__KEYCLOAK_IMAGE__", $effectiveKeycloakImage).Replace("__GUACAMOLE_DB_NAME__", $escapedGuacamoleDbName).Replace("__GUACAMOLE_DB_USER__", $escapedGuacamoleDbUser).Replace("__GUACAMOLE_DB_PASSWORD__", $escapedGuacamoleDbPassword).Replace("__KEYCLOAK_ADMIN_USERNAME__", $escapedKeycloakAdminUsername).Replace("__KEYCLOAK_ADMIN_PASSWORD__", $escapedKeycloakAdminPassword).Replace("__KEYCLOAK_BOOTSTRAP_USERNAME__", $escapedKeycloakBootstrapUsername).Replace("__KEYCLOAK_BOOTSTRAP_PASSWORD__", $escapedKeycloakBootstrapPassword)
     $renderedDesktopManifest = ""
     if ($EnableSampleVdiDesktop) {
       $renderedDesktopManifest = $desktopManifestTemplate.Replace("__VDI_DESKTOP_IMAGE__", $effectiveDesktopImage).Replace("__VDI_DESKTOP_PASSWORD__", $effectiveDesktopVncPassword)
@@ -454,7 +500,7 @@ try {
       Write-Host ""
       Write-Host "== VDI service bootstrap: $($target.site) =="
       Write-Host "Cluster: $($target.cluster) | Region: $($target.region) | Context: $($target.context)"
-      Write-Host "Images: postgres=$effectivePostgresImage ; guacd=$effectiveGuacdImage ; guacamole=$effectiveGuacamoleImage ; nginx=$effectiveNginxImage"
+      Write-Host "Images: postgres=$effectivePostgresImage ; guacd=$effectiveGuacdImage ; guacamole=$effectiveGuacamoleImage ; nginx=$effectiveNginxImage ; keycloak=$effectiveKeycloakImage"
       if ($EnableSampleVdiDesktop) {
         Write-Host "Desktop image: $effectiveDesktopImage"
       }

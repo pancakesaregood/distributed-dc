@@ -1,3 +1,5 @@
+# Template manifest. Do not apply directly without placeholder rendering.
+# Render via iac/terraform/scripts/invoke_phase4_vdi_service_bootstrap.ps1.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -45,31 +47,35 @@ data:
           </header>
 
           <p class="subtitle">
-            Clientless desktop and operations access through the Guacamole gateway.
-            Launch from here, then authenticate with your assigned credentials.
+            Clientless desktop access through the Guacamole gateway.
+            Review site health, then authenticate with your assigned FIDO2 security key.
           </p>
 
-          <section class="status-grid" aria-label="platform status summary">
-            <article class="status-card">
-              <span class="dot up" aria-hidden="true"></span>
+          <section class="status-grid" aria-label="site health summary">
+            <article class="status-card" data-site="site-a" data-state="amber">
+              <span class="dot amber" aria-hidden="true"></span>
               <h2>Site A</h2>
-              <p>Published path online</p>
+              <p class="status-summary">Checking health...</p>
             </article>
-            <article class="status-card">
-              <span class="dot up" aria-hidden="true"></span>
+            <article class="status-card" data-site="site-b" data-state="amber">
+              <span class="dot amber" aria-hidden="true"></span>
               <h2>Site B</h2>
-              <p>Published path online</p>
+              <p class="status-summary">Checking health...</p>
             </article>
-            <article class="status-card">
-              <span class="dot warn" aria-hidden="true"></span>
-              <h2>Ops Stack</h2>
-              <p>Use internal CIDR routes</p>
+            <article class="status-card" data-site="site-c" data-state="amber">
+              <span class="dot amber" aria-hidden="true"></span>
+              <h2>Site C</h2>
+              <p class="status-summary">Checking health...</p>
+            </article>
+            <article class="status-card" data-site="site-d" data-state="amber">
+              <span class="dot amber" aria-hidden="true"></span>
+              <h2>Site D</h2>
+              <p class="status-summary">Checking health...</p>
             </article>
           </section>
 
           <div class="actions">
             <a class="primary" href="/guacamole/">Open Guacamole Login</a>
-            <a class="secondary" href="https://admin.slothkko.com/guacamole/">Admin Console</a>
           </div>
 
           <footer class="footnote">
@@ -78,6 +84,8 @@ data:
           </footer>
         </section>
       </main>
+
+      <a class="status-launch" href="/status/" aria-label="Open read-only status page">Status Page</a>
 
       <script src="/portal/portal.js"></script>
     </body>
@@ -97,6 +105,7 @@ data:
       --focus: #7fb8ff;
       --ok: #65dca1;
       --warn: #ffd27d;
+      --bad: #ff7d9a;
     }
 
     * {
@@ -222,7 +231,19 @@ data:
       color: #cce0ff;
     }
 
-    .status-card p {
+    .status-card[data-state="green"] {
+      border-color: rgba(101, 220, 161, 0.62);
+    }
+
+    .status-card[data-state="amber"] {
+      border-color: rgba(255, 210, 125, 0.62);
+    }
+
+    .status-card[data-state="red"] {
+      border-color: rgba(255, 125, 154, 0.62);
+    }
+
+    .status-summary {
       margin: 0;
       font-size: 0.74rem;
       color: #9fbee5;
@@ -235,14 +256,19 @@ data:
       display: inline-block;
     }
 
-    .dot.up {
+    .dot.green {
       background: var(--ok);
       box-shadow: 0 0 8px rgba(101, 220, 161, 0.6);
     }
 
-    .dot.warn {
+    .dot.amber {
       background: var(--warn);
       box-shadow: 0 0 8px rgba(255, 210, 125, 0.6);
+    }
+
+    .dot.red {
+      background: var(--bad);
+      box-shadow: 0 0 8px rgba(255, 125, 154, 0.6);
     }
 
     .actions {
@@ -251,8 +277,7 @@ data:
       gap: 10px;
     }
 
-    .primary,
-    .secondary {
+    .primary {
       border: 1px solid #3a5b8d;
       border-radius: 8px;
       padding: 10px 14px;
@@ -262,9 +287,27 @@ data:
       box-shadow: 0 1px 0 rgba(192, 217, 255, 0.15) inset;
     }
 
-    .primary:hover,
-    .secondary:hover {
+    .primary:hover {
       background: linear-gradient(180deg, rgba(47, 76, 118, 0.9), rgba(30, 52, 82, 0.9));
+      border-color: #4f79b8;
+    }
+
+    .status-launch {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 2;
+      border: 1px solid #3a5b8d;
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.76rem;
+      color: #d0e2ff;
+      background: linear-gradient(180deg, rgba(33, 54, 85, 0.94), rgba(24, 41, 66, 0.94));
+      box-shadow: 0 1px 0 rgba(192, 217, 255, 0.15) inset, 0 10px 20px rgba(0, 0, 0, 0.36);
+    }
+
+    .status-launch:hover {
+      background: linear-gradient(180deg, rgba(47, 76, 118, 0.94), rgba(30, 52, 82, 0.94));
       border-color: #4f79b8;
     }
 
@@ -291,29 +334,569 @@ data:
         flex-direction: column;
       }
 
-      .primary,
-      .secondary {
+      .primary {
         text-align: center;
       }
 
       .footnote {
         flex-direction: column;
       }
+
+      .status-launch {
+        right: 12px;
+        bottom: 12px;
+      }
     }
   portal.js: |
     (function () {
-      const el = document.getElementById("portal-time");
-      if (!el) {
-        return;
+      const SITES = [
+        { key: "site-a", endpoint: "/status/api/site-a/healthz" },
+        { key: "site-b", endpoint: "/status/api/site-b/healthz" },
+        { key: "site-c", endpoint: "/status/api/site-c/healthz" },
+        { key: "site-d", endpoint: "/status/api/site-d/healthz" }
+      ];
+      const CLOCK_INTERVAL_MS = 15000;
+      const HEALTH_INTERVAL_MS = 20000;
+
+      function classifyProbe(result) {
+        if (!result.ok) {
+          return "red";
+        }
+        if (result.status >= 500) {
+          return "red";
+        }
+        if (result.status >= 400 || result.latency_ms > 1800) {
+          return "amber";
+        }
+        return "green";
       }
 
-      const stamp = function () {
-        const now = new Date();
-        el.textContent = "Updated " + now.toLocaleString();
-      };
+      async function probe(url) {
+        const started = performance.now();
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          return {
+            ok: true,
+            status: res.status,
+            latency_ms: Math.round(performance.now() - started)
+          };
+        } catch (err) {
+          return {
+            ok: false,
+            status: 0,
+            latency_ms: Math.round(performance.now() - started),
+            error: err && err.message ? err.message : "request failed"
+          };
+        }
+      }
 
-      stamp();
-      setInterval(stamp, 15000);
+      function updateClock() {
+        const el = document.getElementById("portal-time");
+        if (!el) {
+          return;
+        }
+        el.textContent = "Updated " + new Date().toLocaleString();
+      }
+
+      function updateCard(siteKey, probeResult) {
+        const card = document.querySelector('[data-site="' + siteKey + '"]');
+        if (!card) {
+          return;
+        }
+        const state = classifyProbe(probeResult);
+        card.dataset.state = state;
+
+        const dot = card.querySelector(".dot");
+        if (dot) {
+          dot.className = "dot " + state;
+        }
+
+        const text = card.querySelector(".status-summary");
+        if (!text) {
+          return;
+        }
+
+        if (state === "green") {
+          text.textContent = "Alive \u2022 HTTP " + probeResult.status + " \u2022 " + probeResult.latency_ms + "ms";
+          return;
+        }
+
+        if (state === "amber") {
+          text.textContent = "Distress \u2022 HTTP " + probeResult.status + " \u2022 " + probeResult.latency_ms + "ms";
+          return;
+        }
+
+        const detail = probeResult.status > 0 ? "HTTP " + probeResult.status : (probeResult.error || "unreachable");
+        text.textContent = "Failing \u2022 " + detail;
+      }
+
+      async function refreshHealth() {
+        const results = await Promise.all(
+          SITES.map(async function (site) {
+            const probeResult = await probe(site.endpoint);
+            return { key: site.key, probe: probeResult };
+          })
+        );
+
+        results.forEach(function (result) {
+          updateCard(result.key, result.probe);
+        });
+      }
+
+      updateClock();
+      refreshHealth();
+      setInterval(updateClock, CLOCK_INTERVAL_MS);
+      setInterval(refreshHealth, HEALTH_INTERVAL_MS);
+    }());
+  status.html: |
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>slothkko.exe | Status</title>
+      <meta name="description" content="Read-only site health status for Slothkko services.">
+      <link rel="stylesheet" href="/portal/status.css">
+    </head>
+    <body>
+      <div class="wallpaper" aria-hidden="true"></div>
+      <div class="texture" aria-hidden="true"></div>
+
+      <main class="status-shell">
+        <header class="status-head">
+          <a class="back-link" href="/" aria-label="Back to main page">Back to Main</a>
+          <p class="kicker">slothkko.exe</p>
+          <h1>Read-Only Status Reactor</h1>
+          <p class="subtitle">Live health telemetry for Sites A-D. No controls are exposed on this page.</p>
+          <div class="overall">
+            <span id="overall-light" class="dot amber" aria-hidden="true"></span>
+            <p id="overall-text">Checking service health...</p>
+          </div>
+          <p id="status-time" class="stamp">--</p>
+        </header>
+
+        <section class="panel">
+          <h2>Site Health Checks</h2>
+          <div id="status-grid" class="status-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="panel legend">
+          <h2>Legend</h2>
+          <p><span class="dot green" aria-hidden="true"></span> Alive</p>
+          <p><span class="dot amber" aria-hidden="true"></span> Device in distress</p>
+          <p><span class="dot red" aria-hidden="true"></span> Health check failing</p>
+        </section>
+      </main>
+      <script src="/portal/status.js"></script>
+    </body>
+    </html>
+  status.css: |
+    :root {
+      --font-ui: "Trebuchet MS", "Tahoma", "Segoe UI", sans-serif;
+      --desktop-top: #111b30;
+      --desktop-mid: #0b1527;
+      --desktop-bottom: #060d1a;
+      --ink-strong: #dde9ff;
+      --ink-soft: #afc7ea;
+      --ok: #65dca1;
+      --warn: #ffd27d;
+      --bad: #ff7d9a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--ink-strong);
+      font-family: var(--font-ui);
+      background: #060d1b;
+    }
+
+    .wallpaper,
+    .texture {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .wallpaper {
+      background:
+        radial-gradient(circle at 22% 18%, rgba(90, 133, 215, 0.25), transparent 44%),
+        radial-gradient(circle at 75% 72%, rgba(120, 95, 190, 0.18), transparent 44%),
+        linear-gradient(180deg, var(--desktop-top), var(--desktop-mid) 52%, var(--desktop-bottom));
+    }
+
+    .texture {
+      opacity: 0.24;
+      background-image:
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0, rgba(255, 255, 255, 0.14) 1px, transparent 1px, transparent 3px),
+        url("/portal/grain.svg");
+      background-size: auto, 320px 320px;
+      mix-blend-mode: soft-light;
+    }
+
+    .status-shell {
+      position: relative;
+      z-index: 1;
+      width: min(980px, 96vw);
+      margin: 20px auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .status-head,
+    .panel {
+      border: 1px solid rgba(96, 132, 188, 0.66);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(8, 18, 33, 0.9), rgba(6, 14, 26, 0.93));
+      padding: 16px;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.36);
+    }
+
+    .kicker {
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.76rem;
+      color: var(--ink-soft);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 10px;
+      border: 1px solid #3a5b8d;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 0.76rem;
+      color: #d0e2ff;
+      text-decoration: none;
+      background: linear-gradient(180deg, rgba(33, 54, 85, 0.9), rgba(24, 41, 66, 0.9));
+      box-shadow: 0 1px 0 rgba(192, 217, 255, 0.15) inset;
+    }
+
+    .back-link:hover {
+      background: linear-gradient(180deg, rgba(47, 76, 118, 0.9), rgba(30, 52, 82, 0.9));
+      border-color: #4f79b8;
+    }
+
+    h1 {
+      margin: 6px 0 8px;
+      font-size: 1.3rem;
+      letter-spacing: 0.03em;
+      color: #edf5ff;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      color: #d7e7ff;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin: 0 0 12px;
+      color: #afc7ea;
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+
+    .overall {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .overall p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #c6daf8;
+    }
+
+    .stamp {
+      margin: 8px 0 0;
+      font-size: 0.77rem;
+      color: #a7c2e8;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    .status-site {
+      border: 1px solid rgba(97, 128, 181, 0.55);
+      border-radius: 10px;
+      background: rgba(14, 29, 48, 0.88);
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .status-site[data-state="green"] {
+      border-color: rgba(101, 220, 161, 0.62);
+    }
+
+    .status-site[data-state="amber"] {
+      border-color: rgba(255, 210, 125, 0.62);
+    }
+
+    .status-site[data-state="red"] {
+      border-color: rgba(255, 125, 154, 0.62);
+    }
+
+    .status-site-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .status-site-head h3 {
+      margin: 0;
+      font-size: 0.92rem;
+      color: #d5e6ff;
+      letter-spacing: 0.02em;
+    }
+
+    .check-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 6px;
+    }
+
+    .check-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.78rem;
+      border-top: 1px solid rgba(157, 191, 236, 0.16);
+      padding-top: 6px;
+    }
+
+    .check-item:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .check-item-name {
+      color: #bdd2f3;
+    }
+
+    .check-item-state {
+      color: #9fbfe8;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .legend p {
+      margin: 6px 0;
+      color: #b6ceee;
+      font-size: 0.84rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+      flex: 0 0 auto;
+    }
+
+    .dot.green {
+      background: var(--ok);
+      box-shadow: 0 0 8px rgba(101, 220, 161, 0.6);
+    }
+
+    .dot.amber {
+      background: var(--warn);
+      box-shadow: 0 0 8px rgba(255, 210, 125, 0.6);
+    }
+
+    .dot.red {
+      background: var(--bad);
+      box-shadow: 0 0 8px rgba(255, 125, 154, 0.6);
+    }
+  status.js: |
+    (function () {
+      const REFRESH_MS = 30000;
+      const SITES = [
+        {
+          id: "site-a",
+          label: "Site A",
+          checks: [
+            { label: "Published /healthz", endpoint: "/status/api/site-a/healthz" },
+            { label: "Guacamole /guacamole/", endpoint: "/status/api/site-a/guacamole" }
+          ]
+        },
+        {
+          id: "site-b",
+          label: "Site B",
+          checks: [
+            { label: "Published /healthz", endpoint: "/status/api/site-b/healthz" },
+            { label: "Guacamole /guacamole/", endpoint: "/status/api/site-b/guacamole" }
+          ]
+        },
+        {
+          id: "site-c",
+          label: "Site C",
+          checks: [
+            { label: "Published /healthz", endpoint: "/status/api/site-c/healthz" },
+            { label: "Guacamole /guacamole/", endpoint: "/status/api/site-c/guacamole" }
+          ]
+        },
+        {
+          id: "site-d",
+          label: "Site D",
+          checks: [
+            { label: "Published /healthz", endpoint: "/status/api/site-d/healthz" },
+            { label: "Guacamole /guacamole/", endpoint: "/status/api/site-d/guacamole" }
+          ]
+        }
+      ];
+
+      function classifyProbe(result) {
+        if (!result.ok) {
+          return "red";
+        }
+        if (result.status >= 500) {
+          return "red";
+        }
+        if (result.status >= 400 || result.latency_ms > 1800) {
+          return "amber";
+        }
+        return "green";
+      }
+
+      function classifyCollection(states) {
+        if (states.some(function (s) { return s === "red"; })) {
+          return "red";
+        }
+        if (states.some(function (s) { return s === "amber"; })) {
+          return "amber";
+        }
+        return "green";
+      }
+
+      async function probe(endpoint) {
+        const started = performance.now();
+        try {
+          const response = await fetch(endpoint, { cache: "no-store" });
+          return {
+            ok: true,
+            status: response.status,
+            latency_ms: Math.round(performance.now() - started)
+          };
+        } catch (err) {
+          return {
+            ok: false,
+            status: 0,
+            latency_ms: Math.round(performance.now() - started),
+            error: err && err.message ? err.message : "request failed"
+          };
+        }
+      }
+
+      function checkSummary(state, result) {
+        if (state === "green") {
+          return "alive \u2022 HTTP " + result.status + " \u2022 " + result.latency_ms + "ms";
+        }
+        if (state === "amber") {
+          return "distress \u2022 HTTP " + result.status + " \u2022 " + result.latency_ms + "ms";
+        }
+        const detail = result.status > 0 ? "HTTP " + result.status : (result.error || "unreachable");
+        return "failing \u2022 " + detail;
+      }
+
+      function renderSite(site, checks) {
+        const states = checks.map(function (check) { return check.state; });
+        const siteState = classifyCollection(states);
+
+        const list = checks.map(function (check) {
+          return (
+            '<li class="check-item">' +
+              '<span class="check-item-name"><span class="dot ' + check.state + '" aria-hidden="true"></span> ' + check.label + "</span>" +
+              '<span class="check-item-state">' + checkSummary(check.state, check.result) + "</span>" +
+            "</li>"
+          );
+        }).join("");
+
+        return (
+          '<article class="status-site" data-state="' + siteState + '">' +
+            '<div class="status-site-head">' +
+              "<h3>" + site.label + "</h3>" +
+              '<span class="dot ' + siteState + '" aria-hidden="true"></span>' +
+            "</div>" +
+            '<ul class="check-list">' + list + "</ul>" +
+          "</article>"
+        );
+      }
+
+      function renderOverall(siteStates) {
+        const state = classifyCollection(siteStates);
+        const light = document.getElementById("overall-light");
+        const text = document.getElementById("overall-text");
+        const stamp = document.getElementById("status-time");
+
+        if (light) {
+          light.className = "dot " + state;
+        }
+        if (text) {
+          if (state === "green") {
+            text.textContent = "Overall state: ALIVE";
+          } else if (state === "amber") {
+            text.textContent = "Overall state: DISTRESS";
+          } else {
+            text.textContent = "Overall state: FAILING";
+          }
+        }
+        if (stamp) {
+          stamp.textContent = "Updated " + new Date().toLocaleString();
+        }
+      }
+
+      async function refresh() {
+        const siteCards = await Promise.all(
+          SITES.map(async function (site) {
+            const checks = await Promise.all(
+              site.checks.map(async function (check) {
+                const result = await probe(check.endpoint);
+                return {
+                  label: check.label,
+                  result: result,
+                  state: classifyProbe(result)
+                };
+              })
+            );
+            return {
+              site: site,
+              checks: checks,
+              state: classifyCollection(checks.map(function (check) { return check.state; }))
+            };
+          })
+        );
+
+        const grid = document.getElementById("status-grid");
+        if (grid) {
+          grid.innerHTML = siteCards.map(function (siteCard) {
+            return renderSite(siteCard.site, siteCard.checks);
+          }).join("");
+        }
+        renderOverall(siteCards.map(function (siteCard) { return siteCard.state; }));
+      }
+
+      refresh();
+      setInterval(refresh, REFRESH_MS);
     }());
   guac-theme.css: |
     :root {
@@ -327,27 +910,43 @@ data:
       --slk-button-border: #3a5b8d;
     }
 
-    #login-ui,
-    .login-ui {
-      font-family: var(--slk-font-ui);
-      color: var(--slk-text);
+    html.slk-login-page,
+    body.slk-login-page {
+      width: 100%;
+      min-height: 100%;
+      margin: 0 !important;
       background:
-        radial-gradient(circle at 22% 18%, rgba(90, 133, 215, 0.24), transparent 44%),
-        radial-gradient(circle at 75% 72%, rgba(120, 95, 190, 0.18), transparent 44%),
-        linear-gradient(180deg, #111b30, #0b1527 52%, #060d1a);
-      min-height: 100vh;
+        radial-gradient(circle at 16% 14%, rgba(104, 158, 255, 0.22), transparent 40%),
+        radial-gradient(circle at 82% 78%, rgba(123, 231, 193, 0.16), transparent 46%),
+        linear-gradient(180deg, #0f1e35 0%, #0a1629 54%, #040b17 100%) !important;
+      background-attachment: fixed;
     }
 
-    #login-ui .login-dialog-middle,
-    .login-ui .login-dialog-middle {
+    html.slk-login-page #content,
+    body.slk-login-page #content {
+      background: transparent !important;
+    }
+
+    html.slk-login-page #login-ui,
+    html.slk-login-page .login-ui {
+      font-family: var(--slk-font-ui);
+      color: var(--slk-text);
+      width: 100%;
+      min-height: 100vh !important;
+      background: transparent !important;
+    }
+
+    html.slk-login-page #login-ui .login-dialog-middle,
+    html.slk-login-page .login-ui .login-dialog-middle {
       min-height: 100vh;
       display: grid;
       place-items: center;
       padding: 16px;
+      background: transparent !important;
     }
 
-    #login-ui .login-dialog,
-    .login-ui .login-dialog {
+    html.slk-login-page #login-ui .login-dialog,
+    html.slk-login-page .login-ui .login-dialog {
       width: min(520px, 92vw);
       border: 1px solid var(--slk-panel-border);
       border-radius: 16px;
@@ -357,8 +956,8 @@ data:
       backdrop-filter: blur(4px);
     }
 
-    #login-ui .logo,
-    .login-ui .logo {
+    html.slk-login-page #login-ui .logo,
+    html.slk-login-page .login-ui .logo {
       width: 82px !important;
       height: 82px !important;
       margin: 0 auto 10px;
@@ -372,21 +971,21 @@ data:
       box-shadow: inset 0 0 0 1px rgba(221, 233, 255, 0.08);
     }
 
-    #login-ui .version,
-    .login-ui .version {
+    html.slk-login-page #login-ui .version,
+    html.slk-login-page .login-ui .version {
       margin-bottom: 14px;
     }
 
-    #login-ui .version .app-name,
-    .login-ui .version .app-name {
+    html.slk-login-page #login-ui .version .app-name,
+    html.slk-login-page .login-ui .version .app-name {
       font-size: 0 !important;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: #edf5ff;
     }
 
-    #login-ui .version .app-name::before,
-    .login-ui .version .app-name::before {
+    html.slk-login-page #login-ui .version .app-name::before,
+    html.slk-login-page .login-ui .version .app-name::before {
       content: "SLOTHKKO ACCESS";
       display: inline-block;
       font-size: 1.05rem;
@@ -394,50 +993,50 @@ data:
       color: #edf5ff;
     }
 
-    #login-ui .version .version-number,
-    .login-ui .version .version-number {
+    html.slk-login-page #login-ui .version .version-number,
+    html.slk-login-page .login-ui .version .version-number {
       font-size: 0 !important;
       margin-top: 2px;
       color: var(--slk-text-soft);
     }
 
-    #login-ui .version .version-number::before,
-    .login-ui .version .version-number::before {
+    html.slk-login-page #login-ui .version .version-number::before,
+    html.slk-login-page .login-ui .version .version-number::before {
       content: "secure workspace";
       display: inline-block;
       font-size: 0.78rem;
       color: var(--slk-text-soft);
     }
 
-    #login-ui p,
-    .login-ui p {
+    html.slk-login-page #login-ui p,
+    html.slk-login-page .login-ui p {
       color: var(--slk-text-soft);
       line-height: 1.45;
     }
 
-    #login-ui .login-fields input,
-    #login-ui .login-fields select,
-    #login-ui .login-fields textarea,
-    #login-ui .login-fields .password-field,
-    #login-ui .login-fields .username-field,
-    .login-ui .login-fields input,
-    .login-ui .login-fields select,
-    .login-ui .login-fields textarea,
-    .login-ui .login-fields .password-field,
-    .login-ui .login-fields .username-field {
+    html.slk-login-page #login-ui .login-fields input,
+    html.slk-login-page #login-ui .login-fields select,
+    html.slk-login-page #login-ui .login-fields textarea,
+    html.slk-login-page #login-ui .login-fields .password-field,
+    html.slk-login-page #login-ui .login-fields .username-field,
+    html.slk-login-page .login-ui .login-fields input,
+    html.slk-login-page .login-ui .login-fields select,
+    html.slk-login-page .login-ui .login-fields textarea,
+    html.slk-login-page .login-ui .login-fields .password-field,
+    html.slk-login-page .login-ui .login-fields .username-field {
       border-color: var(--slk-input-border);
       background: var(--slk-input-bg);
       color: var(--slk-text);
       border-radius: 8px;
     }
 
-    #login-ui .login-fields input,
-    .login-ui .login-fields input {
+    html.slk-login-page #login-ui .login-fields input,
+    html.slk-login-page .login-ui .login-fields input {
       padding: 9px 10px;
     }
 
-    #login-ui .buttons input[type="submit"],
-    .login-ui .buttons input[type="submit"] {
+    html.slk-login-page #login-ui .buttons input[type="submit"],
+    html.slk-login-page .login-ui .buttons input[type="submit"] {
       border: 1px solid var(--slk-button-border);
       border-radius: 8px;
       background: linear-gradient(180deg, rgba(33, 54, 85, 0.92), rgba(24, 41, 66, 0.92));
@@ -449,14 +1048,14 @@ data:
       box-shadow: 0 1px 0 rgba(192, 217, 255, 0.15) inset;
     }
 
-    #login-ui .buttons input[type="submit"]:hover,
-    .login-ui .buttons input[type="submit"]:hover {
+    html.slk-login-page #login-ui .buttons input[type="submit"]:hover,
+    html.slk-login-page .login-ui .buttons input[type="submit"]:hover {
       background: linear-gradient(180deg, rgba(47, 76, 118, 0.9), rgba(30, 52, 82, 0.9));
       border-color: #4f79b8;
     }
 
-    #login-ui .login-error,
-    .login-ui .login-error {
+    html.slk-login-page #login-ui .login-error,
+    html.slk-login-page .login-ui .login-error {
       margin: 0 auto 12px;
       width: min(520px, 92vw);
       border: 1px solid rgba(176, 62, 88, 0.75);
@@ -467,26 +1066,35 @@ data:
     }
   guac-branding.js: |
     (function () {
-      const applyBranding = function () {
-        document.title = "Slothkko Access";
+      var brandTitle = "Slothkko Access";
 
-        const icon = "/portal/sloth-smile.svg";
-        document.querySelectorAll("link[rel='icon'], link[rel='apple-touch-icon']").forEach(function (el) {
-          el.href = icon;
-        });
+      function applyBranding() {
+        try {
+        if (document.title !== brandTitle) {
+          document.title = brandTitle;
+        }
 
-        document.querySelectorAll(".version .app-name").forEach(function (el) {
-          el.textContent = "SLOTHKKO ACCESS";
-        });
-      };
+          var icon = "/portal/sloth-smile.svg";
+          var links = document.querySelectorAll("link[rel='icon'], link[rel='apple-touch-icon']");
+          for (var i = 0; i < links.length; i++) {
+            links[i].href = icon;
+          }
 
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", applyBranding);
-      } else {
-        applyBranding();
+          var labels = document.querySelectorAll(".version .app-name");
+          for (var j = 0; j < labels.length; j++) {
+            labels[j].textContent = "SLOTHKKO ACCESS";
+          }
+        } catch (e) {
+          // Keep Guacamole bootstrap resilient even if branding fails.
+        }
       }
 
-      setTimeout(applyBranding, 600);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", applyBranding, { once: true });
+      }
+
+      applyBranding();
+      setTimeout(applyBranding, 800);
     }());
   sloth-smile.svg: |
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Smiling sloth">
@@ -529,9 +1137,37 @@ data:
       ''      close;
     }
 
+    # First IP from incoming X-Forwarded-For chain (if present).
+    map $http_x_forwarded_for $incoming_forwarded_first_ip {
+      ~^(?<first>[^,]+) $first;
+      default            "";
+    }
+
+    # Prefer Cloudflare's original client IP; then incoming X-Real-IP; then XFF first hop.
+    map $http_cf_connecting_ip $client_real_ip_source_cf {
+      default $http_cf_connecting_ip;
+      ''      $http_x_real_ip;
+    }
+
+    map $client_real_ip_source_cf $client_real_ip_source_hdr {
+      default $client_real_ip_source_cf;
+      ''      $incoming_forwarded_first_ip;
+    }
+
+    map $client_real_ip_source_hdr $client_real_ip_effective {
+      default $client_real_ip_source_hdr;
+      ''      $remote_addr;
+    }
+
+    log_format vdi_main '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent '
+                        '"$http_referer" "$http_user_agent" xff="$http_x_forwarded_for" '
+                        'xri="$http_x_real_ip" cfip="$http_cf_connecting_ip" effective="$client_real_ip_effective"';
+
     server {
       listen 8081;
       server_name _;
+      resolver kube-dns.kube-system.svc.cluster.local ipv6=off valid=30s;
+      access_log /dev/stdout vdi_main;
 
       root /etc/vdi-portal;
       index index.html;
@@ -548,11 +1184,129 @@ data:
       location /portal/ {
         alias /etc/vdi-portal/;
         try_files $uri =404;
-        add_header Cache-Control "public, max-age=300";
+        add_header Cache-Control "no-store";
+      }
+
+      location = /status {
+        return 302 /status/;
+      }
+
+      location /status/ {
+        try_files /status.html =404;
+        add_header Cache-Control "no-store";
+      }
+
+      location = /status/api/site-a/healthz {
+        proxy_pass http://127.0.0.1:8081/healthz;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 3s;
+        proxy_send_timeout 3s;
+        add_header Cache-Control "no-store";
+      }
+
+      location = /status/api/site-a/guacamole {
+        proxy_pass http://127.0.0.1:8080/guacamole/;
+        proxy_set_header Host $host;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 3s;
+        proxy_send_timeout 3s;
+        add_header Cache-Control "no-store";
+      }
+
+      location = /status/api/site-b/healthz {
+        set $status_probe_url https://app-b.slothkko.com/healthz;
+        proxy_pass $status_probe_url;
+        proxy_set_header Host app-b.slothkko.com;
+        proxy_ssl_server_name on;
+        proxy_ssl_name app-b.slothkko.com;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 3s;
+        proxy_send_timeout 3s;
+        add_header Cache-Control "no-store";
+      }
+
+      location = /status/api/site-b/guacamole {
+        set $status_probe_url https://app-b.slothkko.com/guacamole/;
+        proxy_pass $status_probe_url;
+        proxy_set_header Host app-b.slothkko.com;
+        proxy_ssl_server_name on;
+        proxy_ssl_name app-b.slothkko.com;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 3s;
+        proxy_send_timeout 3s;
+        add_header Cache-Control "no-store";
+      }
+
+      location = /status/api/site-c/healthz {
+        set $status_probe_url https://app-c.slothkko.com/healthz;
+        proxy_pass $status_probe_url;
+        proxy_set_header Host app-c.slothkko.com;
+        proxy_ssl_server_name on;
+        proxy_ssl_name app-c.slothkko.com;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 3s;
+        proxy_send_timeout 3s;
+        add_header Cache-Control "no-store";
+      }
+
+      location = /status/api/site-c/guacamole {
+        set $status_probe_url https://app-c.slothkko.com/guacamole/;
+        proxy_pass $status_probe_url;
+        proxy_set_header Host app-c.slothkko.com;
+        proxy_ssl_server_name on;
+        proxy_ssl_name app-c.slothkko.com;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 3s;
+        proxy_send_timeout 3s;
+        add_header Cache-Control "no-store";
+      }
+
+      location = /status/api/site-d/healthz {
+        set $status_probe_url https://app-d.slothkko.com/healthz;
+        proxy_pass $status_probe_url;
+        proxy_set_header Host app-d.slothkko.com;
+        proxy_ssl_server_name on;
+        proxy_ssl_name app-d.slothkko.com;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 3s;
+        proxy_send_timeout 3s;
+        add_header Cache-Control "no-store";
+      }
+
+      location = /status/api/site-d/guacamole {
+        set $status_probe_url https://app-d.slothkko.com/guacamole/;
+        proxy_pass $status_probe_url;
+        proxy_set_header Host app-d.slothkko.com;
+        proxy_ssl_server_name on;
+        proxy_ssl_name app-d.slothkko.com;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 3s;
+        proxy_send_timeout 3s;
+        add_header Cache-Control "no-store";
       }
 
       location = /guacamole {
         return 302 /guacamole/;
+      }
+
+      location = /idp {
+        return 302 /idp/;
+      }
+
+      location /idp/ {
+        proxy_pass http://keycloak.vdi.svc.cluster.local:8080/idp/;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-For $client_real_ip_effective;
+        proxy_set_header X-Real-IP $client_real_ip_effective;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port 443;
+
+        proxy_connect_timeout 10s;
+        proxy_read_timeout 60s;
+        proxy_send_timeout 60s;
       }
 
       location /guacamole/ {
@@ -561,14 +1315,23 @@ data:
 
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-For $client_real_ip_effective;
+        proxy_set_header X-Real-IP $client_real_ip_effective;
+        proxy_set_header X-Original-Forwarded-For $http_x_forwarded_for;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
         proxy_set_header Accept-Encoding "";
 
         proxy_buffering off;
+        proxy_set_header If-None-Match "";
+        proxy_set_header If-Modified-Since "";
+        proxy_hide_header ETag;
+        proxy_hide_header Last-Modified;
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0" always;
+        add_header Pragma "no-cache" always;
+        add_header Expires "0" always;
 
-        sub_filter '</head>' '<link rel="stylesheet" href="/portal/guac-theme.css"><script src="/portal/guac-branding.js"></script></head>';
+        sub_filter '</head>' '<link rel="stylesheet" href="/portal/guac-theme.css?v=20260309r2"><script src="/portal/guac-branding.js?v=20260309r2"></script></head>';
         sub_filter_types text/html;
         sub_filter_once on;
       }
@@ -680,6 +1443,243 @@ spec:
         configMap:
           name: guacamole-db-init
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: keycloak-auth
+  namespace: vdi
+type: Opaque
+stringData:
+  admin_username: "__KEYCLOAK_ADMIN_USERNAME__"
+  admin_password: "__KEYCLOAK_ADMIN_PASSWORD__"
+  bootstrap_username: "__KEYCLOAK_BOOTSTRAP_USERNAME__"
+  bootstrap_password: "__KEYCLOAK_BOOTSTRAP_PASSWORD__"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-realm-import
+  namespace: vdi
+data:
+  vdi-realm.json: |
+    {
+      "realm": "vdi",
+      "enabled": true,
+      "displayName": "Slothkko Access",
+      "registrationAllowed": false,
+      "registrationEmailAsUsername": false,
+      "rememberMe": false,
+      "verifyEmail": false,
+      "loginWithEmailAllowed": false,
+      "duplicateEmailsAllowed": false,
+      "resetPasswordAllowed": true,
+      "editUsernameAllowed": false,
+      "sslRequired": "external",
+      "webAuthnPolicyRpEntityName": "slothkko access",
+      "webAuthnPolicyPasswordlessRpEntityName": "slothkko access",
+      "webAuthnPolicyPasswordlessRpId": "slothkko.com",
+      "webAuthnPolicyPasswordlessSignatureAlgorithms": [
+        "ES256",
+        "RS256"
+      ],
+      "webAuthnPolicyPasswordlessAuthenticatorAttachment": "cross-platform",
+      "webAuthnPolicyPasswordlessAvoidSameAuthenticatorRegister": true,
+      "webAuthnPolicyPasswordlessCreateTimeout": 120,
+      "webAuthnPolicyPasswordlessRequireResidentKey": "Yes",
+      "webAuthnPolicyPasswordlessUserVerificationRequirement": "required",
+      "clients": [
+        {
+          "clientId": "guacamole",
+          "name": "Guacamole VDI",
+          "enabled": true,
+          "protocol": "openid-connect",
+          "publicClient": true,
+          "standardFlowEnabled": true,
+          "directAccessGrantsEnabled": false,
+          "implicitFlowEnabled": true,
+          "serviceAccountsEnabled": false,
+          "attributes": {
+            "pkce.code.challenge.method": "S256",
+            "post.logout.redirect.uris": "+"
+          },
+          "redirectUris": [
+            "https://slothkko.com/guacamole/*",
+            "https://app-a.slothkko.com/guacamole/*"
+          ],
+          "webOrigins": [
+            "https://slothkko.com",
+            "https://app-a.slothkko.com"
+          ],
+          "defaultClientScopes": [
+            "profile",
+            "email",
+            "roles"
+          ],
+          "optionalClientScopes": [
+            "web-origins"
+          ]
+        }
+      ],
+      "users": [
+        {
+          "username": "__KEYCLOAK_BOOTSTRAP_USERNAME__",
+          "enabled": true,
+          "emailVerified": true,
+          "credentials": [
+            {
+              "type": "password",
+              "temporary": true,
+              "value": "__KEYCLOAK_BOOTSTRAP_PASSWORD__"
+            }
+          ],
+          "requiredActions": [
+            "webauthn-register-passwordless"
+          ]
+        }
+      ]
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  namespace: vdi
+  labels:
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/part-of: vdi
+spec:
+  selector:
+    app.kubernetes.io/name: keycloak
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: vdi
+  labels:
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/part-of: vdi
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: keycloak
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: keycloak
+        app.kubernetes.io/part-of: vdi
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      nodeSelector:
+        workload: vdi
+      tolerations:
+      - key: workload
+        operator: Equal
+        value: vdi
+        effect: NoSchedule
+      containers:
+      - name: keycloak
+        image: __KEYCLOAK_IMAGE__
+        imagePullPolicy: IfNotPresent
+        args:
+        - start-dev
+        - --import-realm
+        - --proxy-headers=xforwarded
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+        env:
+        - name: KC_BOOTSTRAP_ADMIN_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-auth
+              key: admin_username
+        - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: keycloak-auth
+              key: admin_password
+        - name: KC_DB
+          value: postgres
+        - name: KC_DB_URL_HOST
+          value: guacamole-db.vdi.svc.cluster.local
+        - name: KC_DB_URL_PORT
+          value: "5432"
+        - name: KC_DB_URL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: guacamole-db-auth
+              key: database
+        - name: KC_DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: guacamole-db-auth
+              key: username
+        - name: KC_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: guacamole-db-auth
+              key: password
+        - name: KC_DB_SCHEMA
+          value: keycloak
+        - name: KC_HTTP_RELATIVE_PATH
+          value: /idp
+        - name: KC_HOSTNAME
+          value: slothkko.com
+        - name: KC_HOSTNAME_STRICT
+          value: "false"
+        - name: KC_PROXY_HEADERS
+          value: xforwarded
+        - name: KC_HEALTH_ENABLED
+          value: "true"
+        - name: KC_METRICS_ENABLED
+          value: "true"
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 45
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 12
+        livenessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 90
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 6
+        resources:
+          requests:
+            cpu: 100m
+            memory: 384Mi
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+        volumeMounts:
+        - name: keycloak-realm-import
+          mountPath: /opt/keycloak/data/import
+          readOnly: true
+      volumes:
+      - name: keycloak-realm-import
+        configMap:
+          name: keycloak-realm-import
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -743,6 +1743,14 @@ spec:
           value: "127.0.0.1"
         - name: GUACD_PORT
           value: "4822"
+        - name: REMOTE_IP_VALVE_ENABLED
+          value: "true"
+        - name: PROXY_IP_HEADER
+          value: "X-Real-IP"
+        - name: PROXY_PROTOCOL_HEADER
+          value: "X-Forwarded-Proto"
+        - name: PROXY_ALLOWED_IPS_REGEX
+          value: '127\.0\.0\.1|::1|10\..*|192\.168\..*|172\.(1[6-9]|2[0-9]|3[0-1])\..*'
         - name: POSTGRESQL_HOSTNAME
           value: "guacamole-db.vdi.svc.cluster.local"
         - name: POSTGRESQL_PORT
@@ -762,6 +1770,24 @@ spec:
             secretKeyRef:
               name: guacamole-db-auth
               key: password
+        - name: OPENID_AUTHORIZATION_ENDPOINT
+          value: "https://slothkko.com/idp/realms/vdi/protocol/openid-connect/auth"
+        - name: OPENID_JWKS_ENDPOINT
+          value: "http://keycloak.vdi.svc.cluster.local:8080/idp/realms/vdi/protocol/openid-connect/certs"
+        - name: OPENID_ISSUER
+          value: "https://slothkko.com/idp/realms/vdi"
+        - name: OPENID_CLIENT_ID
+          value: "guacamole"
+        - name: OPENID_REDIRECT_URI
+          value: "https://slothkko.com/guacamole/"
+        - name: OPENID_USERNAME_CLAIM_TYPE
+          value: "preferred_username"
+        - name: OPENID_GROUPS_CLAIM_TYPE
+          value: "groups"
+        - name: OPENID_MAX_TOKEN_VALIDITY
+          value: "30"
+        - name: EXTENSION_PRIORITY
+          value: "openid,postgresql"
         ports:
         - name: guac-http
           containerPort: 8080

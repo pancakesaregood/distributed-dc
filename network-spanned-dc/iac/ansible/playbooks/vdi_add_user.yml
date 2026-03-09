@@ -1,0 +1,716 @@
+---
+- name: Provision VDI user with dedicated desktops
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    kube_namespace: "vdi"
+    keycloak_realm: "vdi"
+    keycloak_admin_secret_name: "keycloak-auth"
+    guac_db_secret_name: "guacamole-db-auth"
+    guac_permission_template_user: "john"
+
+    vdi_create_personal_desktops: true
+    vdi_personal_desktops_only: true
+    vdi_create_personal_linux_vm: true
+    vdi_create_personal_windows_vm: true
+
+    aws_region: "us-east-1"
+    aws_profile: ""
+    vdi_windows_template_role_tag: "vdi-windows-desktop"
+    vdi_windows_instance_name_prefix: "slothkko-vdi-win"
+
+  pre_tasks:
+    - name: Assert required user inputs
+      ansible.builtin.assert:
+        that:
+          - vdi_username is defined
+          - vdi_username | length > 0
+          - vdi_user_password is defined
+          - vdi_user_password | length > 0
+          - vdi_username is match('^[A-Za-z0-9._-]{3,64}$')
+        fail_msg: "Provide vdi_username and vdi_user_password."
+
+    - name: Resolve effective defaults
+      ansible.builtin.set_fact:
+        vdi_user_first_name_effective: "{{ vdi_user_first_name | default(vdi_username, true) }}"
+        vdi_user_last_name_effective: "{{ vdi_user_last_name | default('User', true) }}"
+        vdi_user_email_effective: "{{ vdi_user_email | default(vdi_username ~ '@slothkko.local', true) }}"
+        vdi_username_safe: >-
+          {{
+            vdi_username
+            | lower
+            | regex_replace('[^a-z0-9-]', '-')
+            | regex_replace('^-+', '')
+            | regex_replace('-+$', '')
+          }}
+        vdi_linux_deployment_name: "vdi-desktop-{{ vdi_username | lower | regex_replace('[^a-z0-9-]', '-') }}"
+        vdi_linux_service_name: "vdi-desktop-{{ vdi_username | lower | regex_replace('[^a-z0-9-]', '-') }}"
+        vdi_linux_secret_name: "vdi-desktop-auth-{{ vdi_username | lower | regex_replace('[^a-z0-9-]', '-') }}"
+        vdi_personal_linux_connection_name: "{{ vdi_username }} Linux Desktop (VNC)"
+        vdi_personal_windows_connection_name: "{{ vdi_username }} Windows Desktop (RDP)"
+        vdi_windows_rdp_username_effective: >-
+          {{
+            vdi_windows_rdp_username
+            | default(('vdi' ~ (vdi_username | regex_replace('[^A-Za-z0-9]', '') | lower))[0:20], true)
+          }}
+        aws_cli_environment: >-
+          {{
+            {'AWS_REGION': aws_region, 'AWS_DEFAULT_REGION': aws_region}
+            | combine((aws_profile | default('') | trim | length > 0) | ternary({'AWS_PROFILE': aws_profile}, {}))
+          }}
+      changed_when: false
+
+    - name: Assert personal desktop passwords
+      ansible.builtin.assert:
+        that:
+          - vdi_linux_vnc_password is defined
+          - vdi_linux_vnc_password | length >= 10
+          - vdi_windows_rdp_password is defined
+          - vdi_windows_rdp_password | length >= 10
+          - vdi_linux_vnc_password is not search("'")
+          - vdi_windows_rdp_password is not search("'")
+        fail_msg: >-
+          With vdi_create_personal_desktops=true set vdi_linux_vnc_password
+          and vdi_windows_rdp_password (no single quotes).
+      when: vdi_create_personal_desktops | bool
+
+  tasks:
+    - name: Get Keycloak pod
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - get
+          - pod
+          - -n
+          - "{{ kube_namespace }}"
+          - -l
+          - app.kubernetes.io/name=keycloak
+          - -o
+          - jsonpath={.items[0].metadata.name}
+      register: keycloak_pod
+      changed_when: false
+
+    - name: Get Keycloak admin secret (username:password b64)
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - get
+          - secret
+          - -n
+          - "{{ kube_namespace }}"
+          - "{{ keycloak_admin_secret_name }}"
+          - -o
+          - jsonpath={.data.admin_username}:{.data.admin_password}
+      register: keycloak_admin_b64
+      changed_when: false
+      no_log: true
+
+    - name: Decode Keycloak admin credentials
+      ansible.builtin.set_fact:
+        keycloak_admin_username: "{{ (keycloak_admin_b64.stdout.split(':')[0]) | b64decode }}"
+        keycloak_admin_password: "{{ (keycloak_admin_b64.stdout.split(':')[1]) | b64decode }}"
+      no_log: true
+
+    - name: Authenticate and upsert Keycloak user
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - exec
+          - -n
+          - "{{ kube_namespace }}"
+          - "{{ keycloak_pod.stdout }}"
+          - --
+          - /bin/sh
+          - -lc
+          - >
+            /opt/keycloak/bin/kcadm.sh config credentials --server http://127.0.0.1:8080/idp --realm master --user '{{ keycloak_admin_username }}' --password '{{ keycloak_admin_password }}' &&
+            USER_ID=$(/opt/keycloak/bin/kcadm.sh get users -r {{ keycloak_realm }} -q username='{{ vdi_username }}' --fields id --format csv --noquotes | tail -n 1) &&
+            if [ -z "$USER_ID" ]; then /opt/keycloak/bin/kcadm.sh create users -r {{ keycloak_realm }} -s username='{{ vdi_username }}' -s enabled=true >/dev/null; USER_ID=$(/opt/keycloak/bin/kcadm.sh get users -r {{ keycloak_realm }} -q username='{{ vdi_username }}' --fields id --format csv --noquotes | tail -n 1); fi &&
+            /opt/keycloak/bin/kcadm.sh update users/$USER_ID -r {{ keycloak_realm }} -s firstName='{{ vdi_user_first_name_effective }}' -s lastName='{{ vdi_user_last_name_effective }}' -s email='{{ vdi_user_email_effective }}' -s emailVerified=true -s enabled=true &&
+            /opt/keycloak/bin/kcadm.sh set-password -r {{ keycloak_realm }} --username '{{ vdi_username }}' --new-password '{{ vdi_user_password }}'
+      register: keycloak_upsert
+      changed_when: true
+      no_log: true
+
+    - name: Get Guacamole DB pod
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - get
+          - pod
+          - -n
+          - "{{ kube_namespace }}"
+          - -l
+          - app.kubernetes.io/name=guacamole-db
+          - -o
+          - jsonpath={.items[0].metadata.name}
+      register: guac_db_pod
+      changed_when: false
+
+    - name: Get Guacamole DB secret (user:pass:db b64)
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - get
+          - secret
+          - -n
+          - "{{ kube_namespace }}"
+          - "{{ guac_db_secret_name }}"
+          - -o
+          - jsonpath={.data.username}:{.data.password}:{.data.database}
+      register: guac_db_b64
+      changed_when: false
+      no_log: true
+
+    - name: Decode Guacamole DB credentials
+      ansible.builtin.set_fact:
+        guac_db_username: "{{ (guac_db_b64.stdout.split(':')[0]) | b64decode }}"
+        guac_db_password: "{{ (guac_db_b64.stdout.split(':')[1]) | b64decode }}"
+        guac_db_name: "{{ (guac_db_b64.stdout.split(':')[2]) | b64decode }}"
+      no_log: true
+
+    - name: Ensure Guacamole entity and local user row exist
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - exec
+          - -n
+          - "{{ kube_namespace }}"
+          - "{{ guac_db_pod.stdout }}"
+          - --
+          - env
+          - "PGPASSWORD={{ guac_db_password }}"
+          - psql
+          - -U
+          - "{{ guac_db_username }}"
+          - -d
+          - "{{ guac_db_name }}"
+          - -v
+          - ON_ERROR_STOP=1
+          - -c
+          - >
+            WITH tpl AS (
+              SELECT u.password_hash, u.password_salt
+              FROM guacamole_user u
+              JOIN guacamole_entity e ON e.entity_id=u.entity_id
+              WHERE e.type='USER' AND e.name='{{ guac_permission_template_user }}'
+              LIMIT 1
+            ),
+            ent AS (
+              INSERT INTO guacamole_entity(name,type)
+              VALUES('{{ vdi_username }}','USER')
+              ON CONFLICT (type,name) DO NOTHING
+              RETURNING entity_id
+            ),
+            ent2 AS (
+              SELECT entity_id FROM ent
+              UNION ALL
+              SELECT entity_id FROM guacamole_entity WHERE type='USER' AND name='{{ vdi_username }}'
+              LIMIT 1
+            )
+            INSERT INTO guacamole_user(entity_id,password_hash,password_salt,password_date,disabled,expired)
+            SELECT ent2.entity_id, tpl.password_hash, tpl.password_salt, CURRENT_TIMESTAMP, FALSE, FALSE
+            FROM ent2, tpl
+            WHERE NOT EXISTS (SELECT 1 FROM guacamole_user u WHERE u.entity_id = ent2.entity_id);
+      register: guac_user_seed
+      changed_when: true
+      no_log: true
+
+    - name: Clone shared connection permissions from template user
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - exec
+          - -n
+          - "{{ kube_namespace }}"
+          - "{{ guac_db_pod.stdout }}"
+          - --
+          - env
+          - "PGPASSWORD={{ guac_db_password }}"
+          - psql
+          - -U
+          - "{{ guac_db_username }}"
+          - -d
+          - "{{ guac_db_name }}"
+          - -v
+          - ON_ERROR_STOP=1
+          - -c
+          - >
+            INSERT INTO guacamole_connection_permission(entity_id,connection_id,permission)
+            SELECT dst.entity_id, p.connection_id, p.permission
+            FROM guacamole_entity dst
+            JOIN guacamole_entity src ON src.type='USER' AND src.name='{{ guac_permission_template_user }}'
+            JOIN guacamole_connection_permission p ON p.entity_id=src.entity_id
+            WHERE dst.type='USER' AND dst.name='{{ vdi_username }}'
+            ON CONFLICT (entity_id,connection_id,permission) DO NOTHING;
+      register: guac_shared_clone
+      changed_when: true
+      no_log: true
+      when: not (vdi_create_personal_desktops | bool)
+
+    - name: Get base Linux desktop image
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - get
+          - deployment
+          - -n
+          - "{{ kube_namespace }}"
+          - vdi-desktop
+          - -o
+          - jsonpath={.spec.template.spec.containers[0].image}
+      register: vdi_linux_image
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_linux_vm | bool
+
+    - name: Apply per-user Linux desktop resources
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - apply
+          - -f
+          - -
+      args:
+        stdin: |
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: {{ vdi_linux_secret_name }}
+            namespace: {{ kube_namespace }}
+          type: Opaque
+          stringData:
+            password: "{{ vdi_linux_vnc_password }}"
+          ---
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: {{ vdi_linux_deployment_name }}
+            namespace: {{ kube_namespace }}
+            labels:
+              app.kubernetes.io/name: {{ vdi_linux_deployment_name }}
+              app.kubernetes.io/part-of: vdi
+              vdi.slothkko.com/user: "{{ vdi_username_safe }}"
+          spec:
+            replicas: 1
+            strategy:
+              type: Recreate
+            selector:
+              matchLabels:
+                app.kubernetes.io/name: {{ vdi_linux_deployment_name }}
+            template:
+              metadata:
+                labels:
+                  app.kubernetes.io/name: {{ vdi_linux_deployment_name }}
+                  app.kubernetes.io/part-of: vdi
+                  vdi.slothkko.com/user: "{{ vdi_username_safe }}"
+              spec:
+                automountServiceAccountToken: false
+                nodeSelector:
+                  workload: vdi
+                tolerations:
+                - key: workload
+                  operator: Equal
+                  value: vdi
+                  effect: NoSchedule
+                containers:
+                - name: desktop
+                  image: {{ vdi_linux_image.stdout }}
+                  imagePullPolicy: IfNotPresent
+                  env:
+                  - name: VNC_PASSWORD
+                    valueFrom:
+                      secretKeyRef:
+                        name: {{ vdi_linux_secret_name }}
+                        key: password
+                  ports:
+                  - name: vnc
+                    containerPort: 5900
+                    protocol: TCP
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: {{ vdi_linux_service_name }}
+            namespace: {{ kube_namespace }}
+          spec:
+            type: ClusterIP
+            selector:
+              app.kubernetes.io/name: {{ vdi_linux_deployment_name }}
+            ports:
+            - name: vnc
+              port: 5900
+              protocol: TCP
+              targetPort: vnc
+      register: vdi_linux_apply
+      changed_when: true
+      no_log: true
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_linux_vm | bool
+
+    - name: Wait for per-user Linux desktop rollout
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - rollout
+          - status
+          - "deployment/{{ vdi_linux_deployment_name }}"
+          - -n
+          - "{{ kube_namespace }}"
+          - --timeout=300s
+      register: vdi_linux_rollout
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_linux_vm | bool
+
+    - name: Find existing per-user Windows instances
+      ansible.builtin.command:
+        argv:
+          - aws
+          - ec2
+          - describe-instances
+          - --region
+          - "{{ aws_region }}"
+          - --filters
+          - "Name=tag:Role,Values=vdi-windows-desktop-user"
+          - "Name=tag:VDIUser,Values={{ vdi_username }}"
+          - "Name=instance-state-name,Values=pending,running,stopping,stopped"
+          - --query
+          - "Reservations[].Instances[].{InstanceId:InstanceId,State:State.Name,PrivateIp:PrivateIpAddress}"
+          - --output
+          - json
+      register: windows_existing
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+      environment: "{{ aws_cli_environment }}"
+
+    - name: Parse existing Windows instances
+      ansible.builtin.set_fact:
+        windows_existing_list: "{{ windows_existing.stdout | default('[]', true) | from_json }}"
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+
+    - name: Select running/pending Windows instances first
+      ansible.builtin.set_fact:
+        windows_existing_running: "{{ windows_existing_list | selectattr('State', 'in', ['running', 'pending']) | list }}"
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+
+    - name: Select existing Windows instance if present
+      ansible.builtin.set_fact:
+        windows_selected_existing: >-
+          {{
+            (windows_existing_running[0])
+            if (windows_existing_running | length > 0)
+            else (windows_existing_list[0] if (windows_existing_list | length > 0) else {})
+          }}
+        vdi_windows_instance_id: "{{ windows_selected_existing.InstanceId | default('') }}"
+        vdi_windows_instance_state: "{{ windows_selected_existing.State | default('') }}"
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+
+    - name: Get Windows template attributes
+      ansible.builtin.command:
+        argv:
+          - aws
+          - ec2
+          - describe-instances
+          - --region
+          - "{{ aws_region }}"
+          - --filters
+          - "Name=tag:Role,Values={{ vdi_windows_template_role_tag }}"
+          - "Name=instance-state-name,Values=running"
+          - --query
+          - "Reservations[].Instances[0].{ImageId:ImageId,InstanceType:InstanceType,SubnetId:SubnetId,SecurityGroupId:SecurityGroups[0].GroupId}"
+          - --output
+          - json
+      register: windows_template
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length == 0
+      environment: "{{ aws_cli_environment }}"
+
+    - name: Parse Windows template attributes
+      ansible.builtin.set_fact:
+        windows_template_list: "{{ windows_template.stdout | default('[]', true) | from_json }}"
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length == 0
+
+    - name: Assert Windows template exists
+      ansible.builtin.assert:
+        that:
+          - windows_template_list | length > 0
+          - windows_template_list[0].ImageId | length > 0
+          - windows_template_list[0].InstanceType | length > 0
+          - windows_template_list[0].SubnetId | length > 0
+          - windows_template_list[0].SecurityGroupId | length > 0
+        fail_msg: "No running Windows template instance found for Role tag {{ vdi_windows_template_role_tag }}."
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length == 0
+
+    - name: Build Windows bootstrap user-data
+      ansible.builtin.set_fact:
+        windows_user_data: |
+          <powershell>
+          $ErrorActionPreference = "Stop"
+          $username = "{{ vdi_windows_rdp_username_effective }}"
+          $password = ConvertTo-SecureString "{{ vdi_windows_rdp_password }}" -AsPlainText -Force
+          $existing = Get-LocalUser -Name $username -ErrorAction SilentlyContinue
+          if ($null -eq $existing) {
+            New-LocalUser -Name $username -Password $password -AccountNeverExpires:$true | Out-Null
+          } else {
+            $existing | Set-LocalUser -Password $password
+          }
+          Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username -ErrorAction SilentlyContinue
+          Add-LocalGroupMember -Group "Administrators" -Member $username -ErrorAction SilentlyContinue
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name fDenyTSConnections -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop" -ErrorAction SilentlyContinue
+          </powershell>
+      changed_when: false
+      no_log: true
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length == 0
+
+    - name: Wait for existing Windows instance to stop when stopping
+      ansible.builtin.command:
+        argv:
+          - aws
+          - ec2
+          - wait
+          - instance-stopped
+          - --region
+          - "{{ aws_region }}"
+          - --instance-ids
+          - "{{ vdi_windows_instance_id }}"
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length > 0
+        - vdi_windows_instance_state == "stopping"
+      environment: "{{ aws_cli_environment }}"
+
+    - name: Start existing Windows instance when stopped
+      ansible.builtin.command:
+        argv:
+          - aws
+          - ec2
+          - start-instances
+          - --region
+          - "{{ aws_region }}"
+          - --instance-ids
+          - "{{ vdi_windows_instance_id }}"
+      changed_when: true
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length > 0
+        - vdi_windows_instance_state in ["stopped", "stopping"]
+      environment: "{{ aws_cli_environment }}"
+
+    - name: Launch per-user Windows instance when missing
+      ansible.builtin.command:
+        argv:
+          - aws
+          - ec2
+          - run-instances
+          - --region
+          - "{{ aws_region }}"
+          - --image-id
+          - "{{ windows_template_list[0].ImageId }}"
+          - --instance-type
+          - "{{ windows_template_list[0].InstanceType }}"
+          - --subnet-id
+          - "{{ windows_template_list[0].SubnetId }}"
+          - --security-group-ids
+          - "{{ windows_template_list[0].SecurityGroupId }}"
+          - --no-associate-public-ip-address
+          - --user-data
+          - "{{ windows_user_data }}"
+          - --tag-specifications
+          - "ResourceType=instance,Tags=[{Key=Name,Value={{ vdi_windows_instance_name_prefix }}-{{ vdi_username_safe }}},{Key=Role,Value=vdi-windows-desktop-user},{Key=VDIUser,Value={{ vdi_username }}},{Key=ManagedBy,Value=ansible}]"
+          - --query
+          - "Instances[0].InstanceId"
+          - --output
+          - text
+      register: windows_launch
+      changed_when: true
+      no_log: true
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length == 0
+      environment: "{{ aws_cli_environment }}"
+
+    - name: Resolve Windows instance ID from launch
+      ansible.builtin.set_fact:
+        vdi_windows_instance_id: "{{ windows_launch.stdout | trim }}"
+        vdi_windows_instance_state: "pending"
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length == 0
+
+    - name: Wait for Windows instance running and healthy
+      ansible.builtin.command:
+        argv:
+          - aws
+          - ec2
+          - wait
+          - "{{ item }}"
+          - --region
+          - "{{ aws_region }}"
+          - --instance-ids
+          - "{{ vdi_windows_instance_id }}"
+      loop:
+        - instance-running
+        - instance-status-ok
+      register: windows_wait
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length > 0
+      environment: "{{ aws_cli_environment }}"
+
+    - name: Resolve Windows private IP
+      ansible.builtin.command:
+        argv:
+          - aws
+          - ec2
+          - describe-instances
+          - --region
+          - "{{ aws_region }}"
+          - --instance-ids
+          - "{{ vdi_windows_instance_id }}"
+          - --query
+          - "Reservations[0].Instances[0].PrivateIpAddress"
+          - --output
+          - text
+      register: vdi_windows_private_ip_cmd
+      changed_when: false
+      when:
+        - vdi_create_personal_desktops | bool
+        - vdi_create_personal_windows_vm | bool
+        - vdi_windows_instance_id | length > 0
+      environment: "{{ aws_cli_environment }}"
+
+    - name: Set personal desktop endpoints
+      ansible.builtin.set_fact:
+        vdi_linux_hostname_effective: "{{ vdi_linux_service_name }}.{{ kube_namespace }}.svc.cluster.local"
+        vdi_windows_private_ip: >-
+          {{
+            (
+              vdi_windows_private_ip_cmd.stdout | trim
+            ) if (vdi_create_personal_windows_vm | bool)
+            else (vdi_windows_private_ip | default(''))
+          }}
+      changed_when: false
+      when: vdi_create_personal_desktops | bool
+
+    - name: Upsert personal Guacamole connections and permissions
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - exec
+          - -n
+          - "{{ kube_namespace }}"
+          - "{{ guac_db_pod.stdout }}"
+          - --
+          - env
+          - "PGPASSWORD={{ guac_db_password }}"
+          - psql
+          - -U
+          - "{{ guac_db_username }}"
+          - -d
+          - "{{ guac_db_name }}"
+          - -v
+          - ON_ERROR_STOP=1
+          - -c
+          - >
+            DO $$
+            DECLARE v_user integer; v_admin integer; v_lid integer; v_wid integer;
+            BEGIN
+              SELECT entity_id INTO v_user FROM guacamole_entity WHERE type='USER' AND name='{{ vdi_username }}' LIMIT 1;
+              SELECT entity_id INTO v_admin FROM guacamole_entity WHERE type='USER' AND name='guacadmin' LIMIT 1;
+              SELECT connection_id INTO v_lid FROM guacamole_connection WHERE connection_name='{{ vdi_personal_linux_connection_name }}' AND parent_id IS NULL LIMIT 1;
+              IF v_lid IS NULL THEN INSERT INTO guacamole_connection(connection_name,parent_id,protocol) VALUES ('{{ vdi_personal_linux_connection_name }}',NULL,'vnc') RETURNING connection_id INTO v_lid; END IF;
+              INSERT INTO guacamole_connection_parameter(connection_id,parameter_name,parameter_value) VALUES
+              (v_lid,'hostname','{{ vdi_linux_hostname_effective }}'),(v_lid,'port','5900'),(v_lid,'password','{{ vdi_linux_vnc_password }}'),(v_lid,'read-only','false'),(v_lid,'cursor','local')
+              ON CONFLICT (connection_id,parameter_name) DO UPDATE SET parameter_value=EXCLUDED.parameter_value;
+              SELECT connection_id INTO v_wid FROM guacamole_connection WHERE connection_name='{{ vdi_personal_windows_connection_name }}' AND parent_id IS NULL LIMIT 1;
+              IF v_wid IS NULL THEN INSERT INTO guacamole_connection(connection_name,parent_id,protocol) VALUES ('{{ vdi_personal_windows_connection_name }}',NULL,'rdp') RETURNING connection_id INTO v_wid; END IF;
+              INSERT INTO guacamole_connection_parameter(connection_id,parameter_name,parameter_value) VALUES
+              (v_wid,'hostname','{{ vdi_windows_private_ip }}'),(v_wid,'port','3389'),(v_wid,'username','{{ vdi_windows_rdp_username_effective }}'),(v_wid,'password','{{ vdi_windows_rdp_password }}'),(v_wid,'security','any'),(v_wid,'ignore-cert','true')
+              ON CONFLICT (connection_id,parameter_name) DO UPDATE SET parameter_value=EXCLUDED.parameter_value;
+              DELETE FROM guacamole_connection_permission WHERE connection_id IN (v_lid,v_wid);
+              INSERT INTO guacamole_connection_permission(entity_id,connection_id,permission) VALUES
+              (v_admin,v_lid,'READ'::guacamole_object_permission_type),(v_admin,v_lid,'UPDATE'::guacamole_object_permission_type),(v_admin,v_lid,'DELETE'::guacamole_object_permission_type),(v_admin,v_lid,'ADMINISTER'::guacamole_object_permission_type),
+              (v_user,v_lid,'READ'::guacamole_object_permission_type),(v_user,v_lid,'UPDATE'::guacamole_object_permission_type),(v_user,v_lid,'DELETE'::guacamole_object_permission_type),(v_user,v_lid,'ADMINISTER'::guacamole_object_permission_type),
+              (v_admin,v_wid,'READ'::guacamole_object_permission_type),(v_admin,v_wid,'UPDATE'::guacamole_object_permission_type),(v_admin,v_wid,'DELETE'::guacamole_object_permission_type),(v_admin,v_wid,'ADMINISTER'::guacamole_object_permission_type),
+              (v_user,v_wid,'READ'::guacamole_object_permission_type),(v_user,v_wid,'UPDATE'::guacamole_object_permission_type),(v_user,v_wid,'DELETE'::guacamole_object_permission_type),(v_user,v_wid,'ADMINISTER'::guacamole_object_permission_type)
+              ON CONFLICT (entity_id,connection_id,permission) DO NOTHING;
+              IF {{ vdi_personal_desktops_only | bool | ternary('TRUE','FALSE') }} THEN
+                DELETE FROM guacamole_connection_permission WHERE entity_id=v_user AND connection_id NOT IN (v_lid,v_wid);
+              END IF;
+            END $$;
+      register: guac_personal_upsert
+      changed_when: true
+      no_log: true
+      when: vdi_create_personal_desktops | bool
+
+    - name: Verify Guacamole permission count
+      ansible.builtin.command:
+        argv:
+          - kubectl
+          - exec
+          - -n
+          - "{{ kube_namespace }}"
+          - "{{ guac_db_pod.stdout }}"
+          - --
+          - env
+          - "PGPASSWORD={{ guac_db_password }}"
+          - psql
+          - -U
+          - "{{ guac_db_username }}"
+          - -d
+          - "{{ guac_db_name }}"
+          - -At
+          - -c
+          - "SELECT COUNT(*) FROM guacamole_connection_permission p JOIN guacamole_entity e ON e.entity_id=p.entity_id WHERE e.type='USER' AND e.name='{{ vdi_username }}';"
+      register: guac_permission_count
+      changed_when: false
+      no_log: true
+
+    - name: Print provisioning summary
+      ansible.builtin.debug:
+        msg:
+          - "Provisioned VDI user: {{ vdi_username }}"
+          - "Personal desktops enabled: {{ vdi_create_personal_desktops | bool }}"
+          - "Linux desktop host: {{ vdi_linux_hostname_effective | default('shared-template') }}"
+          - "Windows desktop host: {{ vdi_windows_private_ip | default('shared-template') }}"
+          - "Windows instance id: {{ vdi_windows_instance_id | default('n/a') }}"
+          - "Guacamole permission rows: {{ guac_permission_count.stdout | trim }}"
